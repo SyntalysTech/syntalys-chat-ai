@@ -1,11 +1,20 @@
 import { ImageResponse } from "next/og";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
-export const runtime = "edge";
 export const alt = "SYNTALYS Chat AI";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OGImage() {
+export default async function OGImage() {
+  const [logoData, iconData] = await Promise.all([
+    readFile(join(process.cwd(), "public/logos/logo-horizontal-white.png")),
+    readFile(join(process.cwd(), "public/logos/logo-icono-solo-white.png")),
+  ]);
+
+  const logoSrc = `data:image/png;base64,${logoData.toString("base64")}`;
+  const iconSrc = `data:image/png;base64,${iconData.toString("base64")}`;
+
   return new ImageResponse(
     (
       <div
@@ -18,49 +27,51 @@ export default function OGImage() {
           justifyContent: "center",
           background: "linear-gradient(135deg, #03366d 0%, #021d3d 50%, #010e1f 100%)",
           fontFamily: "system-ui, sans-serif",
+          position: "relative",
         }}
       >
-        {/* Logo circle */}
-        <div
+        {/* Subtle decorative icon top-right */}
+        <img
+          src={iconSrc}
+          width={180}
+          height={180}
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 100,
-            height: 100,
-            borderRadius: 24,
-            background: "rgba(255,255,255,0.1)",
-            marginBottom: 32,
+            position: "absolute",
+            top: -20,
+            right: -20,
+            opacity: 0.04,
           }}
-        >
-          <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2L2 19h20L12 2z" fill="white" opacity="0.9" />
-            <circle cx="12" cy="14" r="3" fill="#03366d" />
-          </svg>
-        </div>
+        />
 
-        {/* Title */}
+        {/* Main logo */}
+        <img
+          src={logoSrc}
+          width={400}
+          height={92}
+          style={{ marginBottom: 32 }}
+        />
+
+        {/* Divider */}
         <div
           style={{
-            fontSize: 52,
-            fontWeight: 700,
-            color: "white",
-            letterSpacing: "-1px",
-            marginBottom: 12,
+            width: 60,
+            height: 3,
+            background: "rgba(255,255,255,0.2)",
+            borderRadius: 2,
+            marginBottom: 28,
           }}
-        >
-          SYNTALYS Chat AI
-        </div>
+        />
 
         {/* Subtitle */}
         <div
           style={{
-            fontSize: 24,
-            color: "rgba(255,255,255,0.6)",
+            fontSize: 26,
+            color: "rgba(255,255,255,0.55)",
             fontWeight: 400,
+            letterSpacing: "0.5px",
           }}
         >
-          Assistant intelligent — Intelligence artificielle sur mesure
+          Assistant intelligent — IA sur mesure
         </div>
 
         {/* Domain */}
@@ -69,7 +80,8 @@ export default function OGImage() {
             position: "absolute",
             bottom: 40,
             fontSize: 18,
-            color: "rgba(255,255,255,0.35)",
+            color: "rgba(255,255,255,0.3)",
+            letterSpacing: "1px",
           }}
         >
           ai.syntalys.ch
