@@ -34,7 +34,7 @@ export function EmptyState({ isDark, onSuggestionClick }: EmptyStateProps) {
   const { t } = useI18n();
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-4 py-8 sm:py-16">
+    <div className="flex flex-1 flex-col items-center justify-start sm:justify-center overflow-y-auto px-4 py-6 sm:py-16">
       <div className="mb-6 sm:mb-8">
         <Image
           src={

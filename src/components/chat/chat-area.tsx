@@ -26,7 +26,7 @@ export function ChatArea({ onMenuClick, isDark }: ChatAreaProps) {
   }, []);
 
   return (
-    <div className="flex flex-1 flex-col h-screen overflow-hidden">
+    <div className="flex flex-1 flex-col min-h-0 overflow-hidden">
       <ChatHeader onMenuClick={onMenuClick} />
 
       {hasMessages ? (
