@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ai.syntalys.ch"),
   title: "SYNTALYS Chat AI",
   description:
     "Assistant intelligent SYNTALYS - Intelligence artificielle sur mesure",
@@ -26,6 +27,10 @@ export const metadata: Metadata = {
     description:
       "Assistant intelligent SYNTALYS - Intelligence artificielle sur mesure",
     type: "website",
+    siteName: "SYNTALYS Chat AI",
+  },
+  twitter: {
+    card: "summary_large_image",
   },
 };
 

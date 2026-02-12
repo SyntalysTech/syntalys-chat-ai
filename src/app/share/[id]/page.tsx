@@ -30,9 +30,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     .eq("id", id)
     .single();
 
+  const title = data ? `${data.title} - SYNTALYS AI` : "SYNTALYS Chat AI";
   return {
-    title: data ? `${data.title} - SYNTALYS AI` : "SYNTALYS Chat AI",
+    title,
     description: "Conversation partagée via SYNTALYS Chat AI",
+    openGraph: {
+      title,
+      description: "Conversation partagée via SYNTALYS Chat AI",
+      siteName: "SYNTALYS Chat AI",
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+    },
   };
 }
 
