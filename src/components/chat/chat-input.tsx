@@ -23,6 +23,26 @@ const MAX_FILES = 5;
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_DOC_SIZE = 20 * 1024 * 1024; // 20MB
 
+/** Guess MIME from extension when browser reports empty/generic type (common on mobile) */
+function effectiveType(file: File): string {
+  if (file.type && file.type !== "application/octet-stream") return file.type;
+  const ext = file.name.toLowerCase().split(".").pop();
+  const map: Record<string, string> = {
+    pdf: "application/pdf",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    xls: "application/vnd.ms-excel",
+    csv: "text/csv",
+    txt: "text/plain",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    gif: "image/gif",
+    webp: "image/webp",
+  };
+  return (ext && map[ext]) || file.type || "application/octet-stream";
+}
+
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
@@ -56,11 +76,12 @@ async function compressImage(file: File): Promise<string> {
 }
 
 async function processFile(file: File): Promise<FileAttachment> {
-  const isImage = IMAGE_TYPES.includes(file.type) || file.type.startsWith("image/");
+  const mime = effectiveType(file);
+  const isImage = IMAGE_TYPES.includes(mime) || mime.startsWith("image/");
 
   if (isImage) {
     const dataUrl = await compressImage(file);
-    return { name: file.name, type: file.type, size: file.size, dataUrl };
+    return { name: file.name, type: mime, size: file.size, dataUrl };
   }
 
   // Document - send to server for text extraction
@@ -74,7 +95,7 @@ async function processFile(file: File): Promise<FileAttachment> {
   }
 
   const { text } = await res.json();
-  return { name: file.name, type: file.type, size: file.size, extractedText: text };
+  return { name: file.name, type: mime, size: file.size, extractedText: text };
 }
 
 interface ChatInputProps {
@@ -136,7 +157,8 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
       const results: FileAttachment[] = [];
       const errors: string[] = [];
       for (const file of newFiles) {
-        const isImage = IMAGE_TYPES.includes(file.type) || file.type.startsWith("image/");
+        const mime = effectiveType(file);
+        const isImage = IMAGE_TYPES.includes(mime) || mime.startsWith("image/");
         const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_DOC_SIZE;
         if (file.size > maxSize) {
           errors.push(`${file.name}: archivo demasiado grande`);
