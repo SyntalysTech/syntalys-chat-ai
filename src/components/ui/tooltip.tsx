@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, useRef, useCallback, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 interface TooltipProps {
@@ -17,6 +17,7 @@ export function Tooltip({
   className,
 }: TooltipProps) {
   const [visible, setVisible] = useState(false);
+  const hideTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
   const positionClasses = {
     top: "bottom-full left-1/2 -translate-x-1/2 mb-2",
@@ -25,11 +26,29 @@ export function Tooltip({
     left: "right-full top-1/2 -translate-y-1/2 mr-2",
   };
 
+  const show = useCallback(() => {
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    setVisible(true);
+  }, []);
+
+  const hide = useCallback(() => {
+    hideTimer.current = setTimeout(() => setVisible(false), 150);
+  }, []);
+
+  // On touch: show briefly then auto-hide
+  const handleTouch = useCallback(() => {
+    show();
+    hideTimer.current = setTimeout(() => setVisible(false), 1500);
+  }, [show]);
+
   return (
     <div
       className="relative inline-flex"
-      onMouseEnter={() => setVisible(true)}
-      onMouseLeave={() => setVisible(false)}
+      onMouseEnter={show}
+      onMouseLeave={hide}
+      onFocus={show}
+      onBlur={hide}
+      onTouchStart={handleTouch}
     >
       {children}
       {visible && (

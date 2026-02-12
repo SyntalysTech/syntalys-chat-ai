@@ -90,7 +90,7 @@ export function ChatHeader({ onMenuClick }: ChatHeaderProps) {
       <div className="flex items-center gap-2">
         <button
           onClick={onMenuClick}
-          className="rounded-lg p-2 text-muted-foreground hover:bg-accent transition-colors lg:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent active:bg-accent/80 transition-colors lg:hidden"
           aria-label={t("menu") as string}
         >
           <Menu className="h-5 w-5" />

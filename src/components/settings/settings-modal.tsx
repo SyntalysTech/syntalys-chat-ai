@@ -171,7 +171,7 @@ export function SettingsModal({
                 key={loc.id}
                 onClick={() => setLocale(loc.id)}
                 className={cn(
-                  "flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg border py-2 sm:py-2.5 text-xs sm:text-sm font-medium transition-all",
+                  "flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg border py-2.5 text-xs sm:text-sm font-medium transition-all",
                   locale === loc.id
                     ? "border-syntalys-blue bg-syntalys-blue/5 text-syntalys-blue"
                     : "border-border text-muted-foreground hover:border-border hover:bg-accent"
@@ -195,7 +195,7 @@ export function SettingsModal({
                 key={th.id}
                 onClick={() => onThemeChange(th.id)}
                 className={cn(
-                  "flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg border py-2 sm:py-2.5 text-xs sm:text-sm font-medium transition-all",
+                  "flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg border py-2.5 text-xs sm:text-sm font-medium transition-all",
                   theme === th.id
                     ? "border-syntalys-blue bg-syntalys-blue/5 text-syntalys-blue"
                     : "border-border text-muted-foreground hover:border-border hover:bg-accent"

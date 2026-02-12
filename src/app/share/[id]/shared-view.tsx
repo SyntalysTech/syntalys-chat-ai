@@ -50,7 +50,7 @@ function SharedMessage({ message }: { message: SharedMessage }) {
   const displayContent = parsed ? parsed.answer : message.content;
 
   return (
-    <div className={cn("flex gap-3 sm:gap-4 px-4 py-4 sm:py-5", isUser && "flex-row-reverse")}>
+    <div className={cn("flex gap-2.5 sm:gap-4 px-3 sm:px-4 py-3 sm:py-5", isUser && "flex-row-reverse")}>
       <div className="flex-shrink-0 mt-1">
         {isUser ? (
           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-syntalys-blue/10 text-syntalys-blue">
@@ -159,7 +159,7 @@ export function SharedConversationView({ conversation }: { conversation: SharedC
       </div>
 
       {/* Footer CTA */}
-      <div className="fixed bottom-0 inset-x-0 border-t border-border bg-background/90 backdrop-blur-md">
+      <div className="fixed bottom-0 inset-x-0 border-t border-border bg-background/90 backdrop-blur-md pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-3xl flex items-center justify-between px-4 py-3">
           <p className="text-xs text-muted-foreground">SYNTALYS Chat AI</p>
           <a

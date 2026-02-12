@@ -274,10 +274,10 @@ export function Sidebar({
                         </button>
                       )}
                       {editingId !== thread.id && (
-                        <div className="absolute right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="absolute right-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                           <Dropdown
                             trigger={
-                              <button className="rounded p-1 hover:bg-accent">
+                              <button className="rounded-lg p-1.5 hover:bg-accent active:bg-accent/80">
                                 <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
                               </button>
                             }
@@ -515,7 +515,7 @@ export function Sidebar({
       {/* Mobile drawer */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-[280px] transition-transform duration-300 ease-in-out lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-[280px] max-w-[85vw] transition-transform duration-300 ease-in-out lg:hidden",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >

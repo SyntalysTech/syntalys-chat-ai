@@ -97,7 +97,7 @@ export const MessageBubble = memo(function MessageBubble({
   return (
     <div
       className={cn(
-        "group flex gap-3 sm:gap-4 px-4 py-4 sm:py-5 animate-fade-in",
+        "group flex gap-2.5 sm:gap-4 px-3 sm:px-4 py-3 sm:py-5 animate-fade-in",
         isUser && "flex-row-reverse"
       )}
     >
@@ -218,27 +218,27 @@ export const MessageBubble = memo(function MessageBubble({
               </div>
             ) : null}
 
-            {/* Action buttons */}
+            {/* Action buttons — always visible on mobile, hover on desktop */}
             {!isStreaming && message.content && (
-              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity pt-1">
+              <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity pt-1">
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                  className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
                   aria-label={t("copyMessage")}
                 >
                   {copied ? (
-                    <Check className="h-3.5 w-3.5" />
+                    <Check className="h-4 w-4" />
                   ) : (
-                    <Copy className="h-3.5 w-3.5" />
+                    <Copy className="h-4 w-4" />
                   )}
                 </button>
                 {isLast && onRegenerate && (
                   <button
                     onClick={onRegenerate}
-                    className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
                     aria-label={t("regenerate")}
                   >
-                    <RefreshCw className="h-3.5 w-3.5" />
+                    <RefreshCw className="h-4 w-4" />
                   </button>
                 )}
               </div>

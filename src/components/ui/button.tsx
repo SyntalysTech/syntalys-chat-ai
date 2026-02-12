@@ -38,10 +38,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               variant === "link",
           },
           {
-            "h-10 px-4 py-2 text-sm": size === "default",
-            "h-8 px-3 text-xs": size === "sm",
-            "h-11 px-8 text-base": size === "lg",
-            "h-9 w-9 p-0": size === "icon",
+            "h-11 sm:h-10 px-4 py-2 text-sm": size === "default",
+            "h-9 sm:h-8 px-3 text-xs": size === "sm",
+            "h-12 sm:h-11 px-8 text-base": size === "lg",
+            "h-11 w-11 sm:h-9 sm:w-9 p-0": size === "icon",
           },
           className
         )}

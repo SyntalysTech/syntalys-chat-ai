@@ -20,15 +20,18 @@ export function Dropdown({
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
+    function handleClickOutside(e: MouseEvent | TouchEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
     if (open) {
       document.addEventListener("mousedown", handleClickOutside);
-      return () =>
+      document.addEventListener("touchstart", handleClickOutside);
+      return () => {
         document.removeEventListener("mousedown", handleClickOutside);
+        document.removeEventListener("touchstart", handleClickOutside);
+      };
     }
   }, [open]);
 
@@ -68,7 +71,7 @@ export function DropdownItem({
   return (
     <button
       className={cn(
-        "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
+        "flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition-colors",
         destructive
           ? "text-destructive hover:bg-destructive/10"
           : "text-popover-foreground hover:bg-accent",

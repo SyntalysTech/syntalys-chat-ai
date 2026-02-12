@@ -64,8 +64,8 @@ function CodeBlock({
           )}
         </button>
       </div>
-      <pre className="overflow-x-auto bg-[#1a1a2e] p-4 m-0">
-        <code className={`text-[13px] leading-6 font-mono ${className || ""}`} {...props}>
+      <pre className="overflow-x-auto bg-[#1a1a2e] p-3 sm:p-4 m-0 -webkit-overflow-scrolling-touch">
+        <code className={`text-[13px] leading-relaxed font-mono ${className || ""}`} {...props}>
           {children}
         </code>
       </pre>
@@ -87,6 +87,11 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
         rehypePlugins={[rehypeHighlight]}
         components={{
           code: CodeBlock,
+          table: ({ children, ...props }) => (
+            <div className="overflow-x-auto -mx-1">
+              <table {...props}>{children}</table>
+            </div>
+          ),
         }}
       >
         {content}

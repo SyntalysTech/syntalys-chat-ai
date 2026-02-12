@@ -275,9 +275,9 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                     <span className="text-muted-foreground hidden sm:inline">{formatSize(file.size)}</span>
                     <button
                       onClick={() => removeFile(i)}
-                      className="ml-0.5 rounded-full p-0.5 hover:bg-accent transition-colors"
+                      className="ml-0.5 rounded-full p-1 hover:bg-accent active:bg-accent/80 transition-colors"
                     >
-                      <X className="h-3 w-3 text-muted-foreground" />
+                      <X className="h-3.5 w-3.5 text-muted-foreground" />
                     </button>
                   </div>
                 );
@@ -299,7 +299,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={limitReached || files.length >= MAX_FILES || processingFiles}
                 className={cn(
-                  "flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-xl sm:rounded-lg transition-colors",
+                  "flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-xl sm:rounded-lg transition-colors",
                   "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80",
                   (limitReached || files.length >= MAX_FILES) && "opacity-40 cursor-not-allowed"
                 )}
@@ -346,7 +346,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 onClick={handleSubmit}
                 disabled={!hasContent || isStreaming || limitReached || processingFiles}
                 className={cn(
-                  "flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
+                  "flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
                   hasContent && !isStreaming && !limitReached && !processingFiles
                     ? "bg-syntalys-blue text-white hover:bg-syntalys-blue-light active:scale-95 shadow-sm"
                     : "bg-muted text-muted-foreground cursor-not-allowed"

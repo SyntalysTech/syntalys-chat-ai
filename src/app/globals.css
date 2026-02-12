@@ -148,7 +148,7 @@
 
 .prose ul,
 .prose ol {
-  @apply my-2 ml-6;
+  @apply my-2 ml-4 sm:ml-6;
 }
 
 .prose ul {
@@ -171,15 +171,15 @@
 }
 
 .prose h1 {
-  @apply text-2xl;
+  @apply text-xl sm:text-2xl;
 }
 
 .prose h2 {
-  @apply text-xl;
+  @apply text-lg sm:text-xl;
 }
 
 .prose h3 {
-  @apply text-lg;
+  @apply text-base sm:text-lg;
 }
 
 .prose table {
@@ -188,7 +188,7 @@
 
 .prose th,
 .prose td {
-  @apply border border-border px-3 py-2 text-left;
+  @apply border border-border px-2 sm:px-3 py-1.5 sm:py-2 text-left text-sm;
 }
 
 .prose th {
@@ -196,7 +196,7 @@
 }
 
 .prose blockquote {
-  @apply border-l-4 border-syntalys-blue pl-4 my-4 italic text-muted-foreground;
+  @apply border-l-4 border-syntalys-blue pl-3 sm:pl-4 my-4 italic text-muted-foreground;
 }
 
 .prose a {
