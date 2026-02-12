@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useChat } from "@/lib/chat-context";
 import { useI18n } from "@/lib/i18n-context";
 import { getMessagesRemaining } from "@/lib/translations";
-import { ArrowUp, Square, Paperclip, X, FileText, ImageIcon, Loader2 } from "lucide-react";
+import { ArrowUp, Square, Paperclip, X, FileText, ImageIcon, Loader2, AlertCircle } from "lucide-react";
 import type { FileAttachment } from "@/lib/types";
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
@@ -89,6 +89,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
   const [value, setValue] = useState("");
   const [files, setFiles] = useState<FileAttachment[]>([]);
   const [processingFiles, setProcessingFiles] = useState(false);
+  const [fileError, setFileError] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -117,25 +118,42 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
     }
   }, [draft, onDraftConsumed]);
 
+  // Auto-clear file error after 4s
+  useEffect(() => {
+    if (fileError) {
+      const timer = setTimeout(() => setFileError(""), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [fileError]);
+
   const handleFiles = useCallback(async (fileList: FileList | File[]) => {
     const newFiles = Array.from(fileList).slice(0, MAX_FILES - files.length);
     if (newFiles.length === 0) return;
 
+    setFileError("");
     setProcessingFiles(true);
     try {
       const results: FileAttachment[] = [];
+      const errors: string[] = [];
       for (const file of newFiles) {
         const isImage = IMAGE_TYPES.includes(file.type) || file.type.startsWith("image/");
         const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_DOC_SIZE;
-        if (file.size > maxSize) continue;
+        if (file.size > maxSize) {
+          errors.push(`${file.name}: archivo demasiado grande`);
+          continue;
+        }
         try {
           const att = await processFile(file);
           results.push(att);
-        } catch {
-          // Skip failed files silently
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : "Error";
+          errors.push(`${file.name}: ${msg}`);
         }
       }
       setFiles((prev) => [...prev, ...results].slice(0, MAX_FILES));
+      if (errors.length > 0) {
+        setFileError(errors.join(". "));
+      }
     } finally {
       setProcessingFiles(false);
     }
@@ -153,6 +171,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
 
     setValue("");
     setFiles([]);
+    setFileError("");
     if (textareaRef.current) textareaRef.current.style.height = "auto";
 
     await sendMessage(content, attachments);
@@ -191,7 +210,21 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
 
   return (
     <div className="flex-shrink-0 border-t border-border/50 bg-background pb-[env(safe-area-inset-bottom)]">
-      <div className="mx-auto max-w-3xl px-3 sm:px-4 py-2 sm:py-4">
+      <div className="mx-auto max-w-3xl px-3 sm:px-4 py-2 sm:py-3">
+        {/* File error message */}
+        {fileError && (
+          <div className="mb-2 flex items-start gap-2 rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive animate-fade-in">
+            <AlertCircle className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
+            <span className="break-words min-w-0">{fileError}</span>
+            <button
+              onClick={() => setFileError("")}
+              className="ml-auto flex-shrink-0 rounded-full p-0.5 hover:bg-destructive/10 transition-colors"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        )}
+
         <div
           className={cn(
             "relative rounded-2xl border border-border bg-card shadow-sm transition-colors",
@@ -239,18 +272,18 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
           {/* Input row */}
           <div className="flex items-end">
             {/* Attach button */}
-            <div className="flex items-center pl-1.5 sm:pl-2 pb-2">
+            <div className="flex items-center pl-1.5 sm:pl-2 pb-2 sm:pb-2.5">
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={limitReached || files.length >= MAX_FILES || processingFiles}
                 className={cn(
-                  "flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-lg transition-colors",
-                  "text-muted-foreground hover:text-foreground hover:bg-accent",
+                  "flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-xl sm:rounded-lg transition-colors",
+                  "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80",
                   (limitReached || files.length >= MAX_FILES) && "opacity-40 cursor-not-allowed"
                 )}
                 aria-label={t("attachFile") as string}
               >
-                <Paperclip className="h-[18px] w-[18px] sm:h-4 sm:w-4" />
+                <Paperclip className="h-5 w-5 sm:h-4 sm:w-4" />
               </button>
               <input
                 ref={fileInputRef}
@@ -279,21 +312,21 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
               disabled={limitReached}
               rows={1}
               className={cn(
-                "flex-1 resize-none bg-transparent px-2 py-3 text-base sm:text-sm text-foreground placeholder:text-muted-foreground",
+                "flex-1 resize-none bg-transparent px-1.5 sm:px-2 py-3 text-[16px] sm:text-sm text-foreground placeholder:text-muted-foreground",
                 "outline-none",
                 "max-h-[200px]"
               )}
               aria-label="Mensaje"
             />
 
-            <div className="flex items-center gap-1 px-1.5 sm:px-2 pb-2">
+            <div className="flex items-center gap-1 px-1.5 sm:px-2 pb-2 sm:pb-2.5">
               <button
                 onClick={handleSubmit}
                 disabled={!hasContent || isStreaming || limitReached || processingFiles}
                 className={cn(
-                  "flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-lg transition-all duration-150",
+                  "flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
                   hasContent && !isStreaming && !limitReached && !processingFiles
-                    ? "bg-syntalys-blue text-white hover:bg-syntalys-blue-light shadow-sm"
+                    ? "bg-syntalys-blue text-white hover:bg-syntalys-blue-light active:scale-95 shadow-sm"
                     : "bg-muted text-muted-foreground cursor-not-allowed"
                 )}
                 aria-label={isStreaming ? (t("stop") as string) : (t("sendMessage") as string)}
@@ -301,7 +334,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 {isStreaming ? (
                   <Square className="h-3.5 w-3.5" />
                 ) : (
-                  <ArrowUp className="h-[18px] w-[18px] sm:h-4 sm:w-4" />
+                  <ArrowUp className="h-5 w-5 sm:h-4 sm:w-4" />
                 )}
               </button>
             </div>

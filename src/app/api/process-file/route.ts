@@ -22,11 +22,12 @@ export async function POST(req: NextRequest) {
     const ext = file.name.toLowerCase().split(".").pop() || "";
     const mimeType = file.type;
 
-    // PDF
+    // PDF (pdf-parse v2 class-based API)
     if (mimeType === "application/pdf" || ext === "pdf") {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const pdfParse = require("pdf-parse") as (data: Buffer) => Promise<{ text: string }>;
-      const result = await pdfParse(buffer);
+      const { PDFParse } = await import("pdf-parse");
+      const parser = new PDFParse({ data: buffer });
+      const result = await parser.getText();
+      await parser.destroy();
       text = result.text;
     }
     // DOCX

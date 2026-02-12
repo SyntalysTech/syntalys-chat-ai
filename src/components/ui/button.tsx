@@ -20,9 +20,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         className={cn(
-          "inline-flex items-center justify-center rounded-lg font-medium transition-colors duration-150",
+          "inline-flex items-center justify-center rounded-xl sm:rounded-lg font-medium transition-all duration-150",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-          "disabled:pointer-events-none disabled:opacity-50",
+          "disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
           {
             "bg-primary text-primary-foreground hover:bg-syntalys-blue-light shadow-sm":
               variant === "default",

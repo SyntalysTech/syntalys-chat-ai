@@ -71,6 +71,18 @@
     -moz-appearance: none;
     appearance: none;
   }
+
+  /* Improve touch response on mobile */
+  button,
+  a,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Smooth overscroll behavior on mobile */
+  html {
+    overscroll-behavior: none;
+  }
 }
 
 /* Custom scrollbar */

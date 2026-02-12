@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 
@@ -14,6 +14,7 @@ interface ModalProps {
 
 export function Modal({ open, onClose, children, title, className }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -22,6 +23,28 @@ export function Modal({ open, onClose, children, title, className }: ModalProps)
         document.body.style.overflow = "";
       };
     }
+  }, [open]);
+
+  // Track visual viewport for mobile keyboard handling
+  useEffect(() => {
+    if (!open || typeof window === "undefined") return;
+
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    function handleResize() {
+      if (!vv) return;
+      setViewportHeight(vv.height);
+    }
+
+    handleResize();
+    vv.addEventListener("resize", handleResize);
+    vv.addEventListener("scroll", handleResize);
+    return () => {
+      vv.removeEventListener("resize", handleResize);
+      vv.removeEventListener("scroll", handleResize);
+      setViewportHeight(null);
+    };
   }, [open]);
 
   useEffect(() => {
@@ -35,6 +58,12 @@ export function Modal({ open, onClose, children, title, className }: ModalProps)
   }, [open, onClose]);
 
   if (!open) return null;
+
+  // Calculate max height: use visual viewport when keyboard is open, otherwise CSS default
+  const isKeyboardOpen = viewportHeight !== null && typeof window !== "undefined" && viewportHeight < window.innerHeight - 50;
+  const maxHeight = isKeyboardOpen
+    ? `${viewportHeight! - 16}px`
+    : undefined;
 
   return (
     <div
@@ -51,6 +80,7 @@ export function Modal({ open, onClose, children, title, className }: ModalProps)
           "max-h-[92dvh] sm:max-h-[85vh] flex flex-col",
           className
         )}
+        style={maxHeight ? { maxHeight } : undefined}
         role="dialog"
         aria-modal="true"
         aria-label={title}
@@ -67,7 +97,7 @@ export function Modal({ open, onClose, children, title, className }: ModalProps)
             </h2>
             <button
               onClick={onClose}
-              className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+              className="rounded-lg p-2 -mr-1 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
               aria-label="Cerrar"
             >
               <X className="h-5 w-5" />

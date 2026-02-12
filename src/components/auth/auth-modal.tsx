@@ -71,7 +71,6 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
 
   const handleClose = () => {
     onClose();
-    // Delay reset so animation finishes
     setTimeout(resetForm, 200);
   };
 
@@ -84,7 +83,7 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
     ? "/logos/logo-horizontal-white.png"
     : "/logos/logo-horizontal-blue.png";
 
-  // ── Check Email Confirmation Screen ──
+  // Check Email Confirmation Screen
   if (mode === "checkEmail") {
     return (
       <Modal open={open} onClose={handleClose} className="sm:max-w-sm">
@@ -133,7 +132,7 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
     );
   }
 
-  // ── Login / Register Form ──
+  // Login / Register Form
   return (
     <Modal open={open} onClose={handleClose} className="sm:max-w-sm">
       <div className="flex flex-col items-center">
@@ -193,6 +192,7 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
               placeholder="tu@email.com"
               required
               autoComplete="email"
+              inputMode="email"
             />
           </div>
 
@@ -224,7 +224,7 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
           <div className="pt-1">
             <Button
               type="submit"
-              className="w-full"
+              className="w-full h-11 sm:h-10"
               disabled={loading}
             >
               {loading ? (
