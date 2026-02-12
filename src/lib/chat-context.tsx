@@ -268,7 +268,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
         // If there's document context, prepend it to the last user message
         const lastContent = docContext
-          ? `${content}\n\n[Documents joints]${docContext}`
+          ? `${content}\n\n[Attached documents]${docContext}`
           : content;
 
         const historyForApi: StreamMessage[] = [
