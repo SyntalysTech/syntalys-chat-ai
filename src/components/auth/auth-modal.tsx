@@ -87,7 +87,7 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
   // ── Check Email Confirmation Screen ──
   if (mode === "checkEmail") {
     return (
-      <Modal open={open} onClose={handleClose} className="max-w-sm">
+      <Modal open={open} onClose={handleClose} className="sm:max-w-sm">
         <div className="flex flex-col items-center text-center">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-syntalys-blue/10">
             <Mail className="h-7 w-7 text-syntalys-blue" />
@@ -101,12 +101,12 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
             {t("checkEmailDesc")}
           </p>
 
-          <p className="mb-6 text-sm font-medium text-foreground">
+          <p className="mb-5 text-sm font-medium text-foreground break-all">
             {email}
           </p>
 
-          <div className="w-full rounded-lg bg-muted/50 p-3 mb-6">
-            <p className="text-xs text-muted-foreground">
+          <div className="w-full rounded-lg bg-muted/50 p-3 mb-5">
+            <p className="text-xs text-muted-foreground leading-relaxed">
               {t("checkEmailHint")}
             </p>
           </div>
@@ -123,7 +123,7 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
               setMode("login");
               setError("");
             }}
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             {t("backToLogin")}
@@ -135,27 +135,27 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
 
   // ── Login / Register Form ──
   return (
-    <Modal open={open} onClose={handleClose} className="max-w-sm">
+    <Modal open={open} onClose={handleClose} className="sm:max-w-sm">
       <div className="flex flex-col items-center">
         <Image
           src={logoSrc}
           alt="SYNTALYS"
-          width={160}
-          height={40}
-          className="mb-6 h-10 w-auto"
+          width={140}
+          height={35}
+          className="mb-5 sm:mb-6 h-8 sm:h-10 w-auto"
         />
 
-        <h2 className="mb-1 text-lg font-semibold text-card-foreground">
+        <h2 className="mb-1 text-base sm:text-lg font-semibold text-card-foreground">
           {mode === "login" ? t("welcomeBack") : t("createAccount")}
         </h2>
-        <p className="mb-6 text-sm text-muted-foreground">
+        <p className="mb-5 sm:mb-6 text-sm text-muted-foreground text-center">
           {mode === "login" ? t("signInSubtitle") : t("registerSubtitle")}
         </p>
 
         {error && (
-          <div className="mb-4 flex w-full items-center gap-2 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <div className="mb-4 flex w-full items-center gap-2 rounded-lg bg-destructive/10 px-3 py-2.5 text-sm text-destructive">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
-            {error}
+            <span className="break-words min-w-0">{error}</span>
           </div>
         )}
 
@@ -164,7 +164,7 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
             <div>
               <label
                 htmlFor="displayName"
-                className="mb-1 block text-sm font-medium text-card-foreground"
+                className="mb-1.5 block text-sm font-medium text-card-foreground"
               >
                 {t("nameOptional")}
               </label>
@@ -181,7 +181,7 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
           <div>
             <label
               htmlFor="email"
-              className="mb-1 block text-sm font-medium text-card-foreground"
+              className="mb-1.5 block text-sm font-medium text-card-foreground"
             >
               {t("email")}
             </label>
@@ -199,7 +199,7 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
           <div>
             <label
               htmlFor="password"
-              className="mb-1 block text-sm font-medium text-card-foreground"
+              className="mb-1.5 block text-sm font-medium text-card-foreground"
             >
               {t("password")}
             </label>
@@ -221,19 +221,21 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
             />
           </div>
 
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={loading}
-          >
-            {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : mode === "login" ? (
-              t("signIn")
-            ) : (
-              t("createAccount")
-            )}
-          </Button>
+          <div className="pt-1">
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : mode === "login" ? (
+                t("signIn")
+              ) : (
+                t("createAccount")
+              )}
+            </Button>
+          </div>
         </form>
 
         <div className="mt-4 w-full border-t border-border pt-4">

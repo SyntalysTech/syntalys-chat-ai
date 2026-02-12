@@ -11,7 +11,7 @@ const Input = forwardRef<
     <input
       type={type}
       className={cn(
-        "flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm",
+        "flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-base sm:text-sm",
         "placeholder:text-muted-foreground",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
         "disabled:cursor-not-allowed disabled:opacity-50",

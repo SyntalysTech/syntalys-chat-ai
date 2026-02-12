@@ -65,7 +65,7 @@ export function ModelSelector() {
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-1 w-[280px] rounded-xl border border-border bg-popover p-2 shadow-xl animate-fade-in">
+        <div className="absolute left-0 top-full z-50 mt-1 w-[calc(100vw-2rem)] sm:w-[280px] max-w-[280px] rounded-xl border border-border bg-popover p-1.5 sm:p-2 shadow-xl animate-fade-in">
           {availableModels.map((model) => {
             const ModelIcon = modelIcons[model.id] || Zap;
             const isSelected = model.id === selectedModel;

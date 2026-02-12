@@ -127,29 +127,29 @@ export const MessageBubble = memo(function MessageBubble({
         )}
       >
         {isUser ? (
-          <div className="inline-block max-w-[85%]">
+          <div className="inline-block max-w-[90%] sm:max-w-[85%]">
             {message.attachments && message.attachments.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mb-1.5 justify-end">
+              <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-1.5 justify-end">
                 {message.attachments.map((att, i) => {
                   const isImg = att.type.startsWith("image/");
                   return (
                     <div
                       key={i}
-                      className="flex items-center gap-1.5 rounded-lg bg-syntalys-blue/80 px-2.5 py-1.5 text-xs text-white/90"
+                      className="flex items-center gap-1 sm:gap-1.5 rounded-lg bg-syntalys-blue/80 px-2 sm:px-2.5 py-1 sm:py-1.5 text-[11px] sm:text-xs text-white/90"
                     >
                       {isImg ? (
-                        <ImageIcon className="h-3.5 w-3.5 flex-shrink-0" />
+                        <ImageIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
                       ) : (
-                        <FileText className="h-3.5 w-3.5 flex-shrink-0" />
+                        <FileText className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
                       )}
-                      <span className="max-w-[100px] truncate">{att.name}</span>
-                      <span className="text-white/60">{formatSize(att.size)}</span>
+                      <span className="max-w-[80px] sm:max-w-[100px] truncate">{att.name}</span>
+                      <span className="text-white/60 hidden sm:inline">{formatSize(att.size)}</span>
                     </div>
                   );
                 })}
               </div>
             )}
-            <div className="rounded-2xl rounded-tr-sm bg-syntalys-blue px-4 py-2.5 text-white">
+            <div className="rounded-2xl rounded-tr-sm bg-syntalys-blue px-3.5 sm:px-4 py-2 sm:py-2.5 text-white">
               <p className="whitespace-pre-wrap text-sm leading-relaxed break-words">
                 {message.content}
               </p>

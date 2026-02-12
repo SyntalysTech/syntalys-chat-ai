@@ -159,7 +159,7 @@ export function SettingsModal({
 
   return (
     <Modal open={open} onClose={onClose} title={t("settings") as string}>
-      <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-1">
+      <div className="space-y-5 sm:space-y-6">
         {/* Language */}
         <div>
           <h3 className="mb-3 text-sm font-medium text-card-foreground">
@@ -171,7 +171,7 @@ export function SettingsModal({
                 key={loc.id}
                 onClick={() => setLocale(loc.id)}
                 className={cn(
-                  "flex flex-1 items-center justify-center gap-2 rounded-lg border py-2.5 text-sm font-medium transition-all",
+                  "flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg border py-2 sm:py-2.5 text-xs sm:text-sm font-medium transition-all",
                   locale === loc.id
                     ? "border-syntalys-blue bg-syntalys-blue/5 text-syntalys-blue"
                     : "border-border text-muted-foreground hover:border-border hover:bg-accent"
@@ -195,7 +195,7 @@ export function SettingsModal({
                 key={th.id}
                 onClick={() => onThemeChange(th.id)}
                 className={cn(
-                  "flex flex-1 items-center justify-center gap-2 rounded-lg border py-2.5 text-sm font-medium transition-all",
+                  "flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg border py-2 sm:py-2.5 text-xs sm:text-sm font-medium transition-all",
                   theme === th.id
                     ? "border-syntalys-blue bg-syntalys-blue/5 text-syntalys-blue"
                     : "border-border text-muted-foreground hover:border-border hover:bg-accent"
@@ -332,18 +332,18 @@ export function SettingsModal({
                 {!showDeleteChats ? (
                   <button
                     onClick={() => setShowDeleteChats(true)}
-                    className="flex w-full items-center gap-2 rounded-lg border border-border px-4 py-3 text-left text-sm text-card-foreground hover:border-destructive/40 hover:bg-destructive/5 transition-all"
+                    className="flex w-full items-center gap-2.5 rounded-lg border border-border px-3 sm:px-4 py-3 text-left text-sm text-card-foreground hover:border-destructive/40 hover:bg-destructive/5 transition-all"
                   >
-                    <Trash2 className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">{t("deleteAllChats")}</p>
-                      <p className="text-xs text-muted-foreground">
+                    <Trash2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="font-medium text-xs sm:text-sm">{t("deleteAllChats")}</p>
+                      <p className="text-[11px] sm:text-xs text-muted-foreground">
                         {t("deleteAllChatsDesc")}
                       </p>
                     </div>
                   </button>
                 ) : (
-                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 space-y-3">
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 sm:p-4 space-y-3">
                     <p className="text-sm text-card-foreground">
                       {t("deleteAllChatsConfirm")}
                     </p>
@@ -374,20 +374,20 @@ export function SettingsModal({
                 {!showDeleteAccount ? (
                   <button
                     onClick={() => setShowDeleteAccount(true)}
-                    className="flex w-full items-center gap-2 rounded-lg border border-border px-4 py-3 text-left text-sm text-card-foreground hover:border-destructive/40 hover:bg-destructive/5 transition-all"
+                    className="flex w-full items-center gap-2.5 rounded-lg border border-border px-3 sm:px-4 py-3 text-left text-sm text-card-foreground hover:border-destructive/40 hover:bg-destructive/5 transition-all"
                   >
-                    <AlertTriangle className="h-4 w-4 text-destructive" />
-                    <div>
-                      <p className="font-medium text-destructive">
+                    <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="font-medium text-destructive text-xs sm:text-sm">
                         {t("deleteAccount")}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-[11px] sm:text-xs text-muted-foreground">
                         {t("deleteAccountDesc")}
                       </p>
                     </div>
                   </button>
                 ) : (
-                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 space-y-3">
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 sm:p-4 space-y-3">
                     <p className="text-sm text-card-foreground">
                       {t("deleteAccountConfirm")}
                     </p>

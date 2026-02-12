@@ -203,21 +203,21 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
         >
           {/* File previews */}
           {files.length > 0 && (
-            <div className="flex flex-wrap gap-2 px-3 pt-3">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 px-2.5 sm:px-3 pt-2.5 sm:pt-3">
               {files.map((file, i) => {
                 const isImage = file.type.startsWith("image/");
                 return (
                   <div
                     key={i}
-                    className="flex items-center gap-2 rounded-lg bg-muted/60 px-2.5 py-1.5 text-xs"
+                    className="flex items-center gap-1.5 sm:gap-2 rounded-lg bg-muted/60 px-2 sm:px-2.5 py-1 sm:py-1.5 text-[11px] sm:text-xs"
                   >
                     {isImage ? (
-                      <ImageIcon className="h-3.5 w-3.5 text-syntalys-blue flex-shrink-0" />
+                      <ImageIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-syntalys-blue flex-shrink-0" />
                     ) : (
-                      <FileText className="h-3.5 w-3.5 text-syntalys-blue flex-shrink-0" />
+                      <FileText className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-syntalys-blue flex-shrink-0" />
                     )}
-                    <span className="max-w-[120px] truncate text-card-foreground">{file.name}</span>
-                    <span className="text-muted-foreground">{formatSize(file.size)}</span>
+                    <span className="max-w-[80px] sm:max-w-[120px] truncate text-card-foreground">{file.name}</span>
+                    <span className="text-muted-foreground hidden sm:inline">{formatSize(file.size)}</span>
                     <button
                       onClick={() => removeFile(i)}
                       className="ml-0.5 rounded-full p-0.5 hover:bg-accent transition-colors"
@@ -239,18 +239,18 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
           {/* Input row */}
           <div className="flex items-end">
             {/* Attach button */}
-            <div className="flex items-center pl-2 pb-2">
+            <div className="flex items-center pl-1.5 sm:pl-2 pb-2">
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={limitReached || files.length >= MAX_FILES || processingFiles}
                 className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
+                  "flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-lg transition-colors",
                   "text-muted-foreground hover:text-foreground hover:bg-accent",
                   (limitReached || files.length >= MAX_FILES) && "opacity-40 cursor-not-allowed"
                 )}
                 aria-label={t("attachFile") as string}
               >
-                <Paperclip className="h-4 w-4" />
+                <Paperclip className="h-[18px] w-[18px] sm:h-4 sm:w-4" />
               </button>
               <input
                 ref={fileInputRef}
@@ -279,19 +279,19 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
               disabled={limitReached}
               rows={1}
               className={cn(
-                "flex-1 resize-none bg-transparent px-2 py-3 text-sm text-foreground placeholder:text-muted-foreground",
+                "flex-1 resize-none bg-transparent px-2 py-3 text-base sm:text-sm text-foreground placeholder:text-muted-foreground",
                 "outline-none",
                 "max-h-[200px]"
               )}
               aria-label="Mensaje"
             />
 
-            <div className="flex items-center gap-1 px-2 pb-2">
+            <div className="flex items-center gap-1 px-1.5 sm:px-2 pb-2">
               <button
                 onClick={handleSubmit}
                 disabled={!hasContent || isStreaming || limitReached || processingFiles}
                 className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150",
+                  "flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-lg transition-all duration-150",
                   hasContent && !isStreaming && !limitReached && !processingFiles
                     ? "bg-syntalys-blue text-white hover:bg-syntalys-blue-light shadow-sm"
                     : "bg-muted text-muted-foreground cursor-not-allowed"
@@ -301,7 +301,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 {isStreaming ? (
                   <Square className="h-3.5 w-3.5" />
                 ) : (
-                  <ArrowUp className="h-4 w-4" />
+                  <ArrowUp className="h-[18px] w-[18px] sm:h-4 sm:w-4" />
                 )}
               </button>
             </div>

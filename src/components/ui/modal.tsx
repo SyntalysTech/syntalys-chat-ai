@@ -46,13 +46,20 @@ export function Modal({ open, onClose, children, title, className }: ModalProps)
     >
       <div
         className={cn(
-          "w-full max-w-md rounded-t-xl sm:rounded-xl bg-card border border-border shadow-2xl animate-fade-in max-h-[90dvh] sm:max-h-[85vh] flex flex-col",
+          "w-full sm:max-w-md rounded-t-2xl sm:rounded-xl bg-card border border-border shadow-2xl",
+          "animate-slide-up sm:animate-fade-in",
+          "max-h-[92dvh] sm:max-h-[85vh] flex flex-col",
           className
         )}
         role="dialog"
         aria-modal="true"
         aria-label={title}
       >
+        {/* Drag handle for mobile */}
+        <div className="flex justify-center pt-2 pb-0 sm:hidden flex-shrink-0">
+          <div className="h-1 w-10 rounded-full bg-border" />
+        </div>
+
         {title && (
           <div className="flex items-center justify-between border-b border-border px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
             <h2 className="text-base sm:text-lg font-semibold text-card-foreground">
@@ -60,14 +67,14 @@ export function Modal({ open, onClose, children, title, className }: ModalProps)
             </h2>
             <button
               onClick={onClose}
-              className="rounded-lg p-1 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+              className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
               aria-label="Cerrar"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
         )}
-        <div className="p-4 sm:p-6 overflow-y-auto min-h-0">{children}</div>
+        <div className="p-4 sm:p-6 overflow-y-auto min-h-0 overscroll-contain">{children}</div>
       </div>
     </div>
   );
