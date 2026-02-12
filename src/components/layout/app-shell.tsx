@@ -9,6 +9,10 @@ import { Sidebar } from "./sidebar";
 import { ChatArea } from "@/components/chat/chat-area";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { SettingsModal } from "@/components/settings/settings-modal";
+import { ExploreModal } from "@/components/pages/explore-modal";
+import { DocumentationModal } from "@/components/pages/documentation-modal";
+import { SupportModal } from "@/components/pages/support-modal";
+import { LegalModal } from "@/components/pages/legal-modal";
 
 export function AppShell() {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -20,6 +24,10 @@ export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [exploreOpen, setExploreOpen] = useState(false);
+  const [documentationOpen, setDocumentationOpen] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
+  const [legalOpen, setLegalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [authTimedOut, setAuthTimedOut] = useState(false);
 
@@ -74,6 +82,10 @@ export function AppShell() {
         onMobileClose={() => setMobileOpen(false)}
         onOpenSettings={() => setSettingsOpen(true)}
         onOpenAuth={() => setAuthOpen(true)}
+        onOpenExplore={() => setExploreOpen(true)}
+        onOpenDocumentation={() => setDocumentationOpen(true)}
+        onOpenSupport={() => setSupportOpen(true)}
+        onOpenLegal={() => setLegalOpen(true)}
         isDark={isDark}
       />
 
@@ -93,6 +105,34 @@ export function AppShell() {
         onClose={() => setSettingsOpen(false)}
         theme={theme || "system"}
         onThemeChange={handleThemeChange}
+      />
+
+      <ExploreModal
+        open={exploreOpen}
+        onClose={() => setExploreOpen(false)}
+        onOpenAuth={() => {
+          setExploreOpen(false);
+          setAuthOpen(true);
+        }}
+      />
+
+      <DocumentationModal
+        open={documentationOpen}
+        onClose={() => setDocumentationOpen(false)}
+      />
+
+      <SupportModal
+        open={supportOpen}
+        onClose={() => setSupportOpen(false)}
+        onOpenDocumentation={() => {
+          setSupportOpen(false);
+          setDocumentationOpen(true);
+        }}
+      />
+
+      <LegalModal
+        open={legalOpen}
+        onClose={() => setLegalOpen(false)}
       />
     </div>
   );

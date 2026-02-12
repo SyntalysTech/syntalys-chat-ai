@@ -35,6 +35,10 @@ interface SidebarProps {
   onMobileClose: () => void;
   onOpenSettings: () => void;
   onOpenAuth: () => void;
+  onOpenExplore: () => void;
+  onOpenDocumentation: () => void;
+  onOpenSupport: () => void;
+  onOpenLegal: () => void;
   isDark: boolean;
 }
 
@@ -65,6 +69,10 @@ export function Sidebar({
   onMobileClose,
   onOpenSettings,
   onOpenAuth,
+  onOpenExplore,
+  onOpenDocumentation,
+  onOpenSupport,
+  onOpenLegal,
   isDark,
 }: SidebarProps) {
   const { user, signOut } = useAuth();
@@ -115,10 +123,10 @@ export function Sidebar({
     : "/logos/logo-icono-solo-blue.png";
 
   const navLinks = [
-    { icon: Compass, labelKey: "explore" as const },
-    { icon: BookOpen, labelKey: "documentation" as const },
-    { icon: HelpCircle, labelKey: "support" as const },
-    { icon: Scale, labelKey: "legal" as const },
+    { icon: Compass, labelKey: "explore" as const, onClick: onOpenExplore },
+    { icon: BookOpen, labelKey: "documentation" as const, onClick: onOpenDocumentation },
+    { icon: HelpCircle, labelKey: "support" as const, onClick: onOpenSupport },
+    { icon: Scale, labelKey: "legal" as const, onClick: onOpenLegal },
   ];
 
   // Common transition class for text that fades in/out
@@ -337,6 +345,10 @@ export function Sidebar({
             label={t(link.labelKey)}
           >
             <button
+              onClick={() => {
+                link.onClick();
+                onMobileClose();
+              }}
               className={cn(
                 "flex items-center rounded-lg transition-all duration-300",
                 "text-muted-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground",

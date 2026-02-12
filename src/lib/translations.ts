@@ -239,6 +239,16 @@ const translations = {
     es: "Compartir",
     en: "Share",
   },
+  shareCopied: {
+    fr: "Lien copié !",
+    es: "Enlace copiado!",
+    en: "Link copied!",
+  },
+  shareError: {
+    fr: "Erreur lors du partage",
+    es: "Error al compartir",
+    en: "Error sharing",
+  },
 
   // ── Auth Modal ──
   welcomeBack: {
@@ -449,6 +459,369 @@ const translations = {
     fr: "Désolé, une erreur s'est produite. Veuillez réessayer.",
     es: "Lo siento, ha ocurrido un error. Por favor, intenta de nuevo.",
     en: "Sorry, an error occurred. Please try again.",
+  },
+
+  // ── Explore Page ──
+  exploreTitle: {
+    fr: "Explorer SYNTALYS AI",
+    es: "Explorar SYNTALYS AI",
+    en: "Explore SYNTALYS AI",
+  },
+  exploreSubtitle: {
+    fr: "Découvrez les capacités de votre assistant intelligent",
+    es: "Descubre las capacidades de tu asistente inteligente",
+    en: "Discover the capabilities of your intelligent assistant",
+  },
+  exploreModelsTitle: {
+    fr: "Modèles disponibles",
+    es: "Modelos disponibles",
+    en: "Available models",
+  },
+  exploreTryNow: {
+    fr: "Essayer",
+    es: "Probar",
+    en: "Try now",
+  },
+  exploreRequiresAuth: {
+    fr: "Compte requis",
+    es: "Cuenta requerida",
+    en: "Account required",
+  },
+  exploreUseCasesTitle: {
+    fr: "Que pouvez-vous faire ?",
+    es: "Que puedes hacer?",
+    en: "What can you do?",
+  },
+  exploreUseCase1: {
+    fr: "Rédiger des emails professionnels",
+    es: "Redactar emails profesionales",
+    en: "Draft professional emails",
+  },
+  exploreUseCase1Desc: {
+    fr: "Créez des emails clairs et structurés pour toute situation professionnelle.",
+    es: "Crea emails claros y estructurados para cualquier situacion profesional.",
+    en: "Create clear, structured emails for any professional situation.",
+  },
+  exploreUseCase2: {
+    fr: "Résumer des documents",
+    es: "Resumir documentos",
+    en: "Summarize documents",
+  },
+  exploreUseCase2Desc: {
+    fr: "Obtenez l'essentiel d'un texte long en quelques secondes.",
+    es: "Obtén lo esencial de un texto largo en segundos.",
+    en: "Get the essence of a long text in seconds.",
+  },
+  exploreUseCase3: {
+    fr: "Écrire et expliquer du code",
+    es: "Escribir y explicar codigo",
+    en: "Write and explain code",
+  },
+  exploreUseCase3Desc: {
+    fr: "Générez, déboguez et comprenez du code dans de nombreux langages.",
+    es: "Genera, depura y comprende codigo en multiples lenguajes.",
+    en: "Generate, debug and understand code in many languages.",
+  },
+  exploreUseCase4: {
+    fr: "Traduire du contenu",
+    es: "Traducir contenido",
+    en: "Translate content",
+  },
+  exploreUseCase4Desc: {
+    fr: "Traduisez des textes entre le français, l'espagnol, l'anglais et plus.",
+    es: "Traduce textos entre frances, espanol, ingles y mas.",
+    en: "Translate text between French, Spanish, English and more.",
+  },
+  exploreUseCase5: {
+    fr: "Analyser et brainstormer",
+    es: "Analizar y generar ideas",
+    en: "Analyze and brainstorm",
+  },
+  exploreUseCase5Desc: {
+    fr: "Explorez des idées, analysez des données et générez des solutions créatives.",
+    es: "Explora ideas, analiza datos y genera soluciones creativas.",
+    en: "Explore ideas, analyze data and generate creative solutions.",
+  },
+  exploreUseCase6: {
+    fr: "Aide à l'apprentissage",
+    es: "Ayuda al aprendizaje",
+    en: "Learning assistance",
+  },
+  exploreUseCase6Desc: {
+    fr: "Comprenez des concepts complexes avec des explications claires et adaptées.",
+    es: "Comprende conceptos complejos con explicaciones claras y adaptadas.",
+    en: "Understand complex concepts with clear, adapted explanations.",
+  },
+
+  // ── Documentation Page ──
+  docTitle: {
+    fr: "Documentation",
+    es: "Documentacion",
+    en: "Documentation",
+  },
+  docSubtitle: {
+    fr: "Guide complet pour utiliser SYNTALYS Chat AI",
+    es: "Guia completa para usar SYNTALYS Chat AI",
+    en: "Complete guide for using SYNTALYS Chat AI",
+  },
+  docGettingStarted: {
+    fr: "Démarrage rapide",
+    es: "Inicio rapido",
+    en: "Getting started",
+  },
+  docGettingStartedContent: {
+    fr: "Créez un compte ou utilisez le mode anonyme pour commencer à discuter avec SYNTALYS AI. Tapez votre message dans la zone de saisie et appuyez sur Entrée pour envoyer.",
+    es: "Crea una cuenta o usa el modo anonimo para empezar a chatear con SYNTALYS AI. Escribe tu mensaje en el campo de texto y presiona Enter para enviar.",
+    en: "Create an account or use anonymous mode to start chatting with SYNTALYS AI. Type your message in the input field and press Enter to send.",
+  },
+  docModels: {
+    fr: "Les modèles",
+    es: "Los modelos",
+    en: "Models",
+  },
+  docModelsContent: {
+    fr: "SYNTALYS AI propose trois modèles adaptés à vos besoins :",
+    es: "SYNTALYS AI ofrece tres modelos adaptados a tus necesidades:",
+    en: "SYNTALYS AI offers three models adapted to your needs:",
+  },
+  docModelBase: {
+    fr: "Rapide et efficace pour les tâches quotidiennes. Disponible pour tous les utilisateurs.",
+    es: "Rapido y eficiente para tareas diarias. Disponible para todos los usuarios.",
+    en: "Fast and efficient for daily tasks. Available to all users.",
+  },
+  docModelReasoning: {
+    fr: "Affiche son raisonnement étape par étape avant de répondre. Idéal pour les problèmes complexes. Nécessite un compte.",
+    es: "Muestra su razonamiento paso a paso antes de responder. Ideal para problemas complejos. Requiere cuenta.",
+    en: "Shows step-by-step reasoning before answering. Ideal for complex problems. Requires an account.",
+  },
+  docModelBeta: {
+    fr: "Dernière version avec des capacités étendues en créativité, code et analyse. Nécessite un compte.",
+    es: "Ultima version con capacidades ampliadas en creatividad, codigo y analisis. Requiere cuenta.",
+    en: "Latest version with expanded capabilities in creativity, code and analysis. Requires an account.",
+  },
+  docConversations: {
+    fr: "Gestion des conversations",
+    es: "Gestion de conversaciones",
+    en: "Conversation management",
+  },
+  docConversationsContent: {
+    fr: "Vos conversations sont organisées dans la barre latérale par date (aujourd'hui, hier, 7 derniers jours, plus ancien). Vous pouvez renommer ou supprimer une conversation via le menu contextuel. Cliquez sur « Nouveau chat » pour démarrer une nouvelle conversation.",
+    es: "Tus conversaciones se organizan en la barra lateral por fecha (hoy, ayer, ultimos 7 dias, anterior). Puedes renombrar o eliminar una conversacion desde el menu contextual. Haz clic en « Nuevo chat » para iniciar una nueva conversacion.",
+    en: "Your conversations are organized in the sidebar by date (today, yesterday, last 7 days, older). You can rename or delete a conversation from the context menu. Click \"New chat\" to start a new conversation.",
+  },
+  docAnonymous: {
+    fr: "Mode anonyme vs. Compte",
+    es: "Modo anonimo vs. Cuenta",
+    en: "Anonymous mode vs. Account",
+  },
+  docAnonymousContent: {
+    fr: "En mode anonyme, vous avez accès au modèle SYNT A 1.0 avec une limite de 20 messages par jour. Vos conversations sont stockées localement dans votre navigateur. Avec un compte, vous accédez à tous les modèles, sans limite de messages, et vos conversations sont synchronisées dans le cloud.",
+    es: "En modo anonimo, tienes acceso al modelo SYNT A 1.0 con un limite de 20 mensajes por dia. Tus conversaciones se guardan localmente en tu navegador. Con una cuenta, accedes a todos los modelos, sin limite de mensajes, y tus conversaciones se sincronizan en la nube.",
+    en: "In anonymous mode, you have access to the SYNT A 1.0 model with a limit of 20 messages per day. Your conversations are stored locally in your browser. With an account, you access all models, with no message limit, and your conversations are synced to the cloud.",
+  },
+  docSettings: {
+    fr: "Paramètres",
+    es: "Ajustes",
+    en: "Settings",
+  },
+  docSettingsContent: {
+    fr: "Personnalisez votre expérience : choisissez le thème (clair, sombre ou système), la langue (français, espagnol, anglais), votre nom d'affichage et votre modèle par défaut. Les paramètres sont accessibles depuis l'icône dans la barre latérale.",
+    es: "Personaliza tu experiencia: elige el tema (claro, oscuro o sistema), el idioma (frances, espanol, ingles), tu nombre para mostrar y tu modelo por defecto. Los ajustes se encuentran en el icono de la barra lateral.",
+    en: "Customize your experience: choose the theme (light, dark or system), language (French, Spanish, English), your display name and default model. Settings are accessible from the icon in the sidebar.",
+  },
+  docShortcuts: {
+    fr: "Raccourcis clavier",
+    es: "Atajos de teclado",
+    en: "Keyboard shortcuts",
+  },
+  docShortcutsContent: {
+    fr: "Entrée : envoyer le message | Maj + Entrée : saut de ligne",
+    es: "Enter: enviar mensaje | Shift + Enter: salto de linea",
+    en: "Enter: send message | Shift + Enter: new line",
+  },
+  docFaqTitle: {
+    fr: "Questions fréquentes",
+    es: "Preguntas frecuentes",
+    en: "FAQ",
+  },
+  docFaq1Q: {
+    fr: "Où sont stockées mes données ?",
+    es: "Donde se guardan mis datos?",
+    en: "Where is my data stored?",
+  },
+  docFaq1A: {
+    fr: "Si vous avez un compte, vos conversations sont stockées de manière sécurisée dans le cloud (Supabase). En mode anonyme, tout reste dans votre navigateur.",
+    es: "Si tienes cuenta, tus conversaciones se guardan de forma segura en la nube (Supabase). En modo anonimo, todo se queda en tu navegador.",
+    en: "If you have an account, your conversations are securely stored in the cloud (Supabase). In anonymous mode, everything stays in your browser.",
+  },
+  docFaq2Q: {
+    fr: "Puis-je supprimer mon compte ?",
+    es: "Puedo eliminar mi cuenta?",
+    en: "Can I delete my account?",
+  },
+  docFaq2A: {
+    fr: "Contactez-nous à hello@syntalys.ch pour toute demande de suppression de compte.",
+    es: "Contactanos en hello@syntalys.ch para cualquier solicitud de eliminacion de cuenta.",
+    en: "Contact us at hello@syntalys.ch for any account deletion request.",
+  },
+  docFaq3Q: {
+    fr: "L'IA peut-elle se tromper ?",
+    es: "Puede la IA equivocarse?",
+    en: "Can the AI make mistakes?",
+  },
+  docFaq3A: {
+    fr: "Oui. SYNTALYS AI peut faire des erreurs. Vérifiez toujours les informations importantes avant de les utiliser.",
+    es: "Si. SYNTALYS AI puede cometer errores. Verifica siempre la informacion importante antes de usarla.",
+    en: "Yes. SYNTALYS AI can make mistakes. Always verify important information before using it.",
+  },
+
+  // ── Support Page ──
+  supportTitle: {
+    fr: "Besoin d'aide ?",
+    es: "Necesitas ayuda?",
+    en: "Need help?",
+  },
+  supportSubtitle: {
+    fr: "Notre équipe est disponible pour répondre à vos questions et résoudre vos problèmes.",
+    es: "Nuestro equipo esta disponible para responder tus preguntas y resolver tus problemas.",
+    en: "Our team is available to answer your questions and solve your problems.",
+  },
+  supportContactTitle: {
+    fr: "Contactez-nous",
+    es: "Contactanos",
+    en: "Contact us",
+  },
+  supportContactDesc: {
+    fr: "Envoyez-nous un email et nous vous répondrons dans les plus brefs délais.",
+    es: "Envianos un email y te responderemos lo antes posible.",
+    en: "Send us an email and we'll get back to you as soon as possible.",
+  },
+  supportResponseTime: {
+    fr: "Délai de réponse estimé : 24 – 48h",
+    es: "Tiempo de respuesta estimado: 24 – 48h",
+    en: "Estimated response time: 24 – 48h",
+  },
+  supportSendEmail: {
+    fr: "Envoyer un email",
+    es: "Enviar un email",
+    en: "Send an email",
+  },
+  supportUsefulLinks: {
+    fr: "Liens utiles",
+    es: "Enlaces utiles",
+    en: "Useful links",
+  },
+  supportViewDoc: {
+    fr: "Consulter la documentation",
+    es: "Consultar la documentacion",
+    en: "View documentation",
+  },
+  supportViewFaq: {
+    fr: "Voir la FAQ",
+    es: "Ver las preguntas frecuentes",
+    en: "View FAQ",
+  },
+  supportBugTitle: {
+    fr: "Signaler un problème",
+    es: "Reportar un problema",
+    en: "Report a problem",
+  },
+  supportBugDesc: {
+    fr: "Si vous rencontrez un bug, décrivez le problème en détail dans votre email afin que nous puissions le résoudre rapidement.",
+    es: "Si encuentras un bug, describe el problema en detalle en tu email para que podamos resolverlo rapidamente.",
+    en: "If you encounter a bug, describe the problem in detail in your email so we can resolve it quickly.",
+  },
+
+  // ── Legal Page ──
+  legalTitle: {
+    fr: "Mentions légales",
+    es: "Informacion legal",
+    en: "Legal notice",
+  },
+  legalInfoTitle: {
+    fr: "Informations légales",
+    es: "Informacion legal",
+    en: "Legal information",
+  },
+  legalForm: {
+    fr: "Forme juridique",
+    es: "Forma juridica",
+    en: "Legal form",
+  },
+  legalFormValue: {
+    fr: "Entreprise Individuelle",
+    es: "Empresa Individual",
+    en: "Sole Proprietorship",
+  },
+  legalRepresentative: {
+    fr: "Représentant légal",
+    es: "Representante legal",
+    en: "Legal representative",
+  },
+  legalAddress: {
+    fr: "Adresse",
+    es: "Direccion",
+    en: "Address",
+  },
+  legalEmail: {
+    fr: "E-mail",
+    es: "E-mail",
+    en: "E-mail",
+  },
+  legalVat: {
+    fr: "N° IDE / TVA",
+    es: "N° IDE / IVA",
+    en: "VAT number",
+  },
+  legalHostingTitle: {
+    fr: "Hébergement",
+    es: "Alojamiento",
+    en: "Hosting",
+  },
+  legalHostingContent: {
+    fr: "Application hébergée par Vercel Inc. (San Francisco, USA). Base de données hébergée par Supabase Inc.",
+    es: "Aplicacion alojada por Vercel Inc. (San Francisco, USA). Base de datos alojada por Supabase Inc.",
+    en: "Application hosted by Vercel Inc. (San Francisco, USA). Database hosted by Supabase Inc.",
+  },
+  legalDataTitle: {
+    fr: "Protection des données",
+    es: "Proteccion de datos",
+    en: "Data protection",
+  },
+  legalDataContent: {
+    fr: "Les données des utilisateurs authentifiés sont stockées de manière sécurisée dans Supabase. Les utilisateurs anonymes utilisent le stockage local du navigateur. Les messages sont traités par OpenAI pour la génération des réponses. Aucune donnée personnelle n'est partagée avec des tiers en dehors de ce traitement.",
+    es: "Los datos de los usuarios autenticados se almacenan de forma segura en Supabase. Los usuarios anonimos usan el almacenamiento local del navegador. Los mensajes son procesados por OpenAI para la generacion de respuestas. Ningun dato personal se comparte con terceros fuera de este procesamiento.",
+    en: "Authenticated user data is securely stored in Supabase. Anonymous users use browser local storage. Messages are processed by OpenAI for response generation. No personal data is shared with third parties outside of this processing.",
+  },
+  legalAiTitle: {
+    fr: "Utilisation de l'IA",
+    es: "Uso de la IA",
+    en: "AI usage",
+  },
+  legalAiContent: {
+    fr: "Les réponses sont générées par intelligence artificielle et peuvent contenir des erreurs. SYNTALYS TECH ne se responsabilise pas de l'usage fait des réponses générées par l'IA.",
+    es: "Las respuestas son generadas por inteligencia artificial y pueden contener errores. SYNTALYS TECH no se responsabiliza del uso que se haga de las respuestas generadas por la IA.",
+    en: "Responses are generated by artificial intelligence and may contain errors. SYNTALYS TECH is not responsible for the use made of AI-generated responses.",
+  },
+  legalCookiesTitle: {
+    fr: "Cookies et stockage local",
+    es: "Cookies y almacenamiento local",
+    en: "Cookies and local storage",
+  },
+  legalCookiesContent: {
+    fr: "Ce site utilise le stockage local du navigateur pour sauvegarder vos préférences (thème, langue) et les sessions anonymes. Aucun cookie tiers n'est utilisé à des fins publicitaires.",
+    es: "Este sitio utiliza el almacenamiento local del navegador para guardar tus preferencias (tema, idioma) y las sesiones anonimas. No se usan cookies de terceros con fines publicitarios.",
+    en: "This site uses browser local storage to save your preferences (theme, language) and anonymous sessions. No third-party cookies are used for advertising purposes.",
+  },
+  legalIpTitle: {
+    fr: "Propriété intellectuelle",
+    es: "Propiedad intelectual",
+    en: "Intellectual property",
+  },
+  legalIpContent: {
+    fr: "L'ensemble du contenu de ce site (textes, logos, images, code) est protégé par le droit d'auteur.",
+    es: "Todo el contenido de este sitio (textos, logos, imagenes, codigo) esta protegido por derechos de autor.",
+    en: "All content on this site (text, logos, images, code) is protected by copyright.",
   },
 } as const;
 

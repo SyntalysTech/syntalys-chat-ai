@@ -39,14 +39,14 @@ export function Modal({ open, onClose, children, title, className }: ModalProps)
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4"
       onClick={(e) => {
         if (e.target === overlayRef.current) onClose();
       }}
     >
       <div
         className={cn(
-          "w-full max-w-md rounded-xl bg-card border border-border shadow-2xl animate-fade-in",
+          "w-full max-w-md rounded-t-xl sm:rounded-xl bg-card border border-border shadow-2xl animate-fade-in max-h-[90dvh] sm:max-h-[85vh] flex flex-col",
           className
         )}
         role="dialog"
@@ -54,8 +54,8 @@ export function Modal({ open, onClose, children, title, className }: ModalProps)
         aria-label={title}
       >
         {title && (
-          <div className="flex items-center justify-between border-b border-border px-6 py-4">
-            <h2 className="text-lg font-semibold text-card-foreground">
+          <div className="flex items-center justify-between border-b border-border px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
+            <h2 className="text-base sm:text-lg font-semibold text-card-foreground">
               {title}
             </h2>
             <button
@@ -67,7 +67,7 @@ export function Modal({ open, onClose, children, title, className }: ModalProps)
             </button>
           </div>
         )}
-        <div className="p-6">{children}</div>
+        <div className="p-4 sm:p-6 overflow-y-auto min-h-0">{children}</div>
       </div>
     </div>
   );
