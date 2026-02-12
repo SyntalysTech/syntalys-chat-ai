@@ -8,6 +8,16 @@ export interface ChatThread {
   updated_at: string;
 }
 
+export interface FileAttachment {
+  name: string;
+  type: string;
+  size: number;
+  /** base64 data URL for images (only in-session, not persisted) */
+  dataUrl?: string;
+  /** Extracted text from documents (only in-session) */
+  extractedText?: string;
+}
+
 export interface ChatMessage {
   id: string;
   thread_id: string;
@@ -15,6 +25,7 @@ export interface ChatMessage {
   content: string;
   model: string | null;
   created_at: string;
+  attachments?: Pick<FileAttachment, "name" | "type" | "size">[];
 }
 
 export interface UserProfile {

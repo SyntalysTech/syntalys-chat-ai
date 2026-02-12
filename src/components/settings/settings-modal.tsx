@@ -10,7 +10,15 @@ import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Sun, Moon, Monitor, Loader2 } from "lucide-react";
+import {
+  Sun,
+  Moon,
+  Monitor,
+  Loader2,
+  KeyRound,
+  Trash2,
+  AlertTriangle,
+} from "lucide-react";
 
 interface SettingsModalProps {
   open: boolean;
@@ -25,8 +33,9 @@ export function SettingsModal({
   theme,
   onThemeChange,
 }: SettingsModalProps) {
-  const { user, profile, updateProfile } = useAuth();
-  const { setSelectedModel } = useChat();
+  const { user, profile, updateProfile, updatePassword, deleteAccount } =
+    useAuth();
+  const { setSelectedModel, deleteAllThreads } = useChat();
   const { t, locale, setLocale } = useI18n();
   const [displayName, setDisplayName] = useState(
     profile?.display_name || ""
@@ -36,12 +45,41 @@ export function SettingsModal({
   );
   const [saving, setSaving] = useState(false);
 
+  // Password change
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
+
+  // Delete all chats
+  const [showDeleteChats, setShowDeleteChats] = useState(false);
+  const [deletingChats, setDeletingChats] = useState(false);
+
+  // Delete account
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+
   useEffect(() => {
     if (profile) {
       setDisplayName(profile.display_name || "");
       setDefaultModel(profile.default_model || DEFAULT_MODEL_ID);
     }
   }, [profile]);
+
+  // Reset states when modal closes
+  useEffect(() => {
+    if (!open) {
+      setNewPassword("");
+      setConfirmPassword("");
+      setPasswordError("");
+      setPasswordSuccess(false);
+      setShowDeleteChats(false);
+      setShowDeleteAccount(false);
+      setDeleteConfirmText("");
+    }
+  }, [open]);
 
   const handleSave = async () => {
     if (!user) return;
@@ -60,6 +98,59 @@ export function SettingsModal({
     }
   };
 
+  const handlePasswordChange = async () => {
+    setPasswordError("");
+    setPasswordSuccess(false);
+
+    if (newPassword.length < 6) {
+      setPasswordError(t("passwordTooShort") as string);
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError(t("passwordsNoMatch") as string);
+      return;
+    }
+
+    setSavingPassword(true);
+    try {
+      const result = await updatePassword(newPassword);
+      if (result.error) {
+        setPasswordError(result.error);
+      } else {
+        setPasswordSuccess(true);
+        setNewPassword("");
+        setConfirmPassword("");
+        setTimeout(() => setPasswordSuccess(false), 3000);
+      }
+    } finally {
+      setSavingPassword(false);
+    }
+  };
+
+  const handleDeleteAllChats = async () => {
+    setDeletingChats(true);
+    try {
+      await deleteAllThreads();
+      setShowDeleteChats(false);
+    } finally {
+      setDeletingChats(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
+    try {
+      const result = await deleteAccount();
+      if (result.error) {
+        setDeletingAccount(false);
+      } else {
+        onClose();
+      }
+    } catch {
+      setDeletingAccount(false);
+    }
+  };
+
   const themes = [
     { id: "light" as const, labelKey: "themeLight" as const, icon: Sun },
     { id: "dark" as const, labelKey: "themeDark" as const, icon: Moon },
@@ -68,7 +159,7 @@ export function SettingsModal({
 
   return (
     <Modal open={open} onClose={onClose} title={t("settings") as string}>
-      <div className="space-y-6">
+      <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-1">
         {/* Language */}
         <div>
           <h3 className="mb-3 text-sm font-medium text-card-foreground">
@@ -187,6 +278,155 @@ export function SettingsModal({
                 t("saveChanges")
               )}
             </Button>
+
+            {/* Change Password */}
+            <div className="border-t border-border pt-4">
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-card-foreground">
+                <KeyRound className="h-4 w-4" />
+                {t("changePassword")}
+              </h3>
+              <div className="space-y-3">
+                <Input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder={t("newPassword") as string}
+                />
+                <Input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder={t("confirmNewPassword") as string}
+                />
+                {passwordError && (
+                  <p className="text-xs text-destructive">{passwordError}</p>
+                )}
+                {passwordSuccess && (
+                  <p className="text-xs text-green-600 dark:text-green-400">
+                    {t("passwordChanged")}
+                  </p>
+                )}
+                <Button
+                  onClick={handlePasswordChange}
+                  disabled={savingPassword || !newPassword || !confirmPassword}
+                  variant="outline"
+                  className="w-full"
+                >
+                  {savingPassword ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    t("changePassword")
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Danger Zone */}
+            <div className="border-t border-destructive/20 pt-4">
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-destructive">
+                <AlertTriangle className="h-4 w-4" />
+                {t("dangerZone")}
+              </h3>
+              <div className="space-y-3">
+                {/* Delete all chats */}
+                {!showDeleteChats ? (
+                  <button
+                    onClick={() => setShowDeleteChats(true)}
+                    className="flex w-full items-center gap-2 rounded-lg border border-border px-4 py-3 text-left text-sm text-card-foreground hover:border-destructive/40 hover:bg-destructive/5 transition-all"
+                  >
+                    <Trash2 className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">{t("deleteAllChats")}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {t("deleteAllChatsDesc")}
+                      </p>
+                    </div>
+                  </button>
+                ) : (
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 space-y-3">
+                    <p className="text-sm text-card-foreground">
+                      {t("deleteAllChatsConfirm")}
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowDeleteChats(false)}
+                        className="flex-1"
+                      >
+                        {t("cancel")}
+                      </Button>
+                      <Button
+                        onClick={handleDeleteAllChats}
+                        disabled={deletingChats}
+                        className="flex-1 bg-destructive text-white hover:bg-destructive/90"
+                      >
+                        {deletingChats ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          t("delete")
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Delete account */}
+                {!showDeleteAccount ? (
+                  <button
+                    onClick={() => setShowDeleteAccount(true)}
+                    className="flex w-full items-center gap-2 rounded-lg border border-border px-4 py-3 text-left text-sm text-card-foreground hover:border-destructive/40 hover:bg-destructive/5 transition-all"
+                  >
+                    <AlertTriangle className="h-4 w-4 text-destructive" />
+                    <div>
+                      <p className="font-medium text-destructive">
+                        {t("deleteAccount")}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {t("deleteAccountDesc")}
+                      </p>
+                    </div>
+                  </button>
+                ) : (
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 space-y-3">
+                    <p className="text-sm text-card-foreground">
+                      {t("deleteAccountConfirm")}
+                    </p>
+                    <Input
+                      value={deleteConfirmText}
+                      onChange={(e) => setDeleteConfirmText(e.target.value)}
+                      placeholder={t("typeDelete") as string}
+                      className="border-destructive/30"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setShowDeleteAccount(false);
+                          setDeleteConfirmText("");
+                        }}
+                        className="flex-1"
+                      >
+                        {t("cancel")}
+                      </Button>
+                      <Button
+                        onClick={handleDeleteAccount}
+                        disabled={
+                          deletingAccount ||
+                          deleteConfirmText.toLowerCase() !== "delete"
+                        }
+                        className="flex-1 bg-destructive text-white hover:bg-destructive/90"
+                      >
+                        {deletingAccount ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          t("deleteAccount")
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </>
         )}
 
@@ -196,7 +436,8 @@ export function SettingsModal({
             SYNTALYS Chat AI v1.0
           </p>
           <p className="mt-1 text-[10px] text-muted-foreground/60 text-center">
-            &copy; {new Date().getFullYear()} SYNTALYS TECH. {t("allRightsReserved")}
+            &copy; {new Date().getFullYear()} SYNTALYS TECH.{" "}
+            {t("allRightsReserved")}
           </p>
         </div>
       </div>

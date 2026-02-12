@@ -865,6 +865,92 @@ const translations = {
     es: "Todo el contenido de este sitio (textos, logos, imagenes, codigo) esta protegido por derechos de autor.",
     en: "All content on this site (text, logos, images, code) is protected by copyright.",
   },
+
+  // ── File Upload ──
+  attachFile: {
+    fr: "Joindre un fichier",
+    es: "Adjuntar archivo",
+    en: "Attach file",
+  },
+  attachedFiles: {
+    fr: "Fichiers joints",
+    es: "Archivos adjuntos",
+    en: "Attached files",
+  },
+  processing: {
+    fr: "Traitement...",
+    es: "Procesando...",
+    en: "Processing...",
+  },
+
+  // ── Settings: Password ──
+  changePassword: {
+    fr: "Changer le mot de passe",
+    es: "Cambiar contraseña",
+    en: "Change password",
+  },
+  newPassword: {
+    fr: "Nouveau mot de passe",
+    es: "Nueva contraseña",
+    en: "New password",
+  },
+  confirmNewPassword: {
+    fr: "Confirmer le mot de passe",
+    es: "Confirmar contraseña",
+    en: "Confirm password",
+  },
+  passwordChanged: {
+    fr: "Mot de passe modifié avec succès",
+    es: "Contraseña cambiada con éxito",
+    en: "Password changed successfully",
+  },
+  passwordsNoMatch: {
+    fr: "Les mots de passe ne correspondent pas",
+    es: "Las contraseñas no coinciden",
+    en: "Passwords do not match",
+  },
+
+  // ── Settings: Danger Zone ──
+  dangerZone: {
+    fr: "Zone de danger",
+    es: "Zona de peligro",
+    en: "Danger zone",
+  },
+  deleteAllChats: {
+    fr: "Supprimer toutes les conversations",
+    es: "Eliminar todas las conversaciones",
+    en: "Delete all conversations",
+  },
+  deleteAllChatsDesc: {
+    fr: "Supprime toutes vos conversations et messages de manière irréversible.",
+    es: "Elimina todas tus conversaciones y mensajes de forma irreversible.",
+    en: "Permanently delete all your conversations and messages.",
+  },
+  deleteAllChatsConfirm: {
+    fr: "Êtes-vous sûr ? Toutes vos conversations seront supprimées définitivement.",
+    es: "¿Estás seguro? Todas tus conversaciones se eliminarán permanentemente.",
+    en: "Are you sure? All your conversations will be permanently deleted.",
+  },
+  deleteAccount: {
+    fr: "Supprimer le compte",
+    es: "Eliminar cuenta",
+    en: "Delete account",
+  },
+  deleteAccountDesc: {
+    fr: "Supprime votre compte, vos données et toutes vos conversations.",
+    es: "Elimina tu cuenta, tus datos y todas tus conversaciones.",
+    en: "Delete your account, data, and all conversations.",
+  },
+  deleteAccountConfirm: {
+    fr: "Cette action est irréversible. Tapez \"delete\" pour confirmer la suppression de votre compte.",
+    es: "Esta acción es irreversible. Escribe \"delete\" para confirmar la eliminación de tu cuenta.",
+    en: "This action is irreversible. Type \"delete\" to confirm account deletion.",
+  },
+  typeDelete: {
+    fr: "Tapez \"delete\"",
+    es: "Escribe \"delete\"",
+    en: "Type \"delete\"",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

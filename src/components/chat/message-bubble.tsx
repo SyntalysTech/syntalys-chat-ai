@@ -12,6 +12,8 @@ import {
   ChevronDown,
   Sparkles,
   FlaskConical,
+  FileText,
+  ImageIcon,
 } from "lucide-react";
 import Image from "next/image";
 import type { ChatMessage } from "@/lib/types";
@@ -22,6 +24,12 @@ interface MessageBubbleProps {
   isStreaming: boolean;
   onRegenerate?: () => void;
   isDark: boolean;
+}
+
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 /** Parse <reasoning>...</reasoning> tags from content */
@@ -119,10 +127,33 @@ export const MessageBubble = memo(function MessageBubble({
         )}
       >
         {isUser ? (
-          <div className="inline-block max-w-[85%] rounded-2xl rounded-tr-sm bg-syntalys-blue px-4 py-2.5 text-white">
-            <p className="whitespace-pre-wrap text-sm leading-relaxed break-words">
-              {message.content}
-            </p>
+          <div className="inline-block max-w-[85%]">
+            {message.attachments && message.attachments.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-1.5 justify-end">
+                {message.attachments.map((att, i) => {
+                  const isImg = att.type.startsWith("image/");
+                  return (
+                    <div
+                      key={i}
+                      className="flex items-center gap-1.5 rounded-lg bg-syntalys-blue/80 px-2.5 py-1.5 text-xs text-white/90"
+                    >
+                      {isImg ? (
+                        <ImageIcon className="h-3.5 w-3.5 flex-shrink-0" />
+                      ) : (
+                        <FileText className="h-3.5 w-3.5 flex-shrink-0" />
+                      )}
+                      <span className="max-w-[100px] truncate">{att.name}</span>
+                      <span className="text-white/60">{formatSize(att.size)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            <div className="rounded-2xl rounded-tr-sm bg-syntalys-blue px-4 py-2.5 text-white">
+              <p className="whitespace-pre-wrap text-sm leading-relaxed break-words">
+                {message.content}
+              </p>
+            </div>
           </div>
         ) : (
           <div className="space-y-2">

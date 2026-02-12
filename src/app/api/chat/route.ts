@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import type { ChatCompletionMessageParam, ChatCompletionContentPart } from "openai/resources/chat/completions";
 import { getModelByIdOrDefault, getSystemPrompt } from "@/lib/models";
 import { checkRateLimit, incrementUsage } from "@/lib/rate-limit";
 import { z } from "zod";
@@ -12,7 +13,7 @@ const requestSchema = z.object({
   messages: z.array(
     z.object({
       role: z.enum(["user", "assistant"]),
-      content: z.string().min(1).max(32000),
+      content: z.string().min(1).max(100000),
     })
   ),
   model: z.string(),
@@ -20,6 +21,7 @@ const requestSchema = z.object({
   isAnonymous: z.boolean().optional(),
   anonId: z.string().optional(),
   userName: z.string().max(100).optional(),
+  imageUrls: z.array(z.string()).max(5).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -34,12 +36,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { messages, model: modelId, isAnonymous, anonId, userName } = parsed.data;
+    const { messages, model: modelId, isAnonymous, anonId, userName, imageUrls } = parsed.data;
 
     // Rate limiting for anonymous users
     if (isAnonymous && anonId) {
       const rateLimitKey = `anon:${anonId}`;
-      const { allowed, remaining } = checkRateLimit(rateLimitKey);
+      const { allowed } = checkRateLimit(rateLimitKey);
 
       if (!allowed) {
         return NextResponse.json(
@@ -69,15 +71,38 @@ export async function POST(req: NextRequest) {
       systemPrompt += `\n\nThe user's name is "${userName}". Address them by their name naturally when appropriate (greetings, personalized responses), but don't force it into every sentence.`;
     }
 
-    const stream = await openai.chat.completions.create({
-      model: modelConfig.openaiModel,
-      messages: [
-        { role: "system", content: systemPrompt },
-        ...messages.map((m) => ({
+    // Build OpenAI messages, with vision support for the last user message
+    const openaiMessages: ChatCompletionMessageParam[] = [
+      { role: "system", content: systemPrompt },
+    ];
+
+    for (let i = 0; i < messages.length; i++) {
+      const m = messages[i];
+      const isLastUser = i === messages.length - 1 && m.role === "user" && imageUrls?.length;
+
+      if (isLastUser) {
+        // Build multimodal content for the last user message
+        const parts: ChatCompletionContentPart[] = [
+          { type: "text", text: m.content },
+        ];
+        for (const url of imageUrls!) {
+          parts.push({
+            type: "image_url",
+            image_url: { url, detail: "auto" },
+          });
+        }
+        openaiMessages.push({ role: "user", content: parts });
+      } else {
+        openaiMessages.push({
           role: m.role as "user" | "assistant",
           content: m.content,
-        })),
-      ],
+        });
+      }
+    }
+
+    const stream = await openai.chat.completions.create({
+      model: modelConfig.openaiModel,
+      messages: openaiMessages,
       stream: true,
       temperature: 0.7,
       max_tokens: 4096,

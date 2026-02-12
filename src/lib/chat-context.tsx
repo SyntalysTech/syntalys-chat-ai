@@ -21,7 +21,7 @@ import {
   incrementAnonUsage,
 } from "./chat-store";
 import { DEFAULT_MODEL_ID, getModelByIdOrDefault } from "./models";
-import type { ChatThread, ChatMessage, StreamMessage } from "./types";
+import type { ChatThread, ChatMessage, StreamMessage, FileAttachment } from "./types";
 import { generateId, getAnonId } from "./utils";
 
 interface ChatContextType {
@@ -38,9 +38,10 @@ interface ChatContextType {
   selectThread: (threadId: string) => Promise<void>;
   deleteThread: (threadId: string) => Promise<void>;
   renameThread: (threadId: string, title: string) => Promise<void>;
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (content: string, attachments?: FileAttachment[]) => Promise<void>;
   regenerateLastResponse: () => Promise<void>;
   clearCurrentThread: () => void;
+  deleteAllThreads: () => Promise<void>;
 }
 
 const ChatContext = createContext<ChatContextType | null>(null);
@@ -188,7 +189,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   );
 
   const sendMessage = useCallback(
-    async (content: string) => {
+    async (content: string, attachments?: FileAttachment[]) => {
       if (isStreaming) return;
 
       // Check anonymous limit
@@ -211,6 +212,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         content,
         model: null,
         created_at: new Date().toISOString(),
+        attachments: attachments?.map(({ name, type, size }) => ({ name, type, size })),
       };
 
       // Save user message
@@ -251,24 +253,43 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       abortRef.current = abortController;
 
       try {
-        const historyMessages: StreamMessage[] = [
+        // Build image URLs and document context from attachments
+        const imageUrls: string[] = [];
+        let docContext = "";
+        if (attachments?.length) {
+          for (const att of attachments) {
+            if (att.type.startsWith("image/") && att.dataUrl) {
+              imageUrls.push(att.dataUrl);
+            } else if (att.extractedText) {
+              docContext += `\n\n--- [${att.name}] ---\n${att.extractedText}`;
+            }
+          }
+        }
+
+        // If there's document context, prepend it to the last user message
+        const lastContent = docContext
+          ? `${content}\n\n[Documents joints]${docContext}`
+          : content;
+
+        const historyForApi: StreamMessage[] = [
           ...messages.map((m) => ({
             role: m.role as "user" | "assistant",
             content: m.content,
           })),
-          { role: "user" as const, content },
+          { role: "user" as const, content: lastContent },
         ];
 
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: historyMessages,
+            messages: historyForApi,
             model: selectedModel,
             threadId,
             isAnonymous: !user,
             anonId: !user ? getAnonId() : undefined,
             userName: profile?.display_name || undefined,
+            imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
           }),
           signal: abortController.signal,
         });
@@ -385,6 +406,25 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     setMessages([]);
   }, []);
 
+  const deleteAllThreads = useCallback(async () => {
+    if (user) {
+      // Delete all messages then all threads for this user
+      const threadIds = threads.map((t) => t.id);
+      if (threadIds.length > 0) {
+        await supabase.from("chat_messages").delete().in("thread_id", threadIds);
+        await supabase.from("chat_threads").delete().eq("user_id", user.id);
+      }
+    } else {
+      // Clear localStorage
+      for (const thread of threads) {
+        deleteLocalThread(thread.id);
+      }
+    }
+    setThreads([]);
+    setCurrentThread(null);
+    setMessages([]);
+  }, [user, supabase, threads]);
+
   return (
     <ChatContext.Provider
       value={{
@@ -404,6 +444,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         sendMessage,
         regenerateLastResponse,
         clearCurrentThread,
+        deleteAllThreads,
       }}
     >
       {children}

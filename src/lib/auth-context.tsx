@@ -23,6 +23,8 @@ interface AuthContextType {
     displayName?: string
   ) => Promise<{ error?: string; confirmEmail?: boolean }>;
   signOut: () => Promise<void>;
+  updatePassword: (newPassword: string) => Promise<{ error?: string }>;
+  deleteAccount: () => Promise<{ error?: string }>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -142,6 +144,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
   };
 
+  const updatePassword = async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) return { error: error.message };
+    return {};
+  };
+
+  const deleteAccount = async () => {
+    if (!user) return { error: "Not authenticated" };
+    try {
+      const res = await fetch("/api/account", { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        return { error: data.error || "Failed to delete account" };
+      }
+      await supabase.auth.signOut();
+      setUser(null);
+      setProfile(null);
+      return {};
+    } catch {
+      return { error: "Failed to delete account" };
+    }
+  };
+
   const updateProfile = async (updates: Partial<UserProfile>) => {
     if (!user) return;
     await supabase.from("profiles").update(updates).eq("id", user.id);
@@ -157,6 +182,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn,
         signUp,
         signOut,
+        updatePassword,
+        deleteAccount,
         updateProfile,
         refreshProfile,
       }}
