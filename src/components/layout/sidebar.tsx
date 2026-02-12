@@ -493,31 +493,6 @@ export function Sidebar({
 
   return (
     <>
-      {/* Delete confirmation modal */}
-      <Modal
-        open={deleteConfirmId !== null}
-        onClose={() => setDeleteConfirmId(null)}
-        title={t("deleteConversation")}
-      >
-        <p className="text-sm text-muted-foreground mb-6">
-          {t("deleteConfirmMessage")}
-        </p>
-        <div className="flex gap-3 justify-end">
-          <button
-            onClick={() => setDeleteConfirmId(null)}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-card-foreground hover:bg-accent transition-colors"
-          >
-            {t("cancel")}
-          </button>
-          <button
-            onClick={handleConfirmDelete}
-            className="rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-white hover:bg-destructive/90 transition-colors"
-          >
-            {t("delete")}
-          </button>
-        </div>
-      </Modal>
-
       {/* Desktop sidebar */}
       <aside
         className={cn(
@@ -546,6 +521,31 @@ export function Sidebar({
       >
         {sidebarInner}
       </aside>
+
+      {/* Delete confirmation — rendered AFTER sidebar so it stacks on top on mobile */}
+      <Modal
+        open={deleteConfirmId !== null}
+        onClose={() => setDeleteConfirmId(null)}
+        title={t("deleteConversation")}
+      >
+        <p className="text-sm text-muted-foreground mb-6">
+          {t("deleteConfirmMessage")}
+        </p>
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={() => setDeleteConfirmId(null)}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-card-foreground hover:bg-accent transition-colors"
+          >
+            {t("cancel")}
+          </button>
+          <button
+            onClick={handleConfirmDelete}
+            className="rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-white hover:bg-destructive/90 transition-colors"
+          >
+            {t("delete")}
+          </button>
+        </div>
+      </Modal>
     </>
   );
 }
