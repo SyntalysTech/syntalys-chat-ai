@@ -322,6 +322,48 @@ const translations = {
     en: "Sign up",
   },
 
+  // ── Email Confirmation ──
+  checkEmailTitle: {
+    fr: "Vérifiez votre email",
+    es: "Revisa tu correo",
+    en: "Check your email",
+  },
+  checkEmailDesc: {
+    fr: "Nous avons envoyé un lien de confirmation à :",
+    es: "Hemos enviado un enlace de confirmación a:",
+    en: "We sent a confirmation link to:",
+  },
+  checkEmailHint: {
+    fr: "Cliquez sur le lien dans l'email pour activer votre compte. Vérifiez aussi vos spams.",
+    es: "Haz clic en el enlace del correo para activar tu cuenta. Revisa también la carpeta de spam.",
+    en: "Click the link in the email to activate your account. Check your spam folder too.",
+  },
+  understood: {
+    fr: "Compris",
+    es: "Entendido",
+    en: "Got it",
+  },
+  backToLogin: {
+    fr: "Retour à la connexion",
+    es: "Volver al inicio de sesión",
+    en: "Back to login",
+  },
+  emailConfirmedTitle: {
+    fr: "Email confirmé !",
+    es: "¡Correo confirmado!",
+    en: "Email confirmed!",
+  },
+  emailConfirmedDesc: {
+    fr: "Votre compte est maintenant actif. Vous pouvez commencer à utiliser SYNTALYS Chat AI.",
+    es: "Tu cuenta está activa. Ya puedes empezar a usar SYNTALYS Chat AI.",
+    en: "Your account is now active. You can start using SYNTALYS Chat AI.",
+  },
+  startChatting: {
+    fr: "Commencer à discuter",
+    es: "Empezar a chatear",
+    en: "Start chatting",
+  },
+
   // ── Settings Modal ──
   theme: {
     fr: "Thème",

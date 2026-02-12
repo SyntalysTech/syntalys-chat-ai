@@ -21,7 +21,7 @@ interface AuthContextType {
     email: string,
     password: string,
     displayName?: string
-  ) => Promise<{ error?: string }>;
+  ) => Promise<{ error?: string; confirmEmail?: boolean }>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -116,15 +116,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     password: string,
     displayName?: string
   ) => {
-    const { error } = await supabase.auth.signUp({
+    const redirectTo =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/auth/callback`
+        : undefined;
+
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { display_name: displayName },
+        emailRedirectTo: redirectTo,
       },
     });
     if (error) return { error: error.message };
-    return {};
+
+    // If session is null, email confirmation is required
+    const needsConfirmation = !data.session;
+    return { confirmEmail: needsConfirmation };
   };
 
   const signOut = async () => {

@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
 import { useI18n } from "@/lib/i18n-context";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Mail, ArrowLeft } from "lucide-react";
 
 interface AuthModalProps {
   open: boolean;
@@ -19,7 +18,7 @@ interface AuthModalProps {
 export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
   const { signIn, signUp } = useAuth();
   const { t } = useI18n();
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register" | "checkEmail">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -38,6 +37,8 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
           setError(result.error);
           return;
         }
+        onClose();
+        resetForm();
       } else {
         if (password.length < 6) {
           setError(t("passwordTooShort") as string);
@@ -48,9 +49,13 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
           setError(result.error);
           return;
         }
+        if (result.confirmEmail) {
+          setMode("checkEmail");
+        } else {
+          onClose();
+          resetForm();
+        }
       }
-      onClose();
-      resetForm();
     } finally {
       setLoading(false);
     }
@@ -61,6 +66,13 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
     setPassword("");
     setDisplayName("");
     setError("");
+    setMode("login");
+  };
+
+  const handleClose = () => {
+    onClose();
+    // Delay reset so animation finishes
+    setTimeout(resetForm, 200);
   };
 
   const toggleMode = () => {
@@ -68,16 +80,65 @@ export function AuthModal({ open, onClose, isDark }: AuthModalProps) {
     setError("");
   };
 
+  const logoSrc = isDark
+    ? "/logos/logo-horizontal-white.png"
+    : "/logos/logo-horizontal-blue.png";
+
+  // ── Check Email Confirmation Screen ──
+  if (mode === "checkEmail") {
+    return (
+      <Modal open={open} onClose={handleClose} className="max-w-sm">
+        <div className="flex flex-col items-center text-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-syntalys-blue/10">
+            <Mail className="h-7 w-7 text-syntalys-blue" />
+          </div>
+
+          <h2 className="mb-2 text-lg font-semibold text-card-foreground">
+            {t("checkEmailTitle")}
+          </h2>
+
+          <p className="mb-2 text-sm text-muted-foreground">
+            {t("checkEmailDesc")}
+          </p>
+
+          <p className="mb-6 text-sm font-medium text-foreground">
+            {email}
+          </p>
+
+          <div className="w-full rounded-lg bg-muted/50 p-3 mb-6">
+            <p className="text-xs text-muted-foreground">
+              {t("checkEmailHint")}
+            </p>
+          </div>
+
+          <Button
+            onClick={handleClose}
+            className="w-full mb-3"
+          >
+            {t("understood")}
+          </Button>
+
+          <button
+            onClick={() => {
+              setMode("login");
+              setError("");
+            }}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            {t("backToLogin")}
+          </button>
+        </div>
+      </Modal>
+    );
+  }
+
+  // ── Login / Register Form ──
   return (
-    <Modal open={open} onClose={onClose} className="max-w-sm">
+    <Modal open={open} onClose={handleClose} className="max-w-sm">
       <div className="flex flex-col items-center">
-        {/* Logo */}
         <Image
-          src={
-            isDark
-              ? "/logos/logo-horizontal-white.png"
-              : "/logos/logo-horizontal-blue.png"
-          }
+          src={logoSrc}
           alt="SYNTALYS"
           width={160}
           height={40}
