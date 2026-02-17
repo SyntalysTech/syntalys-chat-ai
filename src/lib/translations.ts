@@ -203,6 +203,16 @@ const translations = {
     es: "SYNTALYS AI puede cometer errores. Verifica la informacion importante.",
     en: "SYNTALYS AI can make mistakes. Verify important information.",
   },
+  voiceInput: {
+    fr: "Saisie vocale",
+    es: "Entrada de voz",
+    en: "Voice input",
+  },
+  voiceListening: {
+    fr: "Écoute en cours...",
+    es: "Escuchando...",
+    en: "Listening...",
+  },
 
   // ── Message Bubble ──
   copyMessage: {
@@ -219,6 +229,16 @@ const translations = {
     fr: "Régénérer avec un autre modèle",
     es: "Regenerar con otro modelo",
     en: "Regenerate with another model",
+  },
+  readAloud: {
+    fr: "Lire à voix haute",
+    es: "Leer en voz alta",
+    en: "Read aloud",
+  },
+  stopReading: {
+    fr: "Arrêter la lecture",
+    es: "Detener lectura",
+    en: "Stop reading",
   },
 
   // ── Code Block ──

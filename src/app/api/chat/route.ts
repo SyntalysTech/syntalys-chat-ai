@@ -79,9 +79,34 @@ export async function POST(req: NextRequest) {
     // ── Image generation (Milo) ──
     if (modelConfig.isImageModel) {
       const lastUserMessage = messages[messages.length - 1]?.content || "";
+
+      // If reference images are provided, use GPT-4o Vision to create an enhanced prompt
+      let dallePrompt = lastUserMessage;
+      if (imageUrls?.length) {
+        const visionResponse = await openai.responses.create({
+          model: "gpt-4o",
+          instructions: "You are an expert prompt engineer for DALL-E 3 image generation. The user will provide a text description and one or more reference images. Analyze the reference images and combine their visual style, composition, colors, and relevant elements with the user's text description to create a single, detailed DALL-E 3 prompt. Output ONLY the prompt text, nothing else. Max 900 characters.",
+          input: [
+            {
+              role: "user",
+              content: [
+                { type: "input_text", text: lastUserMessage },
+                ...imageUrls.map((url) => ({
+                  type: "input_image" as const,
+                  image_url: url,
+                  detail: "auto" as const,
+                })),
+              ],
+            },
+          ],
+        });
+        const enhanced = visionResponse.output_text;
+        if (enhanced) dallePrompt = enhanced;
+      }
+
       const imageResponse = await openai.images.generate({
         model: modelConfig.openaiModel,
-        prompt: lastUserMessage,
+        prompt: dallePrompt,
         n: 1,
         size: "1024x1024",
         quality: "standard",

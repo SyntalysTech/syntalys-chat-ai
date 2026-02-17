@@ -1,12 +1,12 @@
 "use client";
 
-import { memo, useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
 import { useI18n } from "@/lib/i18n-context";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, X } from "lucide-react";
 
 function CodeBlock({
   className,
@@ -73,39 +73,77 @@ function CodeBlock({
   );
 }
 
+/** Fullscreen image lightbox */
+function ImageLightbox({ src, onClose }: { src: string; onClose: () => void }) {
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in"
+      onClick={onClose}
+    >
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+      >
+        <X className="h-5 w-5" />
+      </button>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt=""
+        className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
+        onClick={(e) => e.stopPropagation()}
+      />
+    </div>
+  );
+}
+
 interface MarkdownRendererProps {
   content: string;
 }
 
-export const MarkdownRenderer = memo(function MarkdownRenderer({
-  content,
-}: MarkdownRendererProps) {
+export function MarkdownRenderer({ content }: MarkdownRendererProps) {
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+
+  const closeLightbox = useCallback(() => setLightboxSrc(null), []);
+
   return (
-    <div className="prose max-w-none">
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeHighlight]}
-        components={{
-          code: CodeBlock,
-          table: ({ children, ...props }) => (
-            <div className="overflow-x-auto -mx-1">
-              <table {...props}>{children}</table>
-            </div>
-          ),
-          img: ({ src, alt, ...props }) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={src}
-              alt={alt || ""}
-              className="rounded-xl max-w-full shadow-md border border-border my-3"
-              loading="lazy"
-              {...props}
-            />
-          ),
-        }}
-      >
-        {content}
-      </ReactMarkdown>
-    </div>
+    <>
+      <div className="prose max-w-none">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeHighlight]}
+          components={{
+            code: CodeBlock,
+            table: ({ children, ...props }) => (
+              <div className="overflow-x-auto -mx-1">
+                <table {...props}>{children}</table>
+              </div>
+            ),
+            img: ({ src, alt, ...props }) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={src}
+                alt={alt || ""}
+                className="rounded-xl max-w-full shadow-md border border-border my-3 cursor-pointer hover:opacity-90 transition-opacity"
+                loading="lazy"
+                onClick={() => typeof src === "string" && setLightboxSrc(src)}
+                {...props}
+              />
+            ),
+          }}
+        >
+          {content}
+        </ReactMarkdown>
+      </div>
+      {lightboxSrc && <ImageLightbox src={lightboxSrc} onClose={closeLightbox} />}
+    </>
   );
-});
+}

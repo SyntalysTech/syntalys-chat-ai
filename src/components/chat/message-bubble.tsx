@@ -17,6 +17,8 @@ import {
   FlaskConical,
   FileText,
   ImageIcon,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import Image from "next/image";
 import type { ChatMessage } from "@/lib/types";
@@ -33,6 +35,32 @@ function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/** Strip markdown formatting for TTS */
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/!\[.*?\]\(.*?\)/g, "") // images
+    .replace(/\[([^\]]+)\]\(.*?\)/g, "$1") // links
+    .replace(/```[\s\S]*?```/g, "") // code blocks
+    .replace(/`([^`]+)`/g, "$1") // inline code
+    .replace(/#{1,6}\s*/g, "") // headings
+    .replace(/[*_]{1,3}([^*_]+)[*_]{1,3}/g, "$1") // bold/italic
+    .replace(/~~([^~]+)~~/g, "$1") // strikethrough
+    .replace(/>\s*/g, "") // blockquotes
+    .replace(/[-*+]\s+/g, "") // list items
+    .replace(/\d+\.\s+/g, "") // ordered list items
+    .replace(/\|.*\|/g, "") // table rows
+    .replace(/<[^>]+>/g, "") // HTML tags
+    .replace(/\n{2,}/g, ". ")
+    .replace(/\n/g, " ")
+    .trim();
+}
+
+/** Map locale to BCP-47 for speech synthesis */
+function getSpeechLang(locale: string): string {
+  const map: Record<string, string> = { fr: "fr-FR", es: "es-ES", en: "en-US" };
+  return map[locale] || "en-US";
 }
 
 /** Parse <reasoning>...</reasoning> tags from content */
@@ -73,9 +101,11 @@ export const MessageBubble = memo(function MessageBubble({
   const [copied, setCopied] = useState(false);
   const [reasoningOpen, setReasoningOpen] = useState(false);
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const modelMenuRef = useRef<HTMLDivElement>(null);
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { user } = useAuth();
+  const hasTTS = typeof window !== "undefined" && "speechSynthesis" in window;
 
   // Close model menu on outside click
   useEffect(() => {
@@ -110,6 +140,34 @@ export const MessageBubble = memo(function MessageBubble({
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const handleSpeak = () => {
+    if (!hasTTS) return;
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+    const textToRead = parsed && parsed.answer ? parsed.answer : message.content;
+    const cleaned = stripMarkdown(textToRead);
+    if (!cleaned) return;
+    const utterance = new SpeechSynthesisUtterance(cleaned);
+    utterance.lang = getSpeechLang(locale);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    window.speechSynthesis.cancel();
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Cancel TTS on unmount
+  useEffect(() => {
+    return () => {
+      if (isSpeaking && typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [isSpeaking]);
 
   // Determine what content to render for assistant
   const displayContent = parsed ? parsed.answer : message.content;
@@ -255,6 +313,19 @@ export const MessageBubble = memo(function MessageBubble({
                     <Copy className="h-4 w-4" />
                   )}
                 </button>
+                {hasTTS && (
+                  <button
+                    onClick={handleSpeak}
+                    className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
+                    aria-label={isSpeaking ? t("stopReading" as TranslationKey) : t("readAloud" as TranslationKey)}
+                  >
+                    {isSpeaking ? (
+                      <VolumeX className="h-4 w-4" />
+                    ) : (
+                      <Volume2 className="h-4 w-4" />
+                    )}
+                  </button>
+                )}
                 {isLast && onRegenerate && (
                   <div ref={modelMenuRef} className="relative">
                     <button

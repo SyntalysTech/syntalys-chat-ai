@@ -6,7 +6,8 @@ import { useAuth } from "@/lib/auth-context";
 import { useChat } from "@/lib/chat-context";
 import { useI18n } from "@/lib/i18n-context";
 import { getMessagesRemaining } from "@/lib/translations";
-import { ArrowUp, Square, Paperclip, X, FileText, ImageIcon, Loader2, AlertCircle } from "lucide-react";
+import type { TranslationKey } from "@/lib/translations";
+import { ArrowUp, Square, Paperclip, X, FileText, ImageIcon, Loader2, AlertCircle, Mic, MicOff } from "lucide-react";
 import type { FileAttachment } from "@/lib/types";
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
@@ -98,6 +99,21 @@ async function processFile(file: File): Promise<FileAttachment> {
   return { name: file.name, type: mime, size: file.size, extractedText: text };
 }
 
+/** Map locale to BCP-47 language tag for SpeechRecognition */
+function getRecognitionLang(locale: string): string {
+  const map: Record<string, string> = { fr: "fr-FR", es: "es-ES", en: "en-US" };
+  return map[locale] || "en-US";
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/** Check if browser supports SpeechRecognition */
+function getSpeechRecognition(): (new () => any) | null {
+  if (typeof window === "undefined") return null;
+  const w = window as any;
+  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 interface ChatInputProps {
   draft?: string;
   onDraftConsumed?: () => void;
@@ -111,13 +127,17 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
   const [files, setFiles] = useState<FileAttachment[]>([]);
   const [processingFiles, setProcessingFiles] = useState(false);
   const [fileError, setFileError] = useState("");
+  const [isListening, setIsListening] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
 
   const isAnon = !user;
   const limitReached = isAnon && anonUsageCount >= anonDailyLimit;
   const remaining = isAnon ? anonDailyLimit - anonUsageCount : Infinity;
   const hasContent = value.trim() || files.length > 0;
+  const hasSpeech = !!getSpeechRecognition();
 
   const adjustHeight = useCallback(() => {
     const ta = textareaRef.current;
@@ -146,6 +166,56 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
       return () => clearTimeout(timer);
     }
   }, [fileError]);
+
+  // Cleanup recognition on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
+  }, []);
+
+  const toggleListening = useCallback(() => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRec = getSpeechRecognition();
+    if (!SpeechRec) return;
+
+    const recognition = new SpeechRec();
+    recognition.lang = getRecognitionLang(locale);
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (event: any) => {
+      let transcript = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          transcript += event.results[i][0].transcript;
+        }
+      }
+      if (transcript) {
+        setValue((prev) => (prev ? prev + " " + transcript : transcript));
+      }
+    };
+
+    recognition.onerror = () => {
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsListening(true);
+  }, [isListening, locale]);
 
   const handleFiles = useCallback(async (fileList: FileList | File[]) => {
     const newFiles = Array.from(fileList).slice(0, MAX_FILES - files.length);
@@ -187,6 +257,12 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
 
   const handleSubmit = async () => {
     if ((!value.trim() && files.length === 0) || isStreaming || limitReached) return;
+
+    // Stop listening if active
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    }
 
     const content = value.trim() || (files.length > 0 ? t("attachedFiles") as string : "");
     const attachments = files.length > 0 ? [...files] : undefined;
@@ -292,14 +368,14 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
           )}
 
           {/* Input row */}
-          <div className="flex items-end">
+          <div className="flex items-end gap-0.5">
             {/* Attach button */}
-            <div className="flex items-center pl-1.5 sm:pl-2 pb-2 sm:pb-2.5">
+            <div className="flex-shrink-0 pb-1.5 sm:pb-2 pl-1.5 sm:pl-2">
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={limitReached || files.length >= MAX_FILES || processingFiles}
                 className={cn(
-                  "flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-xl sm:rounded-lg transition-colors",
+                  "flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-xl sm:rounded-lg transition-colors",
                   "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80",
                   (limitReached || files.length >= MAX_FILES) && "opacity-40 cursor-not-allowed"
                 )}
@@ -320,6 +396,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
               />
             </div>
 
+            {/* Textarea */}
             <textarea
               ref={textareaRef}
               value={value}
@@ -327,26 +404,50 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
               onKeyDown={handleKeyDown}
               onPaste={handlePaste}
               placeholder={
-                limitReached
-                  ? (t("inputLimitReached") as string)
-                  : (t("inputPlaceholder") as string)
+                isListening
+                  ? (t("voiceListening" as TranslationKey) as string)
+                  : limitReached
+                    ? (t("inputLimitReached") as string)
+                    : (t("inputPlaceholder") as string)
               }
               disabled={limitReached}
               rows={1}
               className={cn(
-                "flex-1 resize-none bg-transparent px-1.5 sm:px-2 py-3 text-[16px] sm:text-sm text-foreground placeholder:text-muted-foreground",
+                "flex-1 min-w-0 resize-none bg-transparent px-1 sm:px-2 py-2.5 sm:py-2.5 text-[16px] sm:text-sm text-foreground placeholder:text-muted-foreground",
                 "outline-none",
                 "max-h-[200px]"
               )}
               aria-label="Mensaje"
             />
 
-            <div className="flex items-center gap-1 px-1.5 sm:px-2 pb-2 sm:pb-2.5">
+            {/* Right-side buttons */}
+            <div className="flex-shrink-0 flex items-center gap-0.5 pb-1.5 sm:pb-2 pr-1.5 sm:pr-2">
+              {/* Voice input button */}
+              {hasSpeech && !limitReached && (
+                <button
+                  onClick={toggleListening}
+                  className={cn(
+                    "flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
+                    isListening
+                      ? "bg-red-500 text-white animate-pulse shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80"
+                  )}
+                  aria-label={isListening ? (t("voiceListening" as TranslationKey) as string) : (t("voiceInput" as TranslationKey) as string)}
+                >
+                  {isListening ? (
+                    <MicOff className="h-4.5 w-4.5 sm:h-4 sm:w-4" />
+                  ) : (
+                    <Mic className="h-5 w-5 sm:h-4 sm:w-4" />
+                  )}
+                </button>
+              )}
+
+              {/* Send button */}
               <button
                 onClick={handleSubmit}
                 disabled={!hasContent || isStreaming || limitReached || processingFiles}
                 className={cn(
-                  "flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
+                  "flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
                   hasContent && !isStreaming && !limitReached && !processingFiles
                     ? "bg-syntalys-blue text-white hover:bg-syntalys-blue-light active:scale-95 shadow-sm"
                     : "bg-muted text-muted-foreground cursor-not-allowed"
