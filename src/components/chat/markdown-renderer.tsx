@@ -92,6 +92,16 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
               <table {...props}>{children}</table>
             </div>
           ),
+          img: ({ src, alt, ...props }) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={src}
+              alt={alt || ""}
+              className="rounded-xl max-w-full shadow-md border border-border my-3"
+              loading="lazy"
+              {...props}
+            />
+          ),
         }}
       >
         {content}

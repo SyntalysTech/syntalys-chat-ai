@@ -461,6 +461,11 @@ const translations = {
     es: "Nuestro modelo mas avanzado con capacidades de ultima generacion",
     en: "Our most advanced model with cutting-edge capabilities",
   },
+  modelMiloDesc: {
+    fr: "Génère des images à partir de texte",
+    es: "Genera imagenes a partir de texto",
+    en: "Generate images from text",
+  },
   legacyModels: {
     fr: "Modèles anciens",
     es: "Modelos antiguos",

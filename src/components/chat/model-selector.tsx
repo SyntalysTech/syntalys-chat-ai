@@ -17,12 +17,14 @@ import {
   Rocket,
   Brain,
   Atom,
+  Paintbrush,
 } from "lucide-react";
 
 const modelIcons: Record<string, typeof Zap> = {
   "talys-2.0": Rocket,
   "talys-2.5": Brain,
   "talys-3.0-beta": Atom,
+  "milo": Paintbrush,
   "synta-1.0": Zap,
   "synta-1.0-reasoning": Sparkles,
   "synta-1.5-beta": FlaskConical,

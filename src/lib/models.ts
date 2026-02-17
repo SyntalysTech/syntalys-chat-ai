@@ -8,6 +8,7 @@ export interface ModelConfig {
   badge?: string;
   legacy?: boolean;
   systemPrompt?: string;
+  isImageModel?: boolean;
 }
 
 export const MODELS: ModelConfig[] = [
@@ -37,6 +38,17 @@ export const MODELS: ModelConfig[] = [
     openaiModel: "gpt-4o",
     requiresAuth: true,
     badge: "Beta",
+  },
+  // ── Image generation ──
+  {
+    id: "milo",
+    name: "Milo",
+    description: "Genera imagenes a partir de texto",
+    descriptionKey: "modelMiloDesc",
+    openaiModel: "dall-e-3",
+    requiresAuth: true,
+    badge: "New",
+    isImageModel: true,
   },
   // ── Legacy models ──
   {

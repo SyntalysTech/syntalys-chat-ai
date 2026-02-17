@@ -76,6 +76,43 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ── Image generation (Milo) ──
+    if (modelConfig.isImageModel) {
+      const lastUserMessage = messages[messages.length - 1]?.content || "";
+      const imageResponse = await openai.images.generate({
+        model: modelConfig.openaiModel,
+        prompt: lastUserMessage,
+        n: 1,
+        size: "1024x1024",
+        quality: "standard",
+      });
+
+      const imageUrl = imageResponse.data?.[0]?.url;
+      if (!imageUrl) {
+        return NextResponse.json(
+          { error: "No se pudo generar la imagen" },
+          { status: 500 }
+        );
+      }
+
+      const markdown = `![${lastUserMessage.slice(0, 100)}](${imageUrl})`;
+      const encoder = new TextEncoder();
+      const readable = new ReadableStream({
+        start(controller) {
+          controller.enqueue(encoder.encode(markdown));
+          controller.close();
+        },
+      });
+
+      return new Response(readable, {
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "no-cache",
+        },
+      });
+    }
+
+    // ── Text chat models ──
     let systemPrompt = getSystemPrompt(modelConfig.id);
     if (userName) {
       systemPrompt += `\n\nThe user's name is "${userName}". Address them by their name naturally when appropriate (greetings, personalized responses), but don't force it into every sentence.`;
