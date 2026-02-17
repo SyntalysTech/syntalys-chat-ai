@@ -63,6 +63,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [selectedModel, setSelectedModel] = useState(DEFAULT_MODEL_ID);
   const [anonUsageCount, setAnonUsageCount] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
+  const isStreamingRef = useRef(false);
+  const messagesRef = useRef<ChatMessage[]>([]);
+  messagesRef.current = messages;
 
   const loadThreads = useCallback(async () => {
     if (user) {
@@ -123,6 +126,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         abortRef.current.abort();
         abortRef.current = null;
       }
+      isStreamingRef.current = false;
       setIsStreaming(false);
 
       const thread = threads.find((t) => t.id === threadId);
@@ -190,7 +194,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const sendMessage = useCallback(
     async (content: string, attachments?: FileAttachment[]) => {
-      if (isStreaming) return;
+      // Use ref to prevent stale closure from blocking sends
+      if (isStreamingRef.current) return;
 
       // Check anonymous limit
       if (!user) {
@@ -198,61 +203,66 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         if (usage >= ANON_DAILY_LIMIT) return;
       }
 
-      let threadId = currentThread?.id;
+      // Lock immediately via ref (avoids stale closure issues)
+      isStreamingRef.current = true;
+      setIsStreaming(true);
 
-      // Auto-create thread if needed
-      if (!threadId) {
-        threadId = await createThread();
-      }
+      let assistantMessage: ChatMessage | null = null;
 
-      const userMessage: ChatMessage = {
-        id: generateId(),
-        thread_id: threadId,
-        role: "user",
-        content,
-        model: null,
-        created_at: new Date().toISOString(),
-        attachments: attachments?.map(({ name, type, size }) => ({ name, type, size })),
-      };
+      try {
+        let threadId = currentThread?.id;
 
-      // Save user message
-      if (user) {
-        await supabase.from("chat_messages").insert({
+        // Auto-create thread if needed
+        if (!threadId) {
+          threadId = await createThread();
+        }
+
+        const userMessage: ChatMessage = {
+          id: generateId(),
           thread_id: threadId,
           role: "user",
           content,
-        });
-      } else {
-        addLocalMessage(threadId, userMessage);
-      }
+          model: null,
+          created_at: new Date().toISOString(),
+          attachments: attachments?.map(({ name, type, size }) => ({ name, type, size })),
+        };
 
-      setMessages((prev) => [...prev, userMessage]);
+        // Save user message
+        if (user) {
+          await supabase.from("chat_messages").insert({
+            thread_id: threadId,
+            role: "user",
+            content,
+          });
+        } else {
+          addLocalMessage(threadId, userMessage);
+        }
 
-      // Update title from first message
-      const currentMsgs = user
-        ? messages
-        : getLocalMessages(threadId).filter((m) => m.id !== userMessage.id);
-      if (currentMsgs.filter((m) => m.role === "user").length === 0) {
-        const title = content.slice(0, 50) + (content.length > 50 ? "..." : "");
-        await renameThread(threadId, title);
-      }
+        setMessages((prev) => [...prev, userMessage]);
 
-      // Prepare streaming
-      setIsStreaming(true);
-      const assistantMessage: ChatMessage = {
-        id: generateId(),
-        thread_id: threadId,
-        role: "assistant",
-        content: "",
-        model: selectedModel,
-        created_at: new Date().toISOString(),
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
+        // Update title from first message (use ref for current messages)
+        const currentMsgs = user
+          ? messagesRef.current
+          : getLocalMessages(threadId).filter((m) => m.id !== userMessage.id);
+        if (currentMsgs.filter((m) => m.role === "user").length === 0) {
+          const title = content.slice(0, 50) + (content.length > 50 ? "..." : "");
+          await renameThread(threadId, title);
+        }
 
-      const abortController = new AbortController();
-      abortRef.current = abortController;
+        // Prepare streaming
+        assistantMessage = {
+          id: generateId(),
+          thread_id: threadId,
+          role: "assistant",
+          content: "",
+          model: selectedModel,
+          created_at: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, assistantMessage!]);
 
-      try {
+        const abortController = new AbortController();
+        abortRef.current = abortController;
+
         // Build image URLs and document context from attachments
         const imageUrls: string[] = [];
         let docContext = "";
@@ -271,8 +281,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           ? `${content}\n\n[Attached documents]${docContext}`
           : content;
 
+        // Use ref for current messages to avoid stale closure
         const historyForApi: StreamMessage[] = [
-          ...messages.map((m) => ({
+          ...messagesRef.current.map((m) => ({
             role: m.role as "user" | "assistant",
             content: m.content,
           })),
@@ -312,9 +323,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           const chunk = decoder.decode(value, { stream: true });
           fullContent += chunk;
 
+          const msgId = assistantMessage!.id;
           setMessages((prev) =>
             prev.map((m) =>
-              m.id === assistantMessage.id
+              m.id === msgId
                 ? { ...m, content: fullContent }
                 : m
             )
@@ -339,29 +351,31 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         }
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantMessage.id
-              ? {
-                  ...m,
-                  content:
-                    m.content ||
-                    (t("genericError") as string),
-                }
-              : m
-          )
-        );
+        if (assistantMessage) {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantMessage!.id
+                ? {
+                    ...m,
+                    content:
+                      m.content ||
+                      (t("genericError") as string),
+                  }
+                : m
+            )
+          );
+        }
       } finally {
+        isStreamingRef.current = false;
         setIsStreaming(false);
         abortRef.current = null;
       }
     },
     [
       user,
+      profile,
       supabase,
       currentThread,
-      messages,
-      isStreaming,
       selectedModel,
       createThread,
       renameThread,
@@ -370,21 +384,23 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   );
 
   const regenerateLastResponse = useCallback(async () => {
-    if (isStreaming || messages.length < 2) return;
+    if (isStreamingRef.current) return;
+    const currentMsgs = messagesRef.current;
+    if (currentMsgs.length < 2) return;
 
-    const lastUserMsg = [...messages]
+    const lastUserMsg = [...currentMsgs]
       .reverse()
       .find((m) => m.role === "user");
     if (!lastUserMsg) return;
 
     // Remove last assistant message
-    const lastAssistantIdx = messages.length - 1;
-    if (messages[lastAssistantIdx]?.role === "assistant") {
+    const lastAssistantIdx = currentMsgs.length - 1;
+    if (currentMsgs[lastAssistantIdx]?.role === "assistant") {
       if (user) {
         await supabase
           .from("chat_messages")
           .delete()
-          .eq("id", messages[lastAssistantIdx].id);
+          .eq("id", currentMsgs[lastAssistantIdx].id);
       }
       setMessages((prev) => prev.slice(0, -1));
     }
@@ -399,7 +415,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     setMessages((prev) => prev.filter((m) => m.id !== lastUserMsg.id));
 
     await sendMessage(lastUserMsg.content);
-  }, [user, supabase, messages, isStreaming, sendMessage]);
+  }, [user, supabase, sendMessage]);
 
   const clearCurrentThread = useCallback(() => {
     setCurrentThread(null);
