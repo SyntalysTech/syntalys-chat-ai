@@ -237,7 +237,7 @@ export function Sidebar({
             >
               {grouped.map((group) => (
                 <div key={group.label} className="mb-3">
-                  <div className="px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     {t(group.label as TranslationKey) as string}
                   </div>
                   {group.chats.map((thread) => (

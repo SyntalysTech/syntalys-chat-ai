@@ -236,13 +236,13 @@ export function SettingsModal({
                     key={model.id}
                     onClick={() => setDefaultModel(model.id)}
                     className={cn(
-                      "flex w-full items-center justify-between rounded-lg border px-4 py-3 text-left transition-all",
+                      "flex w-full items-center justify-between rounded-lg border px-3 sm:px-4 py-3 text-left transition-all min-h-[44px]",
                       defaultModel === model.id
                         ? "border-syntalys-blue bg-syntalys-blue/5"
                         : "border-border hover:bg-accent"
                     )}
                   >
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-sm font-medium text-card-foreground">
                         {model.name}
                       </p>
@@ -253,7 +253,7 @@ export function SettingsModal({
                     {model.badge && (
                       <span
                         className={cn(
-                          "ml-2 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                          "ml-2 flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
                           model.badge === "Beta"
                             ? "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold"
                             : "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]"
@@ -274,13 +274,13 @@ export function SettingsModal({
                     key={model.id}
                     onClick={() => setDefaultModel(model.id)}
                     className={cn(
-                      "flex w-full items-center justify-between rounded-lg border px-4 py-3 text-left transition-all",
+                      "flex w-full items-center justify-between rounded-lg border px-3 sm:px-4 py-3 text-left transition-all min-h-[44px]",
                       defaultModel === model.id
                         ? "border-syntalys-blue bg-syntalys-blue/5"
                         : "border-border hover:bg-accent"
                     )}
                   >
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-sm font-medium text-card-foreground">
                         {model.name}
                       </p>
@@ -291,7 +291,7 @@ export function SettingsModal({
                     {model.badge && (
                       <span
                         className={cn(
-                          "ml-2 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                          "ml-2 flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
                           model.badge === "Beta"
                             ? "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold"
                             : "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]"
@@ -374,8 +374,8 @@ export function SettingsModal({
                   >
                     <Trash2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                     <div className="min-w-0">
-                      <p className="font-medium text-xs sm:text-sm">{t("deleteAllChats")}</p>
-                      <p className="text-[11px] sm:text-xs text-muted-foreground">
+                      <p className="font-medium text-sm">{t("deleteAllChats")}</p>
+                      <p className="text-xs text-muted-foreground">
                         {t("deleteAllChatsDesc")}
                       </p>
                     </div>
@@ -416,10 +416,10 @@ export function SettingsModal({
                   >
                     <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
                     <div className="min-w-0">
-                      <p className="font-medium text-destructive text-xs sm:text-sm">
+                      <p className="font-medium text-destructive text-sm">
                         {t("deleteAccount")}
                       </p>
-                      <p className="text-[11px] sm:text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground">
                         {t("deleteAccountDesc")}
                       </p>
                     </div>
@@ -473,7 +473,7 @@ export function SettingsModal({
           <p className="text-xs text-muted-foreground text-center">
             SYNTALYS Chat AI v1.0
           </p>
-          <p className="mt-1 text-[10px] text-muted-foreground/60 text-center">
+          <p className="mt-1 text-[11px] text-muted-foreground/60 text-center">
             &copy; {new Date().getFullYear()} SYNTALYS TECH.{" "}
             {t("allRightsReserved")}
           </p>

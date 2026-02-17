@@ -143,7 +143,7 @@
 }
 
 .prose p {
-  @apply leading-7;
+  @apply leading-relaxed sm:leading-7;
 }
 
 .prose ul,

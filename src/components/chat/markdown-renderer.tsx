@@ -38,7 +38,7 @@ function CodeBlock({
   // Block code
   return (
     <div className="group relative my-4 rounded-xl overflow-hidden border border-[#2a2a3c]">
-      <div className="flex items-center justify-between bg-[#161622] px-4 py-2 text-xs">
+      <div className="flex items-center justify-between bg-[#161622] px-3 sm:px-4 py-2 text-xs">
         <div className="flex items-center gap-2">
           <div className="flex gap-1.5">
             <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
@@ -49,7 +49,7 @@ function CodeBlock({
         </div>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[#6c7086] hover:text-[#cdd6f4] hover:bg-white/5 transition-colors"
+          className="flex items-center gap-1.5 rounded-md px-3 py-1.5 sm:px-2.5 sm:py-1 text-[#6c7086] hover:text-[#cdd6f4] hover:bg-white/5 transition-colors"
         >
           {copied ? (
             <>

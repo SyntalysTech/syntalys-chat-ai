@@ -47,7 +47,7 @@ function ModelButton({
     <button
       onClick={onSelect}
       className={cn(
-        "flex w-full items-start gap-3 rounded-lg px-3 py-3 text-left transition-colors",
+        "flex w-full items-start gap-3 rounded-lg px-3 py-3 text-left transition-colors min-h-[44px]",
         isSelected ? "bg-accent" : "hover:bg-accent/50"
       )}
     >
@@ -125,7 +125,7 @@ export function ModelSelector() {
       <button
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+          "flex items-center gap-2 rounded-lg px-3 py-2.5 sm:py-2 text-sm font-medium transition-colors min-h-[44px] sm:min-h-0",
           "hover:bg-accent text-foreground"
         )}
       >

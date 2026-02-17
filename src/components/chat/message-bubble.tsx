@@ -178,7 +178,7 @@ export const MessageBubble = memo(function MessageBubble({
   return (
     <div
       className={cn(
-        "group flex gap-2.5 sm:gap-4 px-3 sm:px-4 py-3 sm:py-5 animate-fade-in",
+        "group flex gap-3 sm:gap-4 px-3 sm:px-4 py-3 sm:py-4 animate-fade-in",
         isUser && "flex-row-reverse"
       )}
     >
@@ -216,7 +216,7 @@ export const MessageBubble = memo(function MessageBubble({
                   return (
                     <div
                       key={i}
-                      className="flex items-center gap-1 sm:gap-1.5 rounded-lg bg-syntalys-blue/80 px-2 sm:px-2.5 py-1 sm:py-1.5 text-[11px] sm:text-xs text-white/90"
+                      className="flex items-center gap-1.5 rounded-lg bg-syntalys-blue/80 px-2.5 py-1.5 text-xs text-white/90"
                     >
                       {isImg ? (
                         <ImageIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
@@ -230,7 +230,7 @@ export const MessageBubble = memo(function MessageBubble({
                 })}
               </div>
             )}
-            <div className="rounded-2xl rounded-tr-sm bg-syntalys-blue px-3.5 sm:px-4 py-2 sm:py-2.5 text-white">
+            <div className="rounded-2xl rounded-tr-sm bg-syntalys-blue px-4 py-2.5 sm:py-2.5 text-white">
               <p className="whitespace-pre-wrap text-sm leading-relaxed break-words">
                 {message.content}
               </p>
@@ -301,10 +301,10 @@ export const MessageBubble = memo(function MessageBubble({
 
             {/* Action buttons */}
             {!isStreaming && message.content && (
-              <div className="flex items-center gap-1 pt-1">
+              <div className="flex items-center gap-0.5 sm:gap-1 pt-1.5 sm:pt-1">
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
+                  className="flex items-center justify-center h-9 w-9 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
                   aria-label={t("copyMessage")}
                 >
                   {copied ? (
@@ -316,7 +316,7 @@ export const MessageBubble = memo(function MessageBubble({
                 {hasTTS && (
                   <button
                     onClick={handleSpeak}
-                    className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
+                    className="flex items-center justify-center h-9 w-9 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
                     aria-label={isSpeaking ? t("stopReading" as TranslationKey) : t("readAloud" as TranslationKey)}
                   >
                     {isSpeaking ? (
@@ -330,13 +330,13 @@ export const MessageBubble = memo(function MessageBubble({
                   <div ref={modelMenuRef} className="relative">
                     <button
                       onClick={() => setModelMenuOpen((o) => !o)}
-                      className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
+                      className="flex items-center justify-center h-9 w-9 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
                       aria-label={t("regenerate")}
                     >
                       <RefreshCw className="h-4 w-4" />
                     </button>
                     {modelMenuOpen && (
-                      <div className="absolute bottom-full left-0 mb-1 w-56 rounded-xl border border-border bg-popover p-1.5 shadow-xl animate-fade-in z-50">
+                      <div className="absolute bottom-full left-0 mb-1 w-[min(14rem,calc(100vw-4rem))] rounded-xl border border-border bg-popover p-1.5 shadow-xl animate-fade-in z-50">
                         <p className="px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground">
                           {t("regenerateWith" as TranslationKey)}
                         </p>

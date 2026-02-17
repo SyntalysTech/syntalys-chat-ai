@@ -56,7 +56,7 @@ export function EmptyState({ isDark, onSuggestionClick }: EmptyStateProps) {
         {t("emptyStateSubtitle")}
       </p>
 
-      <div className="grid w-full max-w-2xl grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
+      <div className="grid w-full max-w-2xl grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3">
         {suggestions.map((s) => {
           const title = t(s.titleKey) as string;
           const prompt = t(s.promptKey) as string;
@@ -66,7 +66,7 @@ export function EmptyState({ isDark, onSuggestionClick }: EmptyStateProps) {
               onClick={() => onSuggestionClick(prompt)}
               className="group flex items-start gap-3 rounded-xl border border-border/60 bg-card p-3.5 text-left transition-all duration-200 hover:border-syntalys-blue/30 hover:bg-accent hover:shadow-sm"
             >
-              <s.icon className="mt-0.5 h-5 w-5 flex-shrink-0 text-syntalys-blue/70 group-hover:text-syntalys-blue transition-colors" />
+              <s.icon className="mt-0.5 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-syntalys-blue/70 group-hover:text-syntalys-blue transition-colors" />
               <div className="min-w-0">
                 <p className="text-sm font-medium text-card-foreground">
                   {title}

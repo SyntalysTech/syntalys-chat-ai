@@ -340,7 +340,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 return (
                   <div
                     key={i}
-                    className="flex items-center gap-1.5 sm:gap-2 rounded-lg bg-muted/60 px-2 sm:px-2.5 py-1 sm:py-1.5 text-[11px] sm:text-xs"
+                    className="flex items-center gap-1.5 sm:gap-2 rounded-lg bg-muted/60 px-2.5 sm:px-2.5 py-1.5 sm:py-1.5 text-xs"
                   >
                     {isImage ? (
                       <ImageIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-syntalys-blue flex-shrink-0" />
@@ -368,7 +368,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
           )}
 
           {/* Input row */}
-          <div className="flex items-end gap-0.5">
+          <div className="flex items-end gap-1">
             {/* Attach button */}
             <div className="flex-shrink-0 pb-1.5 sm:pb-2 pl-1.5 sm:pl-2">
               <button
@@ -421,7 +421,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
             />
 
             {/* Right-side buttons */}
-            <div className="flex-shrink-0 flex items-center gap-0.5 pb-1.5 sm:pb-2 pr-1.5 sm:pr-2">
+            <div className="flex-shrink-0 flex items-center gap-1 pb-1.5 sm:pb-2 pr-1.5 sm:pr-2">
               {/* Voice input button */}
               {hasSpeech && !limitReached && (
                 <button
@@ -467,7 +467,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
         {/* Usage indicator for anonymous users */}
         {isAnon && (
           <div className="mt-2 flex items-center justify-between px-1">
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {limitReached ? (
                 <span className="text-destructive">
                   {t("limitReachedShort")}
@@ -490,7 +490,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
           </div>
         )}
 
-        <p className="mt-1.5 text-center text-[10px] text-muted-foreground/60">
+        <p className="mt-1.5 text-center text-[11px] text-muted-foreground/60">
           {t("aiDisclaimer")}
         </p>
       </div>

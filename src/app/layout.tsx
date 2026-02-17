@@ -13,11 +13,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const viewport = {
+export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  viewportFit: "cover" as const,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#03366d" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0f" },
+  ],
 };
 
 export const metadata: Metadata = {
@@ -26,8 +30,13 @@ export const metadata: Metadata = {
   description:
     "Assistant intelligent SYNTALYS - Intelligence artificielle sur mesure",
   icons: {
-    icon: "/logos/logo-favicon.png",
-    apple: "/logos/logo-favicon.png",
+    icon: "/icon-192x192.png",
+    apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "SYNTALYS AI",
   },
   openGraph: {
     title: "SYNTALYS Chat AI",

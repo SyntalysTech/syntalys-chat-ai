@@ -86,11 +86,11 @@ export function ChatHeader({ onMenuClick }: ChatHeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border/50 bg-background/80 backdrop-blur-md px-3 py-2 sm:px-4">
-      <div className="flex items-center gap-2">
+    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border/50 bg-background/80 backdrop-blur-md px-2 sm:px-4 py-1.5 sm:py-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         <button
           onClick={onMenuClick}
-          className="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent active:bg-accent/80 transition-colors lg:hidden"
+          className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent active:bg-accent/80 transition-colors lg:hidden"
           aria-label={t("menu") as string}
         >
           <Menu className="h-5 w-5" />
