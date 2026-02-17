@@ -307,8 +307,8 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
   );
 
   return (
-    <div className="flex-shrink-0 border-t border-border/50 bg-background pb-[env(safe-area-inset-bottom)]">
-      <div className="mx-auto max-w-3xl px-3 sm:px-4 py-2 sm:py-3">
+    <div className="flex-shrink-0 border-t border-border/50 bg-card/30 pb-safe">
+      <div className="mx-auto max-w-3xl px-3 sm:px-4 pt-2 sm:pt-3 pb-1">
         {/* File error message */}
         {fileError && (
           <div className="mb-2 flex items-start gap-2 rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive animate-fade-in">
@@ -490,7 +490,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
           </div>
         )}
 
-        <p className="mt-1.5 text-center text-[11px] text-muted-foreground/60">
+        <p className="mt-1 text-center text-[11px] text-muted-foreground/60">
           {t("aiDisclaimer")}
         </p>
       </div>

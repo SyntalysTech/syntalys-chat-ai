@@ -64,7 +64,7 @@ export function AppShell() {
 
   if (!mounted || !isReady) {
     return (
-      <div className="flex h-[100dvh] items-center justify-center bg-background">
+      <div className="fixed inset-0 flex items-center justify-center bg-background pt-safe">
         <div className="flex flex-col items-center gap-3">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-syntalys-blue border-t-transparent" />
           <p className="text-sm text-muted-foreground">{t("loading")}</p>
@@ -74,7 +74,7 @@ export function AppShell() {
   }
 
   return (
-    <div className="flex h-[100dvh] overflow-hidden bg-background">
+    <div className="fixed inset-0 flex overflow-hidden bg-background pt-safe">
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed((c) => !c)}

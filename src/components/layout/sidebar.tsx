@@ -538,8 +538,10 @@ export function Sidebar({
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-[280px] max-w-[85vw] transition-transform duration-300 ease-in-out lg:hidden",
+          "pt-safe pb-safe",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
+        style={{ backgroundColor: "var(--sidebar)" }}
       >
         {sidebarInner}
       </aside>
