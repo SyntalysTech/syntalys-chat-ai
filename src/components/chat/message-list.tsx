@@ -39,7 +39,7 @@ export function MessageList({ isDark }: MessageListProps) {
             isStreaming={isStreaming && idx === messages.length - 1}
             onRegenerate={
               idx === actualLastAssistantIdx
-                ? regenerateLastResponse
+                ? (modelId?: string) => regenerateLastResponse(modelId)
                 : undefined
             }
             isDark={isDark}

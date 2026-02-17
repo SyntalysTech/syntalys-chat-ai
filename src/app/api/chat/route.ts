@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
-import type { ChatCompletionMessageParam, ChatCompletionContentPart } from "openai/resources/chat/completions";
+import type { ResponseInputItem } from "openai/resources/responses/responses";
 import { getModelByIdOrDefault, getSystemPrompt } from "@/lib/models";
 import { checkRateLimit, incrementUsage } from "@/lib/rate-limit";
 import { z } from "zod";
@@ -24,6 +24,15 @@ const requestSchema = z.object({
   imageUrls: z.array(z.string()).max(5).optional(),
 });
 
+function getClientIP(req: NextRequest): string {
+  // Vercel / reverse proxy headers
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0].trim();
+  const realIp = req.headers.get("x-real-ip");
+  if (realIp) return realIp;
+  return "unknown";
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -36,12 +45,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { messages, model: modelId, isAnonymous, anonId, userName, imageUrls } = parsed.data;
+    const { messages, model: modelId, isAnonymous, userName, imageUrls } = parsed.data;
 
-    // Rate limiting for anonymous users
-    if (isAnonymous && anonId) {
-      const rateLimitKey = `anon:${anonId}`;
-      const { allowed } = checkRateLimit(rateLimitKey);
+    // Rate limiting for anonymous users — by IP, not client-generated anonId
+    if (isAnonymous) {
+      const clientIP = getClientIP(req);
+      const rateLimitKey = `ip:${clientIP}`;
+      const { allowed, remaining } = checkRateLimit(rateLimitKey);
 
       if (!allowed) {
         return NextResponse.json(
@@ -71,51 +81,51 @@ export async function POST(req: NextRequest) {
       systemPrompt += `\n\nThe user's name is "${userName}". Address them by their name naturally when appropriate (greetings, personalized responses), but don't force it into every sentence.`;
     }
 
-    // Build OpenAI messages, with vision support for the last user message
-    const openaiMessages: ChatCompletionMessageParam[] = [
-      { role: "system", content: systemPrompt },
-    ];
+    // Build input messages for the Responses API
+    const inputMessages: ResponseInputItem[] = [];
 
     for (let i = 0; i < messages.length; i++) {
       const m = messages[i];
       const isLastUser = i === messages.length - 1 && m.role === "user" && imageUrls?.length;
 
       if (isLastUser) {
-        // Build multimodal content for the last user message
-        const parts: ChatCompletionContentPart[] = [
-          { type: "text", text: m.content },
-        ];
-        for (const url of imageUrls!) {
-          parts.push({
-            type: "image_url",
-            image_url: { url, detail: "auto" },
-          });
-        }
-        openaiMessages.push({ role: "user", content: parts });
+        // Build multimodal content for the last user message with images
+        inputMessages.push({
+          role: "user",
+          content: [
+            { type: "input_text", text: m.content },
+            ...imageUrls!.map((url) => ({
+              type: "input_image" as const,
+              image_url: url,
+              detail: "auto" as const,
+            })),
+          ],
+        });
       } else {
-        openaiMessages.push({
+        inputMessages.push({
           role: m.role as "user" | "assistant",
           content: m.content,
-        });
+        } as ResponseInputItem);
       }
     }
 
-    const stream = await openai.chat.completions.create({
+    const stream = await openai.responses.create({
       model: modelConfig.openaiModel,
-      messages: openaiMessages,
+      instructions: systemPrompt,
+      input: inputMessages,
+      tools: [{ type: "web_search_preview", search_context_size: "medium" }],
       stream: true,
       temperature: 0.7,
-      max_tokens: 4096,
+      max_output_tokens: 16384,
     });
 
     const encoder = new TextEncoder();
     const readable = new ReadableStream({
       async start(controller) {
         try {
-          for await (const chunk of stream) {
-            const content = chunk.choices[0]?.delta?.content;
-            if (content) {
-              controller.enqueue(encoder.encode(content));
+          for await (const event of stream) {
+            if (event.type === "response.output_text.delta") {
+              controller.enqueue(encoder.encode(event.delta));
             }
           }
           controller.close();

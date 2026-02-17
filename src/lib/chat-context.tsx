@@ -38,8 +38,8 @@ interface ChatContextType {
   selectThread: (threadId: string) => Promise<void>;
   deleteThread: (threadId: string) => Promise<void>;
   renameThread: (threadId: string, title: string) => Promise<void>;
-  sendMessage: (content: string, attachments?: FileAttachment[]) => Promise<void>;
-  regenerateLastResponse: () => Promise<void>;
+  sendMessage: (content: string, attachments?: FileAttachment[], modelOverride?: string) => Promise<void>;
+  regenerateLastResponse: (modelId?: string) => Promise<void>;
   clearCurrentThread: () => void;
   deleteAllThreads: () => Promise<void>;
 }
@@ -193,7 +193,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   );
 
   const sendMessage = useCallback(
-    async (content: string, attachments?: FileAttachment[]) => {
+    async (content: string, attachments?: FileAttachment[], modelOverride?: string) => {
       // Use ref to prevent stale closure from blocking sends
       if (isStreamingRef.current) return;
 
@@ -207,6 +207,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       isStreamingRef.current = true;
       setIsStreaming(true);
 
+      const effectiveModel = modelOverride || selectedModel;
       let assistantMessage: ChatMessage | null = null;
 
       try {
@@ -255,7 +256,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           thread_id: threadId,
           role: "assistant",
           content: "",
-          model: selectedModel,
+          model: effectiveModel,
           created_at: new Date().toISOString(),
         };
         setMessages((prev) => [...prev, assistantMessage!]);
@@ -295,10 +296,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             messages: historyForApi,
-            model: selectedModel,
+            model: effectiveModel,
             threadId,
             isAnonymous: !user,
-            anonId: !user ? getAnonId() : undefined,
             userName: profile?.display_name || undefined,
             imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
           }),
@@ -307,6 +307,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
+          // If server says rate limit reached, force client state
+          if (response.status === 429 && !user) {
+            setAnonUsageCount(ANON_DAILY_LIMIT);
+          }
           throw new Error(errorData.error || (t("responseError") as string));
         }
 
@@ -339,7 +343,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             thread_id: threadId,
             role: "assistant",
             content: fullContent,
-            model: selectedModel,
+            model: effectiveModel,
           });
         } else {
           addLocalMessage(threadId, {
@@ -383,7 +387,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     ]
   );
 
-  const regenerateLastResponse = useCallback(async () => {
+  const regenerateLastResponse = useCallback(async (modelId?: string) => {
     if (isStreamingRef.current) return;
     const currentMsgs = messagesRef.current;
     if (currentMsgs.length < 2) return;
@@ -392,6 +396,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       .reverse()
       .find((m) => m.role === "user");
     if (!lastUserMsg) return;
+
+    // If switching model, update selectedModel for UI
+    if (modelId) {
+      setSelectedModel(modelId);
+    }
 
     // Remove last assistant message
     const lastAssistantIdx = currentMsgs.length - 1;
@@ -414,7 +423,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
     setMessages((prev) => prev.filter((m) => m.id !== lastUserMsg.id));
 
-    await sendMessage(lastUserMsg.content);
+    await sendMessage(lastUserMsg.content, undefined, modelId);
   }, [user, supabase, sendMessage]);
 
   const clearCurrentThread = useCallback(() => {

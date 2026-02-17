@@ -455,29 +455,51 @@ export function Sidebar({
               </div>
             </CollapsedTooltip>
 
-            {/* Login button */}
-            <CollapsedTooltip collapsed={collapsed} label={t("signIn")}>
-              <button
-                onClick={onOpenAuth}
-                className={cn(
-                  "flex items-center rounded-lg transition-all duration-300",
-                  collapsed
-                    ? "h-9 w-9 justify-center mx-auto text-syntalys-blue hover:bg-sidebar-hover"
-                    : "w-full justify-center gap-2 bg-primary px-3 py-2 text-primary-foreground hover:bg-syntalys-blue-light"
-                )}
-              >
-                <LogIn className="h-4 w-4 flex-shrink-0" />
-                <span
+            {/* Settings + Login row */}
+            <div
+              className={cn(
+                "flex transition-all duration-300",
+                collapsed ? "flex-col items-center gap-0.5" : "gap-2"
+              )}
+            >
+              {/* Settings */}
+              <CollapsedTooltip collapsed={collapsed} label={t("settings")}>
+                <button
+                  onClick={onOpenSettings}
                   className={cn(
-                    "text-sm font-medium",
-                    "whitespace-nowrap overflow-hidden transition-all duration-300",
-                    collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100 ml-1"
+                    "flex items-center justify-center rounded-lg text-muted-foreground hover:bg-sidebar-hover transition-all duration-300",
+                    collapsed ? "h-9 w-9 mx-auto" : "h-9 w-9 flex-shrink-0"
+                  )}
+                  aria-label={t("settings")}
+                >
+                  <Settings className="h-4 w-4" />
+                </button>
+              </CollapsedTooltip>
+
+              {/* Login button */}
+              <CollapsedTooltip collapsed={collapsed} label={t("signIn")}>
+                <button
+                  onClick={onOpenAuth}
+                  className={cn(
+                    "flex items-center rounded-lg transition-all duration-300",
+                    collapsed
+                      ? "h-9 w-9 justify-center mx-auto text-syntalys-blue hover:bg-sidebar-hover"
+                      : "flex-1 justify-center gap-2 bg-primary px-3 py-2 text-primary-foreground hover:bg-syntalys-blue-light"
                   )}
                 >
-                  {t("signIn")}
-                </span>
-              </button>
-            </CollapsedTooltip>
+                  <LogIn className="h-4 w-4 flex-shrink-0" />
+                  <span
+                    className={cn(
+                      "text-sm font-medium",
+                      "whitespace-nowrap overflow-hidden transition-all duration-300",
+                      collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100 ml-1"
+                    )}
+                  >
+                    {t("signIn")}
+                  </span>
+                </button>
+              </CollapsedTooltip>
+            </div>
           </div>
         )}
       </div>

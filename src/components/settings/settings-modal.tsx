@@ -231,7 +231,45 @@ export function SettingsModal({
                 {t("defaultModel")}
               </h3>
               <div className="space-y-2">
-                {MODELS.map((model) => (
+                {MODELS.filter((m) => !m.legacy).map((model) => (
+                  <button
+                    key={model.id}
+                    onClick={() => setDefaultModel(model.id)}
+                    className={cn(
+                      "flex w-full items-center justify-between rounded-lg border px-4 py-3 text-left transition-all",
+                      defaultModel === model.id
+                        ? "border-syntalys-blue bg-syntalys-blue/5"
+                        : "border-border hover:bg-accent"
+                    )}
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-card-foreground">
+                        {model.name}
+                      </p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {t(model.descriptionKey as TranslationKey) as string}
+                      </p>
+                    </div>
+                    {model.badge && (
+                      <span
+                        className={cn(
+                          "ml-2 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                          model.badge === "Beta"
+                            ? "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold"
+                            : "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]"
+                        )}
+                      >
+                        {model.badge}
+                      </span>
+                    )}
+                  </button>
+                ))}
+
+                {/* Legacy models */}
+                <p className="pt-2 text-xs font-medium text-muted-foreground">
+                  {t("legacyModels" as TranslationKey)}
+                </p>
+                {MODELS.filter((m) => m.legacy).map((model) => (
                   <button
                     key={model.id}
                     onClick={() => setDefaultModel(model.id)}

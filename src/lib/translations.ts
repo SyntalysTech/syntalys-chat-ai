@@ -215,6 +215,11 @@ const translations = {
     es: "Regenerar respuesta",
     en: "Regenerate response",
   },
+  regenerateWith: {
+    fr: "Régénérer avec un autre modèle",
+    es: "Regenerar con otro modelo",
+    en: "Regenerate with another model",
+  },
 
   // ── Code Block ──
   copied: {
@@ -440,7 +445,29 @@ const translations = {
     en: "Older",
   },
 
-  // ── Model descriptions ──
+  // ── Model descriptions (new TALYS generation) ──
+  modelTalys20Desc: {
+    fr: "Rapide, efficace et avec recherche web",
+    es: "Rapido, eficiente y con busqueda web",
+    en: "Fast, efficient, and with web search",
+  },
+  modelTalys25Desc: {
+    fr: "Intelligence supérieure, analyse approfondie et raisonnement",
+    es: "Mayor inteligencia, analisis profundo y razonamiento",
+    en: "Higher intelligence, deep analysis, and reasoning",
+  },
+  modelTalys30Desc: {
+    fr: "Notre modèle le plus avancé avec des capacités de dernière génération",
+    es: "Nuestro modelo mas avanzado con capacidades de ultima generacion",
+    en: "Our most advanced model with cutting-edge capabilities",
+  },
+  legacyModels: {
+    fr: "Modèles anciens",
+    es: "Modelos antiguos",
+    en: "Legacy models",
+  },
+
+  // ── Model descriptions (legacy) ──
   modelBaseDesc: {
     fr: "Modèle de base rapide et efficace",
     es: "Modelo base rapido y eficiente",

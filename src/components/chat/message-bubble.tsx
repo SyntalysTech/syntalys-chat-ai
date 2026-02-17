@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useMemo, memo } from "react";
+import { useState, useMemo, useRef, useEffect, memo } from "react";
 import { cn } from "@/lib/utils";
 import { MarkdownRenderer } from "./markdown-renderer";
 import { useI18n } from "@/lib/i18n-context";
+import { useAuth } from "@/lib/auth-context";
+import { MODELS } from "@/lib/models";
+import type { TranslationKey } from "@/lib/translations";
 import {
   Check,
   Copy,
@@ -22,7 +25,7 @@ interface MessageBubbleProps {
   message: ChatMessage;
   isLast: boolean;
   isStreaming: boolean;
-  onRegenerate?: () => void;
+  onRegenerate?: (modelId?: string) => void;
   isDark: boolean;
 }
 
@@ -69,10 +72,30 @@ export const MessageBubble = memo(function MessageBubble({
 }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   const [reasoningOpen, setReasoningOpen] = useState(false);
+  const [modelMenuOpen, setModelMenuOpen] = useState(false);
+  const modelMenuRef = useRef<HTMLDivElement>(null);
   const { t } = useI18n();
+  const { user } = useAuth();
+
+  // Close model menu on outside click
+  useEffect(() => {
+    if (!modelMenuOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (modelMenuRef.current && !modelMenuRef.current.contains(e.target as Node)) {
+        setModelMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [modelMenuOpen]);
+
+  const availableModels = useMemo(
+    () => MODELS.filter((m) => !m.legacy && (user || !m.requiresAuth)),
+    [user]
+  );
   const isUser = message.role === "user";
-  const isReasoning = message.model === "synta-1.0-reasoning";
-  const isBeta = message.model === "synta-1.5-beta";
+  const isReasoning = message.model === "synta-1.0-reasoning" || message.model === "talys-2.5";
+  const isBeta = message.model === "synta-1.5-beta" || message.model === "talys-3.0-beta";
 
   const parsed = useMemo(() => {
     if (!isReasoning || isUser) return null;
@@ -218,9 +241,9 @@ export const MessageBubble = memo(function MessageBubble({
               </div>
             ) : null}
 
-            {/* Action buttons — always visible on mobile, hover on desktop */}
+            {/* Action buttons */}
             {!isStreaming && message.content && (
-              <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity pt-1">
+              <div className="flex items-center gap-1 pt-1">
                 <button
                   onClick={handleCopy}
                   className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
@@ -233,13 +256,48 @@ export const MessageBubble = memo(function MessageBubble({
                   )}
                 </button>
                 {isLast && onRegenerate && (
-                  <button
-                    onClick={onRegenerate}
-                    className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
-                    aria-label={t("regenerate")}
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                  </button>
+                  <div ref={modelMenuRef} className="relative">
+                    <button
+                      onClick={() => setModelMenuOpen((o) => !o)}
+                      className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
+                      aria-label={t("regenerate")}
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </button>
+                    {modelMenuOpen && (
+                      <div className="absolute bottom-full left-0 mb-1 w-56 rounded-xl border border-border bg-popover p-1.5 shadow-xl animate-fade-in z-50">
+                        <p className="px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground">
+                          {t("regenerateWith" as TranslationKey)}
+                        </p>
+                        {availableModels.map((model) => (
+                          <button
+                            key={model.id}
+                            onClick={() => {
+                              setModelMenuOpen(false);
+                              onRegenerate(model.id);
+                            }}
+                            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm hover:bg-accent transition-colors"
+                          >
+                            <span className="font-medium text-xs text-popover-foreground">
+                              {model.name}
+                            </span>
+                            {model.badge && (
+                              <span
+                                className={cn(
+                                  "rounded-full px-1.5 py-0.5 text-[9px] font-semibold",
+                                  model.badge === "Beta"
+                                    ? "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold"
+                                    : "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]"
+                                )}
+                              >
+                                {model.badge}
+                              </span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             )}
