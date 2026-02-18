@@ -186,13 +186,11 @@ export function SettingsModal({
 
   const handleClearAllMemories = async () => {
     if (user) {
-      for (const mem of memories) {
-        await fetch("/api/memory", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ memoryId: mem.id }),
-        });
-      }
+      await fetch("/api/memory", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clearAll: true }),
+      });
     } else {
       localStorage.removeItem("syntalys_anon_memories");
     }

@@ -15,7 +15,8 @@ const saveSchema = z.object({
 });
 
 const deleteSchema = z.object({
-  memoryId: z.string().uuid(),
+  memoryId: z.string().uuid().optional(),
+  clearAll: z.boolean().optional(),
 });
 
 // GET — Load all memories for the authenticated user
@@ -140,7 +141,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// DELETE — Remove a specific memory
+// DELETE — Remove a specific memory or clear all
 export async function DELETE(req: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient();
@@ -162,11 +163,20 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    await supabase
-      .from("user_memories")
-      .delete()
-      .eq("id", parsed.data.memoryId)
-      .eq("user_id", user.id);
+    if (parsed.data.clearAll) {
+      // Bulk delete all memories for this user
+      await supabase
+        .from("user_memories")
+        .delete()
+        .eq("user_id", user.id);
+    } else if (parsed.data.memoryId) {
+      // Delete a single memory
+      await supabase
+        .from("user_memories")
+        .delete()
+        .eq("id", parsed.data.memoryId)
+        .eq("user_id", user.id);
+    }
 
     return NextResponse.json({ deleted: true });
   } catch (error) {
