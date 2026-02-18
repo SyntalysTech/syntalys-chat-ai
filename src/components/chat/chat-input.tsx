@@ -375,34 +375,34 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
             </div>
           )}
 
+          {/* Hidden file input (outside flex row to avoid layout interference) */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept={ALL_ACCEPT}
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files) handleFiles(e.target.files);
+              e.target.value = "";
+            }}
+          />
+
           {/* Input row */}
-          <div className="flex items-end gap-1">
+          <div className="flex items-end gap-0.5">
             {/* Attach button */}
-            <div className="flex-shrink-0 pb-1.5 sm:pb-2 pl-1.5 sm:pl-2">
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={limitReached || files.length >= MAX_FILES || processingFiles}
-                className={cn(
-                  "flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-xl sm:rounded-lg transition-colors",
-                  "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80",
-                  (limitReached || files.length >= MAX_FILES) && "opacity-40 cursor-not-allowed"
-                )}
-                aria-label={t("attachFile") as string}
-              >
-                <Paperclip className="h-5 w-5 sm:h-4 sm:w-4" />
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept={ALL_ACCEPT}
-                className="hidden"
-                onChange={(e) => {
-                  if (e.target.files) handleFiles(e.target.files);
-                  e.target.value = "";
-                }}
-              />
-            </div>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={limitReached || files.length >= MAX_FILES || processingFiles}
+              className={cn(
+                "flex-shrink-0 flex h-10 w-10 sm:h-9 sm:w-9 mb-0.5 ml-0.5 items-center justify-center rounded-xl sm:rounded-lg transition-colors",
+                "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80",
+                (limitReached || files.length >= MAX_FILES) && "opacity-40 cursor-not-allowed"
+              )}
+              aria-label={t("attachFile") as string}
+            >
+              <Paperclip className="h-5 w-5 sm:h-4 sm:w-4" />
+            </button>
 
             {/* Textarea */}
             <textarea
@@ -421,7 +421,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
               disabled={limitReached}
               rows={1}
               className={cn(
-                "flex-1 min-w-0 resize-none bg-transparent px-1 sm:px-2 py-2.5 sm:py-2.5 text-[16px] sm:text-sm text-foreground placeholder:text-muted-foreground",
+                "flex-1 min-w-0 resize-none bg-transparent px-1 sm:px-2 py-2.5 sm:py-2 text-[16px] sm:text-sm text-foreground placeholder:text-muted-foreground",
                 "outline-none",
                 "max-h-[200px]"
               )}
@@ -429,13 +429,13 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
             />
 
             {/* Right-side buttons */}
-            <div className="flex-shrink-0 flex items-center gap-1 pb-1.5 sm:pb-2 pr-1.5 sm:pr-2">
+            <div className="flex-shrink-0 flex items-center gap-0.5 mb-0.5 mr-0.5">
               {/* Voice input button */}
               {hasSpeech && !limitReached && (
                 <button
                   onClick={toggleListening}
                   className={cn(
-                    "flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
+                    "flex h-10 w-10 sm:h-9 sm:w-9 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
                     isListening
                       ? "bg-red-500 text-white animate-pulse shadow-sm"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80"
@@ -455,7 +455,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 onClick={handleSubmit}
                 disabled={!hasContent || isStreaming || limitReached || processingFiles}
                 className={cn(
-                  "flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
+                  "flex h-10 w-10 sm:h-9 sm:w-9 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
                   hasContent && !isStreaming && !limitReached && !processingFiles
                     ? "bg-syntalys-blue text-white hover:bg-syntalys-blue-light active:scale-95 shadow-sm"
                     : "bg-muted text-muted-foreground cursor-not-allowed"
