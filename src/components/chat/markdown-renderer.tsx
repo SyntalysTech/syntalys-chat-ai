@@ -6,7 +6,7 @@ import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
 import { useI18n } from "@/lib/i18n-context";
-import { Check, Copy, X } from "lucide-react";
+import { Check, Copy, Download, X } from "lucide-react";
 
 function CodeBlock({
   className,
@@ -128,15 +128,47 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
               </div>
             ),
             img: ({ src, alt, ...props }) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={src}
-                alt={alt || ""}
-                className="rounded-xl max-w-full shadow-md border border-border my-3 cursor-pointer hover:opacity-90 transition-opacity"
-                loading="lazy"
-                onClick={() => typeof src === "string" && setLightboxSrc(src)}
-                {...props}
-              />
+              <span className="relative group/img inline-block my-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={src}
+                  alt={alt || ""}
+                  className="rounded-xl max-w-full shadow-md border border-border cursor-pointer hover:opacity-90 transition-opacity block"
+                  loading="lazy"
+                  onClick={() => typeof src === "string" && setLightboxSrc(src)}
+                  {...props}
+                />
+                {typeof src === "string" && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const a = document.createElement("a");
+                      a.href = src;
+                      a.download = `syntalys-image.png`;
+                      a.target = "_blank";
+                      a.rel = "noopener noreferrer";
+                      // Try fetch+blob for same-origin, fallback to direct link
+                      fetch(src)
+                        .then((r) => r.blob())
+                        .then((blob) => {
+                          const url = URL.createObjectURL(blob);
+                          a.href = url;
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(url);
+                        })
+                        .catch(() => {
+                          window.open(src, "_blank");
+                        });
+                    }}
+                    className="absolute top-2.5 right-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white opacity-0 group-hover/img:opacity-100 hover:bg-black/70 transition-all"
+                    title="Download"
+                  >
+                    <Download className="h-4 w-4" />
+                  </button>
+                )}
+              </span>
             ),
           }}
         >

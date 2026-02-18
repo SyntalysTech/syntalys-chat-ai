@@ -21,6 +21,7 @@ import {
   VolumeX,
   Loader2,
   ArrowUpRight,
+  Palette,
 } from "lucide-react";
 import Image from "next/image";
 import type { ChatMessage } from "@/lib/types";
@@ -29,6 +30,7 @@ interface MessageBubbleProps {
   message: ChatMessage;
   isLast: boolean;
   isStreaming: boolean;
+  isImageGenerating?: boolean;
   onRegenerate?: (modelId?: string) => void;
   onSuggestionClick?: (prompt: string) => void;
   isDark: boolean;
@@ -125,6 +127,7 @@ export const MessageBubble = memo(function MessageBubble({
   message,
   isLast,
   isStreaming,
+  isImageGenerating,
   onRegenerate,
   onSuggestionClick,
   isDark,
@@ -367,9 +370,18 @@ export const MessageBubble = memo(function MessageBubble({
               <MarkdownRenderer content={displayContent} />
             ) : isStreaming && isLast && !reasoningStillStreaming ? (
               <div className="flex items-center gap-2.5 py-2 animate-fade-in">
-                <span className="text-sm text-muted-foreground font-medium">
-                  {t("thinkingIndicator")}
-                </span>
+                {isImageGenerating ? (
+                  <>
+                    <Palette className="h-4 w-4 text-syntalys-blue animate-pulse" />
+                    <span className="text-sm text-muted-foreground font-medium">
+                      {t("generatingImageIndicator" as TranslationKey)}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-sm text-muted-foreground font-medium">
+                    {t("thinkingIndicator")}
+                  </span>
+                )}
                 <div className="flex items-center gap-1">
                   <div className="h-1.5 w-1.5 rounded-full bg-syntalys-blue animate-typing-dot-1" />
                   <div className="h-1.5 w-1.5 rounded-full bg-syntalys-blue animate-typing-dot-2" />

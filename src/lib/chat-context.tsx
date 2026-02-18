@@ -37,6 +37,7 @@ interface ChatContextType {
   currentThread: ChatThread | null;
   messages: ChatMessage[];
   isStreaming: boolean;
+  isImageGenerating: boolean;
   selectedModel: string;
   anonUsageCount: number;
   anonDailyLimit: number;
@@ -69,6 +70,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [currentThread, setCurrentThread] = useState<ChatThread | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isImageGenerating, setIsImageGenerating] = useState(false);
   const [selectedModel, setSelectedModel] = useState(DEFAULT_MODEL_ID);
   const [anonUsageCount, setAnonUsageCount] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
@@ -296,6 +298,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       isStreamingRef.current = true;
       streamStartedAtRef.current = Date.now();
       setIsStreaming(true);
+      if (imageGen) setIsImageGenerating(true);
 
       const effectiveModel = modelOverride || selectedModel;
       let assistantMessage: ChatMessage | null = null;
@@ -604,6 +607,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       } finally {
         isStreamingRef.current = false;
         setIsStreaming(false);
+        setIsImageGenerating(false);
         abortRef.current = null;
       }
       return true;
@@ -690,6 +694,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         currentThread,
         messages,
         isStreaming,
+        isImageGenerating,
         selectedModel,
         anonUsageCount,
         anonDailyLimit: ANON_DAILY_LIMIT,

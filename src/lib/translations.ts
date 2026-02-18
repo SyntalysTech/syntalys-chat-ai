@@ -581,6 +581,11 @@ const translations = {
     es: "SYNTALYS AI está pensando...",
     en: "SYNTALYS AI is thinking...",
   },
+  generatingImageIndicator: {
+    fr: "Création de votre image...",
+    es: "Creando tu imagen...",
+    en: "Creating your image...",
+  },
   reconnecting: {
     fr: "Reconnexion en cours...",
     es: "Reconectando...",

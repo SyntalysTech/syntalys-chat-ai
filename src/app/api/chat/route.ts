@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import type { ResponseInputItem } from "openai/resources/responses/responses";
 import { getModelByIdOrDefault, getSystemPrompt } from "@/lib/models";
 import { checkRateLimit, incrementUsage } from "@/lib/rate-limit";
+import { createServerSupabaseClient, createServiceRoleClient } from "@/lib/supabase-server";
 import { z } from "zod";
 
 const openai = new OpenAI({
@@ -135,15 +136,60 @@ Output ONLY the DALL-E 3 prompt text, nothing else. Max 950 characters.`,
         quality: "hd",
       });
 
-      const imageUrl = imageResponse.data?.[0]?.url;
-      if (!imageUrl) {
+      const dalleUrl = imageResponse.data?.[0]?.url;
+      const revisedPrompt = imageResponse.data?.[0]?.revised_prompt || null;
+      if (!dalleUrl) {
         return NextResponse.json(
           { error: "No se pudo generar la imagen" },
           { status: 500 }
         );
       }
 
-      const markdown = `![${lastUserMessage.slice(0, 100)}](${imageUrl})`;
+      // Persist to Supabase Storage so the URL doesn't expire
+      let permanentUrl = dalleUrl;
+      try {
+        const supabase = await createServerSupabaseClient();
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+
+        if (authUser) {
+          const imageRes = await fetch(dalleUrl);
+          if (imageRes.ok) {
+            const imageBuffer = Buffer.from(await imageRes.arrayBuffer());
+            const serviceClient = await createServiceRoleClient();
+            const fileId = crypto.randomUUID();
+            const storagePath = `${authUser.id}/${fileId}.png`;
+
+            const { error: uploadError } = await serviceClient.storage
+              .from("generated-images")
+              .upload(storagePath, imageBuffer, {
+                contentType: "image/png",
+                upsert: false,
+              });
+
+            if (!uploadError) {
+              const { data: publicUrlData } = serviceClient.storage
+                .from("generated-images")
+                .getPublicUrl(storagePath);
+              permanentUrl = publicUrlData.publicUrl;
+
+              // Save to gallery
+              await serviceClient.from("generated_images").insert({
+                user_id: authUser.id,
+                prompt: lastUserMessage,
+                revised_prompt: revisedPrompt,
+                image_url: permanentUrl,
+                storage_path: storagePath,
+                size: "1024x1024",
+              });
+            }
+          }
+        }
+      } catch (persistErr) {
+        // Non-blocking: if persistence fails, still return the DALL-E URL
+        console.error("Image persist error:", (persistErr as Error).message);
+      }
+
+      const markdown = `![${lastUserMessage.slice(0, 100)}](${permanentUrl})`;
       const encoder = new TextEncoder();
       const readable = new ReadableStream({
         start(controller) {

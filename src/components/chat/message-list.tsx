@@ -10,7 +10,7 @@ interface MessageListProps {
 }
 
 export function MessageList({ isDark, onSuggestionClick }: MessageListProps) {
-  const { messages, isStreaming, regenerateLastResponse } = useChat();
+  const { messages, isStreaming, isImageGenerating, regenerateLastResponse } = useChat();
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +38,7 @@ export function MessageList({ isDark, onSuggestionClick }: MessageListProps) {
             message={msg}
             isLast={idx === actualLastAssistantIdx}
             isStreaming={isStreaming && idx === messages.length - 1}
+            isImageGenerating={isImageGenerating && idx === messages.length - 1}
             onRegenerate={
               idx === actualLastAssistantIdx
                 ? (modelId?: string) => regenerateLastResponse(modelId)
