@@ -123,22 +123,22 @@ export function ModelSelector() {
       <button
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          "flex items-center gap-2 rounded-lg px-3 py-2.5 sm:py-2 text-sm font-medium transition-colors min-h-[44px] sm:min-h-0",
-          "hover:bg-accent text-foreground"
+          "flex items-center gap-1.5 sm:gap-2 rounded-lg px-2 sm:px-3 py-2.5 sm:py-2 text-sm font-medium transition-colors min-h-[44px] sm:min-h-0",
+          "hover:bg-accent active:bg-accent/80 text-foreground"
         )}
       >
-        <Icon className="h-4 w-4 text-syntalys-blue" />
-        <span className="hidden sm:inline">{currentModel.name}</span>
+        <Icon className="h-4 w-4 text-syntalys-blue flex-shrink-0" />
+        <span className="text-[13px] sm:text-sm truncate max-w-[120px] sm:max-w-none">{currentModel.name}</span>
         <ChevronDown
           className={cn(
-            "h-3.5 w-3.5 text-muted-foreground transition-transform",
+            "h-3.5 w-3.5 text-muted-foreground transition-transform flex-shrink-0",
             open && "rotate-180"
           )}
         />
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-1 w-[calc(100vw-2rem)] sm:w-[300px] max-w-[300px] rounded-xl border border-border bg-popover p-1.5 sm:p-2 shadow-xl animate-fade-in">
+        <div className="absolute left-0 top-full z-50 mt-1 w-[min(300px,calc(100vw-2rem))] rounded-xl border border-border bg-popover p-1.5 sm:p-2 shadow-xl animate-fade-in">
           {/* New models */}
           {currentModels.map((model) => (
             <ModelButton

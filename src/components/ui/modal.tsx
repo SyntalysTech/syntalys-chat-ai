@@ -60,7 +60,7 @@ export function Modal({ open, onClose, children, title, className }: ModalProps)
   if (!open) return null;
 
   // Calculate max height: use visual viewport when keyboard is open, otherwise CSS default
-  const isKeyboardOpen = viewportHeight !== null && typeof window !== "undefined" && viewportHeight < window.innerHeight - 50;
+  const isKeyboardOpen = viewportHeight !== null && typeof window !== "undefined" && viewportHeight < window.innerHeight - 100;
   const maxHeight = isKeyboardOpen
     ? `${viewportHeight! - 16}px`
     : undefined;
@@ -77,7 +77,7 @@ export function Modal({ open, onClose, children, title, className }: ModalProps)
         className={cn(
           "w-full sm:max-w-md rounded-t-2xl sm:rounded-xl bg-card border border-border shadow-2xl",
           "animate-slide-up sm:animate-fade-in",
-          "max-h-[92dvh] sm:max-h-[85vh] flex flex-col",
+          "max-h-[94dvh] sm:max-h-[85vh] flex flex-col",
           className
         )}
         style={maxHeight ? { maxHeight } : undefined}
@@ -92,19 +92,19 @@ export function Modal({ open, onClose, children, title, className }: ModalProps)
 
         {title && (
           <div className="flex items-center justify-between border-b border-border px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
-            <h2 className="text-base sm:text-lg font-semibold text-card-foreground">
+            <h2 className="text-base sm:text-lg font-semibold text-card-foreground pr-2">
               {title}
             </h2>
             <button
               onClick={onClose}
-              className="rounded-lg p-2.5 -mr-2 text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
+              className="rounded-lg p-2.5 -mr-1.5 text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors flex-shrink-0"
               aria-label="Cerrar"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
         )}
-        <div className="p-4 sm:p-6 overflow-y-auto min-h-0 overscroll-contain">{children}</div>
+        <div className="p-4 sm:p-6 overflow-y-auto min-h-0 overscroll-contain scrollbar-thin">{children}</div>
       </div>
     </div>
   );

@@ -315,8 +315,8 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
   );
 
   return (
-    <div className="flex-shrink-0 border-t border-border/50 bg-card/30 pb-safe">
-      <div className="mx-auto max-w-3xl px-3 sm:px-4 pt-2 sm:pt-3 pb-1">
+    <div className="flex-shrink-0 border-t border-border/50 bg-card/30 pb-safe pl-safe pr-safe">
+      <div className="mx-auto max-w-3xl px-2 sm:px-4 pt-2 sm:pt-3 pb-1">
         {/* File error message */}
         {fileError && (
           <div className="mb-2 flex items-start gap-2 rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive animate-fade-in">
@@ -324,9 +324,9 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
             <span className="break-words min-w-0">{fileError}</span>
             <button
               onClick={() => setFileError("")}
-              className="ml-auto flex-shrink-0 rounded-full p-0.5 hover:bg-destructive/10 transition-colors"
+              className="ml-auto flex-shrink-0 rounded-full p-1.5 -mr-1 hover:bg-destructive/10 transition-colors"
             >
-              <X className="h-3 w-3" />
+              <X className="h-3.5 w-3.5" />
             </button>
           </div>
         )}
@@ -355,11 +355,11 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                     ) : (
                       <FileText className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-syntalys-blue flex-shrink-0" />
                     )}
-                    <span className="max-w-[80px] sm:max-w-[120px] truncate text-card-foreground">{file.name}</span>
+                    <span className="max-w-[100px] sm:max-w-[120px] truncate text-card-foreground">{file.name}</span>
                     <span className="text-muted-foreground hidden sm:inline">{formatSize(file.size)}</span>
                     <button
                       onClick={() => removeFile(i)}
-                      className="ml-0.5 rounded-full p-1 hover:bg-accent active:bg-accent/80 transition-colors"
+                      className="ml-0.5 rounded-full p-1.5 -mr-0.5 hover:bg-accent active:bg-accent/80 transition-colors"
                     >
                       <X className="h-3.5 w-3.5 text-muted-foreground" />
                     </button>
@@ -484,12 +484,12 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 getMessagesRemaining(locale, remaining)
               )}
             </p>
-            <div className="flex gap-0.5">
+            <div className="flex gap-[3px]">
               {Array.from({ length: anonDailyLimit }).map((_, i) => (
                 <div
                   key={i}
                   className={cn(
-                    "h-1 w-1 rounded-full transition-colors",
+                    "h-1.5 w-1.5 rounded-full transition-colors",
                     i < anonUsageCount ? "bg-syntalys-blue" : "bg-border"
                   )}
                 />
@@ -498,7 +498,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
           </div>
         )}
 
-        <p className="mt-1 text-center text-[11px] text-muted-foreground/60">
+        <p className="mt-1 text-center text-[11px] sm:text-xs text-muted-foreground/60">
           {t("aiDisclaimer")}
         </p>
       </div>

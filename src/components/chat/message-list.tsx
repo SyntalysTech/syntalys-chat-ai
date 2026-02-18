@@ -29,7 +29,7 @@ export function MessageList({ isDark, onSuggestionClick }: MessageListProps) {
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-y-auto scrollbar-thin"
+      className="flex-1 overflow-y-auto scrollbar-thin pl-safe pr-safe"
     >
       <div className="mx-auto max-w-3xl">
         {messages.map((msg, idx) => (

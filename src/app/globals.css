@@ -132,8 +132,15 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
+  }
+
+  @media (min-width: 640px) {
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
   }
 
   .scrollbar-thin::-webkit-scrollbar-track {
@@ -161,15 +168,15 @@
 
 /* Markdown code blocks */
 .prose pre {
-  @apply rounded-lg bg-[#1a1a2e] p-4 overflow-x-auto text-sm m-0;
+  @apply rounded-lg bg-[#1a1a2e] p-3 sm:p-4 overflow-x-auto text-[13px] sm:text-sm m-0;
 }
 
 .prose code {
-  @apply text-sm font-mono;
+  @apply text-[13px] sm:text-sm font-mono;
 }
 
 .prose pre code {
-  @apply bg-transparent p-0;
+  @apply bg-transparent p-0 block w-full;
 }
 
 /* Let rehype-highlight handle syntax colors */
@@ -178,7 +185,7 @@
 }
 
 .prose :not(pre) > code {
-  @apply rounded bg-muted px-1.5 py-0.5 text-sm font-medium;
+  @apply rounded bg-muted px-1.5 py-0.5 text-[13px] sm:text-sm font-medium break-words;
 }
 
 .prose p {
@@ -187,7 +194,7 @@
 
 .prose ul,
 .prose ol {
-  @apply my-2 ml-4 sm:ml-6;
+  @apply my-2 ml-3.5 sm:ml-6;
 }
 
 .prose ul {
@@ -222,12 +229,12 @@
 }
 
 .prose table {
-  @apply w-full border-collapse my-4;
+  @apply w-full border-collapse my-4 text-[13px] sm:text-sm;
 }
 
 .prose th,
 .prose td {
-  @apply border border-border px-2 sm:px-3 py-1.5 sm:py-2 text-left text-sm;
+  @apply border border-border px-2 sm:px-3 py-1.5 sm:py-2 text-left;
 }
 
 .prose th {

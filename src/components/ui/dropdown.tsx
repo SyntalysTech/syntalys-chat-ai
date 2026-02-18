@@ -71,7 +71,7 @@ export function DropdownItem({
   return (
     <button
       className={cn(
-        "flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition-colors",
+        "flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition-colors active:bg-accent/80",
         destructive
           ? "text-destructive hover:bg-destructive/10"
           : "text-popover-foreground hover:bg-accent",

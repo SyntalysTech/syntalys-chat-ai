@@ -459,10 +459,10 @@ export function SettingsModal({
                       </span>
                       <button
                         onClick={() => handleDeleteMemory(mem.id)}
-                        className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-destructive/10"
+                        className="flex-shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1.5 -mr-1 rounded-lg hover:bg-destructive/10 active:bg-destructive/20"
                         aria-label="Delete memory"
                       >
-                        <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+                        <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
                       </button>
                     </div>
                   ))}

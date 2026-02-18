@@ -221,7 +221,7 @@ export const MessageBubble = memo(function MessageBubble({
   return (
     <div
       className={cn(
-        "group flex gap-3 sm:gap-4 px-3 sm:px-4 py-3 sm:py-4 animate-fade-in",
+        "group flex gap-2.5 sm:gap-4 px-2.5 sm:px-4 py-2.5 sm:py-4 animate-fade-in",
         isUser && "flex-row-reverse"
       )}
     >
@@ -247,11 +247,11 @@ export const MessageBubble = memo(function MessageBubble({
       <div
         className={cn(
           "flex-1 min-w-0",
-          isUser ? "flex justify-end" : "max-w-[calc(100%-3rem)]"
+          isUser ? "flex justify-end" : "max-w-[calc(100%-2.5rem)] sm:max-w-[calc(100%-3rem)]"
         )}
       >
         {isUser ? (
-          <div className="inline-block max-w-[90%] sm:max-w-[85%]">
+          <div className="inline-block max-w-[88%] sm:max-w-[85%]">
             {message.attachments && message.attachments.length > 0 && (
               <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-1.5 justify-end">
                 {message.attachments.map((att, i) => {
@@ -266,15 +266,15 @@ export const MessageBubble = memo(function MessageBubble({
                       ) : (
                         <FileText className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
                       )}
-                      <span className="max-w-[80px] sm:max-w-[100px] truncate">{att.name}</span>
+                      <span className="max-w-[100px] sm:max-w-[120px] truncate">{att.name}</span>
                       <span className="text-white/60 hidden sm:inline">{formatSize(att.size)}</span>
                     </div>
                   );
                 })}
               </div>
             )}
-            <div className="rounded-2xl rounded-tr-sm bg-syntalys-blue px-4 py-2.5 sm:py-2.5 text-white">
-              <p className="whitespace-pre-wrap text-sm leading-relaxed break-words">
+            <div className="rounded-2xl rounded-tr-sm bg-syntalys-blue px-3.5 sm:px-4 py-2.5 text-white">
+              <p className="whitespace-pre-wrap text-[15px] sm:text-sm leading-relaxed break-words">
                 {message.content}
               </p>
             </div>
@@ -384,8 +384,8 @@ export const MessageBubble = memo(function MessageBubble({
                       <RefreshCw className="h-4 w-4" />
                     </button>
                     {modelMenuOpen && (
-                      <div className="absolute bottom-full left-0 mb-1 w-[min(14rem,calc(100vw-4rem))] rounded-xl border border-border bg-popover p-1.5 shadow-xl animate-fade-in z-50">
-                        <p className="px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground">
+                      <div className="absolute bottom-full left-0 mb-1 w-[min(14rem,calc(100vw-3rem))] rounded-xl border border-border bg-popover p-1.5 shadow-xl animate-fade-in z-50">
+                        <p className="px-2.5 py-1.5 text-xs font-medium text-muted-foreground">
                           {t("regenerateWith" as TranslationKey)}
                         </p>
                         {availableModels.map((model) => (
@@ -395,7 +395,7 @@ export const MessageBubble = memo(function MessageBubble({
                               setModelMenuOpen(false);
                               onRegenerate(model.id);
                             }}
-                            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm hover:bg-accent transition-colors"
+                            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2.5 sm:py-2 text-left text-sm hover:bg-accent active:bg-accent/80 transition-colors"
                           >
                             <span className="font-medium text-xs text-popover-foreground">
                               {model.name}
@@ -428,7 +428,7 @@ export const MessageBubble = memo(function MessageBubble({
                   <button
                     key={i}
                     onClick={() => onSuggestionClick(suggestion)}
-                    className="group/chip flex items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-[13px] text-muted-foreground transition-all duration-200 hover:border-syntalys-blue/40 hover:bg-syntalys-blue/5 hover:text-foreground active:scale-[0.97]"
+                    className="group/chip flex items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 py-2 sm:px-3.5 sm:py-2 text-[13px] sm:text-[13px] text-muted-foreground transition-all duration-200 hover:border-syntalys-blue/40 hover:bg-syntalys-blue/5 hover:text-foreground active:scale-[0.97]"
                   >
                     <span className="leading-snug">{suggestion}</span>
                     <ArrowUpRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0 opacity-0 -translate-x-1 group-hover/chip:opacity-100 group-hover/chip:translate-x-0 transition-all duration-200 text-syntalys-blue" />

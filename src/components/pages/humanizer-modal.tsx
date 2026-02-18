@@ -120,13 +120,13 @@ export function HumanizerModal({ open, onClose }: HumanizerModalProps) {
       title={t("humanizerTitle") as string}
       className="sm:max-w-lg"
     >
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {/* Subtitle */}
         <div className="flex items-start gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-syntalys-gold/10 flex-shrink-0">
             <Sparkles className="h-4 w-4 text-syntalys-gold" />
           </div>
-          <p className="text-sm text-muted-foreground pt-1">
+          <p className="text-[13px] sm:text-sm text-muted-foreground pt-1">
             {t("humanizerSubtitle")}
           </p>
         </div>
@@ -137,18 +137,18 @@ export function HumanizerModal({ open, onClose }: HumanizerModalProps) {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder={t("humanizerPlaceholder") as string}
-            rows={6}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-syntalys-blue/40 focus:ring-1 focus:ring-syntalys-blue/20 transition-colors resize-none"
+            rows={5}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-[15px] sm:text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-syntalys-blue/40 focus:ring-1 focus:ring-syntalys-blue/20 transition-colors resize-none"
             disabled={isProcessing}
           />
           <div className="flex items-center justify-between mt-1.5">
-            <span className="text-[11px] text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               {inputText.length.toLocaleString()} / 50,000
             </span>
             {(inputText || result) && !isProcessing && (
               <button
                 onClick={handleReset}
-                className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-1 px-2 py-1 -mr-2 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
               >
                 <RotateCcw className="h-3 w-3" />
                 Reset
@@ -162,7 +162,7 @@ export function HumanizerModal({ open, onClose }: HumanizerModalProps) {
           onClick={isProcessing ? handleStop : handleHumanize}
           disabled={!inputText.trim() && !isProcessing}
           className={cn(
-            "w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all",
+            "w-full flex items-center justify-center gap-2 rounded-xl sm:rounded-lg px-4 py-3 sm:py-2.5 text-sm font-medium transition-all active:scale-[0.98]",
             isProcessing
               ? "bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/20"
               : "bg-syntalys-blue text-white hover:bg-syntalys-blue-light disabled:opacity-40 disabled:cursor-not-allowed"
@@ -183,7 +183,7 @@ export function HumanizerModal({ open, onClose }: HumanizerModalProps) {
 
         {/* Error */}
         {error && (
-          <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-sm text-destructive">
+          <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2.5 text-sm text-destructive">
             {error}
           </div>
         )}
@@ -198,23 +198,23 @@ export function HumanizerModal({ open, onClose }: HumanizerModalProps) {
               {result && !isProcessing && (
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                  className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
                 >
                   {copied ? (
                     <>
-                      <Check className="h-3 w-3 text-green-500" />
+                      <Check className="h-3.5 w-3.5 text-green-500" />
                       {t("humanizerCopied")}
                     </>
                   ) : (
                     <>
-                      <Copy className="h-3 w-3" />
+                      <Copy className="h-3.5 w-3.5" />
                       {t("copy")}
                     </>
                   )}
                 </button>
               )}
             </div>
-            <div className="rounded-lg border border-border bg-accent/30 px-3 py-2.5 text-sm text-foreground leading-relaxed min-h-[80px] whitespace-pre-wrap">
+            <div className="rounded-lg border border-border bg-accent/30 px-3 py-2.5 text-[15px] sm:text-sm text-foreground leading-relaxed min-h-[80px] max-h-[200px] sm:max-h-[260px] overflow-y-auto whitespace-pre-wrap scrollbar-thin">
               {result || (
                 <span className="text-muted-foreground flex items-center gap-2">
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
