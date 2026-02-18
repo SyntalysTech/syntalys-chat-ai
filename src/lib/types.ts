@@ -24,6 +24,7 @@ export interface ChatMessage {
   role: "user" | "assistant" | "system";
   content: string;
   model: string | null;
+  parent_id: string | null;
   created_at: string;
   attachments?: Pick<FileAttachment, "name" | "type" | "size">[];
 }

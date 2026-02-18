@@ -1247,6 +1247,18 @@ const translations = {
     es: "Cargar más",
     en: "Load more",
   },
+
+  // ── Conversation Branching ──
+  editMessage: {
+    fr: "Modifier",
+    es: "Editar",
+    en: "Edit",
+  },
+  saveAndSubmit: {
+    fr: "Enregistrer",
+    es: "Guardar",
+    en: "Save",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

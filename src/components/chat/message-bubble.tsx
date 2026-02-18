@@ -13,6 +13,9 @@ import {
   RefreshCw,
   User,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Pencil,
   Sparkles,
   FlaskConical,
   FileText,
@@ -34,6 +37,10 @@ interface MessageBubbleProps {
   onRegenerate?: (modelId?: string) => void;
   onSuggestionClick?: (prompt: string) => void;
   isDark: boolean;
+  // Branching
+  branchInfo?: { index: number; total: number } | null;
+  onNavigateBranch?: (direction: "prev" | "next") => void;
+  onEditAndResend?: (newContent: string) => void;
 }
 
 function formatSize(bytes: number): string {
@@ -80,7 +87,6 @@ function parseReasoning(content: string): {
   const closeIdx = content.indexOf(closeTag, reasoningStart);
 
   if (closeIdx === -1) {
-    // Still streaming reasoning - no closing tag yet
     const reasoning = content.slice(reasoningStart).trim();
     return { reasoning, answer: "", isReasoningComplete: false };
   }
@@ -92,9 +98,7 @@ function parseReasoning(content: string): {
 
 /** Strip <memory> tags from displayed content */
 function stripMemoryTags(content: string): string {
-  // Strip complete <memory> tags
   let cleaned = content.replace(/<memory(?:\s+category="[^"]*")?\s*>[\s\S]*?<\/memory>/g, "");
-  // Strip incomplete tags during streaming
   cleaned = cleaned.replace(/<memory[^>]*>[^<]*$/, "").replace(/<memo[^>]*$/, "");
   return cleaned.trim();
 }
@@ -104,13 +108,11 @@ function parseSuggestions(content: string): {
   cleanContent: string;
   suggestions: string[];
 } {
-  // First strip memory tags
   const withoutMemory = stripMemoryTags(content);
 
   const regex = /<suggestions>([\s\S]*?)<\/suggestions>/;
   const match = withoutMemory.match(regex);
   if (!match) {
-    // Strip incomplete tags during streaming (e.g. "<suggest" or "<suggestions>partial")
     const cleaned = withoutMemory.replace(/<suggestions>[^<]*$/, "").replace(/<suggest[^>]*$/, "").trim();
     return { cleanContent: cleaned, suggestions: [] };
   }
@@ -123,6 +125,49 @@ function parseSuggestions(content: string): {
   return { cleanContent, suggestions };
 }
 
+/** Compact branch navigation arrows */
+function BranchNav({
+  info,
+  onNavigate,
+}: {
+  info: { index: number; total: number };
+  onNavigate: (dir: "prev" | "next") => void;
+}) {
+  return (
+    <div className="flex items-center gap-0.5">
+      <button
+        onClick={() => onNavigate("prev")}
+        disabled={info.index === 1}
+        className={cn(
+          "flex h-7 w-7 sm:h-6 sm:w-6 items-center justify-center rounded-md transition-colors",
+          info.index === 1
+            ? "text-muted-foreground/25 cursor-not-allowed"
+            : "text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80"
+        )}
+        aria-label="Previous branch"
+      >
+        <ChevronLeft className="h-3.5 w-3.5" />
+      </button>
+      <span className="text-[11px] text-muted-foreground font-medium tabular-nums min-w-[2rem] text-center select-none">
+        {info.index}/{info.total}
+      </span>
+      <button
+        onClick={() => onNavigate("next")}
+        disabled={info.index === info.total}
+        className={cn(
+          "flex h-7 w-7 sm:h-6 sm:w-6 items-center justify-center rounded-md transition-colors",
+          info.index === info.total
+            ? "text-muted-foreground/25 cursor-not-allowed"
+            : "text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80"
+        )}
+        aria-label="Next branch"
+      >
+        <ChevronRight className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+}
+
 export const MessageBubble = memo(function MessageBubble({
   message,
   isLast,
@@ -131,17 +176,23 @@ export const MessageBubble = memo(function MessageBubble({
   onRegenerate,
   onSuggestionClick,
   isDark,
+  branchInfo,
+  onNavigateBranch,
+  onEditAndResend,
 }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   const [reasoningOpen, setReasoningOpen] = useState(false);
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [ttsLoading, setTtsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState("");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const modelMenuRef = useRef<HTMLDivElement>(null);
+  const editTextareaRef = useRef<HTMLTextAreaElement>(null);
   const { t, locale } = useI18n();
   const { user } = useAuth();
-  const hasTTS = true; // OpenAI TTS always available
+  const hasTTS = true;
 
   // Close model menu on outside click
   useEffect(() => {
@@ -155,13 +206,24 @@ export const MessageBubble = memo(function MessageBubble({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [modelMenuOpen]);
 
+  // Auto-resize edit textarea
+  useEffect(() => {
+    if (isEditing && editTextareaRef.current) {
+      const ta = editTextareaRef.current;
+      ta.style.height = "auto";
+      ta.style.height = ta.scrollHeight + "px";
+      ta.focus();
+      ta.setSelectionRange(ta.value.length, ta.value.length);
+    }
+  }, [isEditing, editText]);
+
   const availableModels = useMemo(
     () => MODELS.filter((m) => !m.legacy && (user || !m.requiresAuth)),
     [user]
   );
   const isUser = message.role === "user";
   const isReasoning = message.model === "talys-think" || message.model === "talys-2.5" || message.model === "synta-1.0-reasoning";
-  const isBeta = false; // No beta models in current suite
+  const isBeta = false;
 
   const parsed = useMemo(() => {
     if (!isReasoning || isUser) return null;
@@ -169,7 +231,6 @@ export const MessageBubble = memo(function MessageBubble({
   }, [message.content, isReasoning, isUser]);
 
   const handleCopy = async () => {
-    // Copy only the final answer for reasoning messages
     const textToCopy =
       parsed && parsed.answer ? parsed.answer : message.content;
     await navigator.clipboard.writeText(textToCopy);
@@ -178,7 +239,6 @@ export const MessageBubble = memo(function MessageBubble({
   };
 
   const handleSpeak = useCallback(async () => {
-    // Stop if already playing
     if (isSpeaking || ttsLoading) {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -229,7 +289,6 @@ export const MessageBubble = memo(function MessageBubble({
     }
   }, [isSpeaking, ttsLoading, parsed, message.content, locale]);
 
-  // Cleanup audio on unmount
   useEffect(() => {
     return () => {
       if (audioRef.current) {
@@ -238,6 +297,22 @@ export const MessageBubble = memo(function MessageBubble({
       }
     };
   }, []);
+
+  const handleEditSubmit = useCallback(() => {
+    if (!editText.trim() || editText.trim() === message.content) return;
+    setIsEditing(false);
+    onEditAndResend?.(editText.trim());
+  }, [editText, message.content, onEditAndResend]);
+
+  const handleEditKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleEditSubmit();
+    }
+    if (e.key === "Escape") {
+      setIsEditing(false);
+    }
+  }, [handleEditSubmit]);
 
   // Parse suggestions from content
   const rawContent = parsed ? parsed.answer : message.content;
@@ -251,6 +326,9 @@ export const MessageBubble = memo(function MessageBubble({
   const hasReasoning = parsed && parsed.reasoning;
   const reasoningStillStreaming =
     isStreaming && isLast && parsed && !parsed.isReasoningComplete;
+
+  const showUserActions = isUser && !isStreaming && message.content;
+  const hasBranches = branchInfo && branchInfo.total > 1;
 
   return (
     <div
@@ -281,38 +359,93 @@ export const MessageBubble = memo(function MessageBubble({
       <div
         className={cn(
           "flex-1 min-w-0",
-          isUser ? "flex justify-end" : "max-w-[calc(100%-2.5rem)] sm:max-w-[calc(100%-3rem)]"
+          isUser ? "flex flex-col items-end" : "max-w-[calc(100%-2.5rem)] sm:max-w-[calc(100%-3rem)]"
         )}
       >
         {isUser ? (
-          <div className="inline-block max-w-[88%] sm:max-w-[85%]">
-            {message.attachments && message.attachments.length > 0 && (
-              <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-1.5 justify-end">
-                {message.attachments.map((att, i) => {
-                  const isImg = att.type.startsWith("image/");
-                  return (
-                    <div
-                      key={i}
-                      className="flex items-center gap-1.5 rounded-lg bg-syntalys-blue/80 px-2.5 py-1.5 text-xs text-white/90"
-                    >
-                      {isImg ? (
-                        <ImageIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
-                      ) : (
-                        <FileText className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
-                      )}
-                      <span className="max-w-[100px] sm:max-w-[120px] truncate">{att.name}</span>
-                      <span className="text-white/60 hidden sm:inline">{formatSize(att.size)}</span>
-                    </div>
-                  );
-                })}
+          isEditing ? (
+            /* ── Edit mode ── */
+            <div className="w-full max-w-[88%] sm:max-w-[85%]">
+              <div className="rounded-2xl border-2 border-syntalys-blue/30 bg-card p-3 shadow-sm">
+                <textarea
+                  ref={editTextareaRef}
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  onKeyDown={handleEditKeyDown}
+                  className="w-full resize-none bg-transparent text-[15px] sm:text-sm text-foreground leading-relaxed outline-none scrollbar-none"
+                  rows={1}
+                />
+                <div className="flex items-center justify-end gap-2 mt-2 pt-2 border-t border-border/50">
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent transition-colors"
+                  >
+                    {t("cancel")}
+                  </button>
+                  <button
+                    onClick={handleEditSubmit}
+                    disabled={!editText.trim() || editText.trim() === message.content}
+                    className="rounded-lg bg-syntalys-blue px-3 py-1.5 text-xs font-medium text-white hover:bg-syntalys-blue-light transition-colors disabled:opacity-40"
+                  >
+                    {t("saveAndSubmit" as TranslationKey)}
+                  </button>
+                </div>
               </div>
-            )}
-            <div className="rounded-2xl rounded-tr-sm bg-syntalys-blue px-3.5 sm:px-4 py-2.5 text-white">
-              <p className="whitespace-pre-wrap text-[15px] sm:text-sm leading-relaxed break-words">
-                {message.content}
-              </p>
             </div>
-          </div>
+          ) : (
+            /* ── Normal user message ── */
+            <>
+              <div className="inline-block max-w-[88%] sm:max-w-[85%]">
+                {message.attachments && message.attachments.length > 0 && (
+                  <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-1.5 justify-end">
+                    {message.attachments.map((att, i) => {
+                      const isImg = att.type.startsWith("image/");
+                      return (
+                        <div
+                          key={i}
+                          className="flex items-center gap-1.5 rounded-lg bg-syntalys-blue/80 px-2.5 py-1.5 text-xs text-white/90"
+                        >
+                          {isImg ? (
+                            <ImageIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+                          ) : (
+                            <FileText className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+                          )}
+                          <span className="max-w-[100px] sm:max-w-[120px] truncate">{att.name}</span>
+                          <span className="text-white/60 hidden sm:inline">{formatSize(att.size)}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                <div className="rounded-2xl rounded-tr-sm bg-syntalys-blue px-3.5 sm:px-4 py-2.5 text-white">
+                  <p className="whitespace-pre-wrap text-[15px] sm:text-sm leading-relaxed break-words">
+                    {message.content}
+                  </p>
+                </div>
+              </div>
+
+              {/* User message actions: branch nav + edit */}
+              {showUserActions && (hasBranches || onEditAndResend) && (
+                <div className="flex items-center gap-1 mt-1">
+                  {hasBranches && onNavigateBranch && (
+                    <BranchNav info={branchInfo!} onNavigate={onNavigateBranch} />
+                  )}
+                  {onEditAndResend && (
+                    <button
+                      onClick={() => {
+                        setEditText(message.content);
+                        setIsEditing(true);
+                      }}
+                      className="flex h-7 w-7 sm:h-6 sm:w-6 items-center justify-center rounded-md text-muted-foreground/50 hover:text-foreground hover:bg-accent active:bg-accent/80 transition-colors"
+                      aria-label={t("editMessage" as TranslationKey)}
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
+          )
         ) : (
           <div className="space-y-2">
             {/* Beta model banner */}
@@ -389,6 +522,13 @@ export const MessageBubble = memo(function MessageBubble({
                 </div>
               </div>
             ) : null}
+
+            {/* Branch navigation for assistant messages */}
+            {hasBranches && !isStreaming && onNavigateBranch && (
+              <div className="pt-0.5">
+                <BranchNav info={branchInfo!} onNavigate={onNavigateBranch} />
+              </div>
+            )}
 
             {/* Action buttons */}
             {!isStreaming && message.content && (

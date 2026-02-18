@@ -32,6 +32,73 @@ import { DEFAULT_MODEL_ID, getModelByIdOrDefault } from "./models";
 import type { ChatThread, ChatMessage, StreamMessage, FileAttachment, UserMemory } from "./types";
 import { generateId, getAnonId } from "./utils";
 
+/* ── Tree helper functions ── */
+
+/** Walk the message tree following active-branch choices, returning a linear visible path. */
+function computeVisiblePath(
+  allMsgs: ChatMessage[],
+  branches: Record<string, string>
+): ChatMessage[] {
+  if (allMsgs.length === 0) return [];
+
+  const childrenOf = new Map<string, ChatMessage[]>();
+  for (const msg of allMsgs) {
+    const key = msg.parent_id ?? "root";
+    if (!childrenOf.has(key)) childrenOf.set(key, []);
+    childrenOf.get(key)!.push(msg);
+  }
+  for (const children of childrenOf.values()) {
+    children.sort((a, b) => a.created_at.localeCompare(b.created_at));
+  }
+
+  const path: ChatMessage[] = [];
+  let currentKey = "root";
+  while (true) {
+    const children = childrenOf.get(currentKey);
+    if (!children || children.length === 0) break;
+    const activeId = branches[currentKey];
+    const active = activeId
+      ? children.find((c) => c.id === activeId) || children[children.length - 1]
+      : children[children.length - 1];
+    path.push(active);
+    currentKey = active.id;
+  }
+  return path;
+}
+
+/** Backtrack from a message to the root, returning the path in chronological order. */
+function getPathToMessage(allMsgs: ChatMessage[], targetId: string): ChatMessage[] {
+  const byId = new Map(allMsgs.map((m) => [m.id, m]));
+  const path: ChatMessage[] = [];
+  let current = byId.get(targetId);
+  while (current) {
+    path.unshift(current);
+    current = current.parent_id ? byId.get(current.parent_id) : undefined;
+  }
+  return path;
+}
+
+/** Assign sequential parent_ids to legacy messages that don't have them. */
+function ensureParentIds(msgs: ChatMessage[]): ChatMessage[] {
+  if (msgs.length === 0) return msgs;
+  const hasAnyParent = msgs.some((m) => m.parent_id != null);
+  if (hasAnyParent) {
+    // Backfill only messages that still have null parent_id (legacy rows)
+    return msgs.map((m, i) => {
+      if (m.parent_id != null) return m;
+      if (i === 0) return { ...m, parent_id: null };
+      return { ...m, parent_id: msgs[i - 1].id };
+    });
+  }
+  // Fully legacy thread — build a linear chain
+  return msgs.map((m, i) => ({
+    ...m,
+    parent_id: i === 0 ? null : msgs[i - 1].id,
+  }));
+}
+
+/* ── Context type ── */
+
 interface ChatContextType {
   threads: ChatThread[];
   currentThread: ChatThread | null;
@@ -51,6 +118,10 @@ interface ChatContextType {
   regenerateLastResponse: (modelId?: string) => Promise<void>;
   clearCurrentThread: () => void;
   deleteAllThreads: () => Promise<void>;
+  // Branching
+  getBranchInfo: (messageId: string) => { index: number; total: number } | null;
+  navigateBranch: (messageId: string, direction: "prev" | "next") => void;
+  editAndResend: (messageId: string, newContent: string, attachments?: FileAttachment[]) => Promise<boolean>;
 }
 
 const ChatContext = createContext<ChatContextType | null>(null);
@@ -68,7 +139,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [currentThread, setCurrentThread] = useState<ChatThread | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [allMessages, setAllMessages] = useState<ChatMessage[]>([]);
+  const [activeBranches, setActiveBranches] = useState<Record<string, string>>({});
   const [isStreaming, setIsStreaming] = useState(false);
   const [isImageGenerating, setIsImageGenerating] = useState(false);
   const [selectedModel, setSelectedModel] = useState(DEFAULT_MODEL_ID);
@@ -76,9 +148,17 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const abortRef = useRef<AbortController | null>(null);
   const isStreamingRef = useRef(false);
   const streamStartedAtRef = useRef<number>(0);
+  const allMessagesRef = useRef<ChatMessage[]>([]);
+  allMessagesRef.current = allMessages;
+  const memoriesRef = useRef<UserMemory[]>([]);
+
+  // Computed visible path through the message tree
+  const messages = useMemo(
+    () => computeVisiblePath(allMessages, activeBranches),
+    [allMessages, activeBranches]
+  );
   const messagesRef = useRef<ChatMessage[]>([]);
   messagesRef.current = messages;
-  const memoriesRef = useRef<UserMemory[]>([]);
 
   // Load memories on mount / user change
   useEffect(() => {
@@ -100,11 +180,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     loadMemories();
   }, [user]);
 
-  // Auto-recover from stale streaming lock:
-  // 1. When page regains focus (iOS PWA backgrounded, stream died)
-  // 2. Periodic interval check every 10s (catches hangs while user is on page)
+  // Auto-recover from stale streaming lock
   useEffect(() => {
-    const STALE_THRESHOLD = 45_000; // 45 seconds
+    const STALE_THRESHOLD = 45_000;
 
     const recoverIfStale = () => {
       if (
@@ -154,8 +232,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
   }, [user, supabase]);
 
-  // Auto-load threads whenever user changes (login, logout, initial load)
-  // This is the primary trigger — no need to rely on app-shell calling loadThreads
   useEffect(() => {
     loadThreads();
   }, [loadThreads]);
@@ -218,10 +294,15 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           .select("*")
           .eq("thread_id", threadId)
           .order("created_at", { ascending: true });
-        if (data) setMessages(data as ChatMessage[]);
+        if (data) {
+          const loaded = ensureParentIds(data as ChatMessage[]);
+          setAllMessages(loaded);
+        }
       } else {
-        setMessages(getLocalMessages(threadId));
+        const loaded = ensureParentIds(getLocalMessages(threadId));
+        setAllMessages(loaded);
       }
+      setActiveBranches({});
     },
     [user, supabase, threads]
   );
@@ -237,7 +318,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       setThreads((prev) => prev.filter((t) => t.id !== threadId));
       if (currentThread?.id === threadId) {
         setCurrentThread(null);
-        setMessages([]);
+        setAllMessages([]);
+        setActiveBranches({});
       }
     },
     [user, supabase, currentThread]
@@ -270,8 +352,17 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   );
 
   const sendMessage = useCallback(
-    async (content: string, attachments?: FileAttachment[], modelOverride?: string, imageGen?: boolean): Promise<boolean> => {
-      // Self-heal stale streaming lock (e.g. stream died silently)
+    async (
+      content: string,
+      attachments?: FileAttachment[],
+      modelOverride?: string,
+      imageGen?: boolean,
+      _branchOpts?: { userMsgParentId?: string | null; regenerateUserMsgId?: string }
+    ): Promise<boolean> => {
+      const isRegenerate = !!_branchOpts?.regenerateUserMsgId;
+      const isFork = _branchOpts?.userMsgParentId !== undefined;
+
+      // Self-heal stale streaming lock
       if (isStreamingRef.current) {
         const elapsed = Date.now() - streamStartedAtRef.current;
         if (elapsed > 30_000) {
@@ -290,11 +381,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         if (usage >= ANON_DAILY_LIMIT) return false;
       }
 
-      // Snapshot current messages BEFORE any state mutations
-      // This prevents race conditions with React rendering between setMessages calls
       const previousMessages = messagesRef.current;
 
-      // Lock immediately via ref (avoids stale closure issues)
       isStreamingRef.current = true;
       streamStartedAtRef.current = Date.now();
       setIsStreaming(true);
@@ -307,8 +395,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       try {
         let threadId = currentThread?.id;
 
-        // Auto-create thread if needed
         if (!threadId) {
+          if (isRegenerate) return false;
           isNewThread = true;
           try {
             threadId = await createThread();
@@ -318,87 +406,141 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        const userMessage: ChatMessage = {
-          id: generateId(),
-          thread_id: threadId,
-          role: "user",
-          content,
-          model: null,
-          created_at: new Date().toISOString(),
-          attachments: attachments?.map(({ name, type, size }) => ({ name, type, size })),
-        };
+        // ── Phase 2: Build user message + history based on mode ──
+        let historyForApi: StreamMessage[];
+        let imageUrls: string[] = [];
 
-        // Save user message
-        if (user) {
-          const { error: insertErr } = await supabase.from("chat_messages").insert({
+        if (isRegenerate) {
+          // Regenerate mode: skip user message, create assistant as sibling
+          const regenerateParentId = _branchOpts!.regenerateUserMsgId!;
+          const pathToUser = getPathToMessage(allMessagesRef.current, regenerateParentId);
+          historyForApi = pathToUser.map((m) => ({
+            role: m.role as "user" | "assistant",
+            content: m.content,
+          }));
+
+          assistantMessage = {
+            id: generateId(),
+            thread_id: threadId,
+            role: "assistant",
+            content: "",
+            model: effectiveModel,
+            parent_id: regenerateParentId,
+            created_at: new Date().toISOString(),
+          };
+
+          setAllMessages((prev) => [...prev, assistantMessage!]);
+          setActiveBranches((prev) => ({ ...prev, [regenerateParentId]: assistantMessage!.id }));
+        } else {
+          // Normal send or fork
+          let userParentId: string | null;
+          if (isFork) {
+            userParentId = _branchOpts!.userMsgParentId!;
+          } else {
+            userParentId = previousMessages.length > 0
+              ? previousMessages[previousMessages.length - 1].id
+              : null;
+          }
+
+          const userMessage: ChatMessage = {
+            id: generateId(),
             thread_id: threadId,
             role: "user",
             content,
-          });
-          if (insertErr) console.error("[chat] User message insert failed:", insertErr.message);
-        } else {
-          addLocalMessage(threadId, userMessage);
-        }
+            model: null,
+            parent_id: userParentId,
+            created_at: new Date().toISOString(),
+            attachments: attachments?.map(({ name, type, size }) => ({ name, type, size })),
+          };
 
-        // For new threads, start fresh; for existing, append
-        setMessages((prev) => isNewThread ? [userMessage] : [...prev, userMessage]);
+          // Save user message
+          if (user) {
+            const { error: insertErr } = await supabase.from("chat_messages").insert({
+              id: userMessage.id,
+              thread_id: threadId,
+              role: "user",
+              content,
+              parent_id: userParentId,
+            });
+            if (insertErr) console.error("[chat] User message insert failed:", insertErr.message);
+          } else {
+            addLocalMessage(threadId, userMessage);
+          }
 
-        // Update title from first user message (fire-and-forget, don't block streaming)
-        if (isNewThread) {
-          const title = content.slice(0, 50) + (content.length > 50 ? "..." : "");
-          renameThread(threadId, title).catch(() => {});
-        } else {
-          const prevUserCount = previousMessages.filter((m) => m.role === "user").length;
-          if (prevUserCount === 0) {
+          setAllMessages((prev) => isNewThread ? [userMessage] : [...prev, userMessage]);
+          setActiveBranches((prev) => ({
+            ...prev,
+            [userParentId ?? "root"]: userMessage.id,
+          }));
+
+          // Update title from first user message
+          if (isNewThread) {
             const title = content.slice(0, 50) + (content.length > 50 ? "..." : "");
             renameThread(threadId, title).catch(() => {});
-          }
-        }
-
-        // Prepare streaming
-        assistantMessage = {
-          id: generateId(),
-          thread_id: threadId,
-          role: "assistant",
-          content: "",
-          model: effectiveModel,
-          created_at: new Date().toISOString(),
-        };
-        setMessages((prev) => [...prev, assistantMessage!]);
-
-        // Build image URLs and document context from attachments
-        const imageUrls: string[] = [];
-        let docContext = "";
-        if (attachments?.length) {
-          for (const att of attachments) {
-            if (att.type.startsWith("image/") && att.dataUrl) {
-              imageUrls.push(att.dataUrl);
-            } else if (att.extractedText) {
-              docContext += `\n\n--- [${att.name}] ---\n${att.extractedText}`;
+          } else if (!isFork) {
+            const prevUserCount = previousMessages.filter((m) => m.role === "user").length;
+            if (prevUserCount === 0) {
+              const title = content.slice(0, 50) + (content.length > 50 ? "..." : "");
+              renameThread(threadId, title).catch(() => {});
             }
           }
-        }
 
-        // If there's document context, prepend it to the last user message
-        const lastContent = docContext
-          ? `${content}\n\n[Attached documents]${docContext}`
-          : content;
+          // Build image URLs and document context from attachments
+          let docContext = "";
+          if (attachments?.length) {
+            for (const att of attachments) {
+              if (att.type.startsWith("image/") && att.dataUrl) {
+                imageUrls.push(att.dataUrl);
+              } else if (att.extractedText) {
+                docContext += `\n\n--- [${att.name}] ---\n${att.extractedText}`;
+              }
+            }
+          }
 
-        // Build API history from the snapshot taken BEFORE state mutations
-        // This avoids race conditions where React renders mid-execution and
-        // the ref includes the new user/assistant messages (causing duplicates
-        // or empty content that fails server validation)
-        const historyForApi: StreamMessage[] = isNewThread
-          ? [{ role: "user" as const, content: lastContent }]
-          : [
+          const lastContent = docContext
+            ? `${content}\n\n[Attached documents]${docContext}`
+            : content;
+
+          // Build history
+          if (isFork && !isNewThread) {
+            const parentPath = userParentId
+              ? getPathToMessage(allMessagesRef.current, userParentId)
+              : [];
+            historyForApi = [
+              ...parentPath.map((m) => ({
+                role: m.role as "user" | "assistant",
+                content: m.content,
+              })),
+              { role: "user" as const, content: lastContent },
+            ];
+          } else if (isNewThread) {
+            historyForApi = [{ role: "user" as const, content: lastContent }];
+          } else {
+            historyForApi = [
               ...previousMessages.map((m) => ({
                 role: m.role as "user" | "assistant",
                 content: m.content,
               })),
               { role: "user" as const, content: lastContent },
             ];
+          }
 
-        // Retry loop for network/server errors
+          // Create assistant message
+          assistantMessage = {
+            id: generateId(),
+            thread_id: threadId,
+            role: "assistant",
+            content: "",
+            model: effectiveModel,
+            parent_id: userMessage.id,
+            created_at: new Date().toISOString(),
+          };
+
+          setAllMessages((prev) => [...prev, assistantMessage!]);
+          setActiveBranches((prev) => ({ ...prev, [userMessage.id]: assistantMessage!.id }));
+        }
+
+        // ── Phase 3: Stream response (common for all modes) ──
         const MAX_RETRIES = 2;
         const RETRY_DELAYS = [1000, 3000];
         const msgId = assistantMessage!.id;
@@ -407,11 +549,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           try {
             const abortController = new AbortController();
             abortRef.current = abortController;
-
-            // Hard timeout: abort entire request after 90s
             const requestTimeout = setTimeout(() => abortController.abort(), 90_000);
-
-            // Build memory context for system prompt injection
             const memCtx = buildMemoryContext(memoriesRef.current);
 
             let response: Response;
@@ -442,7 +580,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
               if (response.status === 429 && !user) {
                 setAnonUsageCount(ANON_DAILY_LIMIT);
               }
-              // Don't retry client errors (4xx)
               if (response.status >= 400 && response.status < 500) {
                 throw Object.assign(
                   new Error(errorData.error || (t("responseError") as string)),
@@ -461,7 +598,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             const decoder = new TextDecoder();
             let fullContent = "";
 
-            // Chunk timeout: abort if no data received for 30s
             let chunkTimer: ReturnType<typeof setTimeout>;
             const resetChunkTimer = () => {
               clearTimeout(chunkTimer);
@@ -478,7 +614,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                 const chunk = decoder.decode(value, { stream: true });
                 fullContent += chunk;
 
-                setMessages((prev) =>
+                setAllMessages((prev) =>
                   prev.map((m) =>
                     m.id === msgId
                       ? { ...m, content: fullContent }
@@ -494,26 +630,28 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             // Save assistant message
             if (user) {
               await supabase.from("chat_messages").insert({
+                id: assistantMessage!.id,
                 thread_id: threadId,
                 role: "assistant",
                 content: fullContent,
                 model: effectiveModel,
+                parent_id: assistantMessage!.parent_id,
               });
             } else {
               addLocalMessage(threadId, {
-                ...assistantMessage,
+                ...assistantMessage!,
                 content: fullContent,
               });
               incrementAnonUsage();
               setAnonUsageCount(getAnonUsageCount());
             }
 
-            // Haptic feedback on successful completion
+            // Haptic feedback
             if (typeof navigator !== "undefined" && navigator.vibrate) {
               navigator.vibrate(50);
             }
 
-            // Extract and save memories from AI response
+            // Extract and save memories
             const { memories: newMemories } = parseMemoryTags(fullContent);
             if (newMemories.length > 0) {
               if (user) {
@@ -523,7 +661,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                   body: JSON.stringify({ memories: newMemories }),
                 }).then(async (res) => {
                   if (res.ok) {
-                    // Refresh memories ref
                     const refreshRes = await fetch("/api/memory");
                     if (refreshRes.ok) {
                       const { memories } = await refreshRes.json();
@@ -542,13 +679,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             break; // Success — exit retry loop
 
           } catch (retryErr) {
-            // Always propagate abort and no-retry errors
             if ((retryErr as Error).name === "AbortError") throw retryErr;
             if ((retryErr as { noRetry?: boolean }).noRetry) throw retryErr;
 
             if (attempt < MAX_RETRIES) {
-              // Show reconnecting state briefly
-              setMessages((prev) =>
+              setAllMessages((prev) =>
                 prev.map((m) =>
                   m.id === msgId
                     ? { ...m, content: t("reconnecting") as string }
@@ -556,15 +691,14 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                 )
               );
               await new Promise((r) => setTimeout(r, RETRY_DELAYS[attempt]));
-              // Clear content to re-trigger thinking indicator
-              setMessages((prev) =>
+              setAllMessages((prev) =>
                 prev.map((m) =>
                   m.id === msgId ? { ...m, content: "" } : m
                 )
               );
               continue;
             }
-            throw retryErr; // Exhausted retries
+            throw retryErr;
           }
         }
       } catch (err) {
@@ -573,14 +707,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         console.error("[chat] sendMessage error:", errName, errMsg);
 
         if (errName === "AbortError") {
-          // If nothing was streamed, restore the user's input
           const assistantContent = assistantMessage
-            ? messagesRef.current.find((m) => m.id === assistantMessage!.id)?.content
+            ? allMessagesRef.current.find((m) => m.id === assistantMessage!.id)?.content
             : "";
           if (!assistantContent) {
-            // Remove the empty assistant and user message placeholders
             if (assistantMessage) {
-              setMessages((prev) => prev.filter((m) => m.id !== assistantMessage!.id));
+              setAllMessages((prev) => prev.filter((m) => m.id !== assistantMessage!.id));
             }
             return false;
           }
@@ -588,7 +720,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         }
 
         if (assistantMessage) {
-          setMessages((prev) =>
+          setAllMessages((prev) =>
             prev.map((m) =>
               m.id === assistantMessage!.id
                 ? {
@@ -601,7 +733,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             )
           );
         } else {
-          // Error occurred before assistant message was created — restore input
           return false;
         }
       } finally {
@@ -626,65 +757,89 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const regenerateLastResponse = useCallback(async (modelId?: string) => {
     if (isStreamingRef.current) return;
-    const currentMsgs = messagesRef.current;
-    if (currentMsgs.length < 2) return;
+    const visibleMsgs = messagesRef.current;
+    if (visibleMsgs.length < 2) return;
 
-    const lastUserMsg = [...currentMsgs]
+    const lastUserMsg = [...visibleMsgs]
       .reverse()
       .find((m) => m.role === "user");
     if (!lastUserMsg) return;
 
-    // If switching model, update selectedModel for UI
     if (modelId) {
       setSelectedModel(modelId);
     }
 
-    // Remove last assistant message
-    const lastAssistantIdx = currentMsgs.length - 1;
-    if (currentMsgs[lastAssistantIdx]?.role === "assistant") {
-      if (user) {
-        await supabase
-          .from("chat_messages")
-          .delete()
-          .eq("id", currentMsgs[lastAssistantIdx].id);
-      }
-      setMessages((prev) => prev.slice(0, -1));
-    }
+    // Create a new assistant response as sibling (don't delete the old one)
+    await sendMessage(
+      lastUserMsg.content,
+      undefined,
+      modelId,
+      undefined,
+      { regenerateUserMsgId: lastUserMsg.id }
+    );
+  }, [sendMessage]);
 
-    // Remove last user message too so sendMessage re-adds it
-    if (user) {
-      await supabase
-        .from("chat_messages")
-        .delete()
-        .eq("id", lastUserMsg.id);
-    }
-    setMessages((prev) => prev.filter((m) => m.id !== lastUserMsg.id));
+  /* ── Branching functions ── */
 
-    await sendMessage(lastUserMsg.content, undefined, modelId);
-  }, [user, supabase, sendMessage]);
+  const getBranchInfo = useCallback((messageId: string): { index: number; total: number } | null => {
+    const msg = allMessages.find((m) => m.id === messageId);
+    if (!msg) return null;
+    const parentKey = msg.parent_id ?? "root";
+    const siblings = allMessages
+      .filter((m) => (m.parent_id ?? "root") === parentKey)
+      .sort((a, b) => a.created_at.localeCompare(b.created_at));
+    if (siblings.length <= 1) return null;
+    const idx = siblings.findIndex((s) => s.id === messageId);
+    return { index: idx + 1, total: siblings.length };
+  }, [allMessages]);
+
+  const navigateBranch = useCallback((messageId: string, direction: "prev" | "next") => {
+    const msg = allMessages.find((m) => m.id === messageId);
+    if (!msg) return;
+    const parentKey = msg.parent_id ?? "root";
+    const siblings = allMessages
+      .filter((m) => (m.parent_id ?? "root") === parentKey)
+      .sort((a, b) => a.created_at.localeCompare(b.created_at));
+    const currentIdx = siblings.findIndex((s) => s.id === messageId);
+    const newIdx = direction === "prev" ? currentIdx - 1 : currentIdx + 1;
+    if (newIdx < 0 || newIdx >= siblings.length) return;
+    setActiveBranches((prev) => ({ ...prev, [parentKey]: siblings[newIdx].id }));
+  }, [allMessages]);
+
+  const editAndResend = useCallback(async (
+    messageId: string,
+    newContent: string,
+    attachments?: FileAttachment[]
+  ): Promise<boolean> => {
+    const original = allMessagesRef.current.find((m) => m.id === messageId);
+    if (!original || original.role !== "user") return false;
+    return sendMessage(newContent, attachments, undefined, undefined, {
+      userMsgParentId: original.parent_id,
+    });
+  }, [sendMessage]);
 
   const clearCurrentThread = useCallback(() => {
     setCurrentThread(null);
-    setMessages([]);
+    setAllMessages([]);
+    setActiveBranches({});
   }, []);
 
   const deleteAllThreads = useCallback(async () => {
     if (user) {
-      // Delete all messages then all threads for this user
       const threadIds = threads.map((t) => t.id);
       if (threadIds.length > 0) {
         await supabase.from("chat_messages").delete().in("thread_id", threadIds);
         await supabase.from("chat_threads").delete().eq("user_id", user.id);
       }
     } else {
-      // Clear localStorage
       for (const thread of threads) {
         deleteLocalThread(thread.id);
       }
     }
     setThreads([]);
     setCurrentThread(null);
-    setMessages([]);
+    setAllMessages([]);
+    setActiveBranches({});
   }, [user, supabase, threads]);
 
   return (
@@ -708,6 +863,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         regenerateLastResponse,
         clearCurrentThread,
         deleteAllThreads,
+        getBranchInfo,
+        navigateBranch,
+        editAndResend,
       }}
     >
       {children}

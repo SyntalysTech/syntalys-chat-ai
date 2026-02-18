@@ -10,7 +10,15 @@ interface MessageListProps {
 }
 
 export function MessageList({ isDark, onSuggestionClick }: MessageListProps) {
-  const { messages, isStreaming, isImageGenerating, regenerateLastResponse } = useChat();
+  const {
+    messages,
+    isStreaming,
+    isImageGenerating,
+    regenerateLastResponse,
+    getBranchInfo,
+    navigateBranch,
+    editAndResend,
+  } = useChat();
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -48,6 +56,9 @@ export function MessageList({ isDark, onSuggestionClick }: MessageListProps) {
               idx === actualLastAssistantIdx ? onSuggestionClick : undefined
             }
             isDark={isDark}
+            branchInfo={getBranchInfo(msg.id)}
+            onNavigateBranch={(dir) => navigateBranch(msg.id, dir)}
+            onEditAndResend={(content) => editAndResend(msg.id, content)}
           />
         ))}
         <div ref={bottomRef} className="h-4" />
