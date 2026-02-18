@@ -150,7 +150,7 @@ export function HumanizerView({ onMenuClick }: HumanizerViewProps) {
               onChange={(e) => setInputText(e.target.value)}
               placeholder={t("humanizerPlaceholder") as string}
               rows={6}
-              className="w-full rounded-xl border border-border bg-card px-4 py-3 text-[15px] sm:text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-syntalys-blue/40 focus:ring-1 focus:ring-syntalys-blue/20 transition-colors resize-none"
+              className="w-full rounded-xl border border-border bg-card px-4 py-3 text-[16px] sm:text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-syntalys-blue/40 focus:ring-1 focus:ring-syntalys-blue/20 transition-colors resize-none"
               disabled={isProcessing}
             />
             <div className="flex items-center justify-between mt-1.5">
