@@ -477,7 +477,7 @@ export function Sidebar({
                   <Settings className="h-4 w-4" />
                 </button>
               }
-              align="right"
+              align="left"
               direction="up"
             >
               {settingsDropdownItems}
@@ -546,7 +546,7 @@ export function Sidebar({
                     <Settings className="h-4 w-4" />
                   </button>
                 }
-                align="right"
+                align="left"
                 direction="up"
               >
                 {settingsDropdownItems}
