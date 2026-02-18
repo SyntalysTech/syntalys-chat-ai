@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect, memo } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback, memo } from "react";
 import { cn } from "@/lib/utils";
 import { MarkdownRenderer } from "./markdown-renderer";
 import { useI18n } from "@/lib/i18n-context";
@@ -19,6 +19,7 @@ import {
   ImageIcon,
   Volume2,
   VolumeX,
+  Loader2,
   ArrowUpRight,
 } from "lucide-react";
 import Image from "next/image";
@@ -57,12 +58,6 @@ function stripMarkdown(text: string): string {
     .replace(/\n{2,}/g, ". ")
     .replace(/\n/g, " ")
     .trim();
-}
-
-/** Map locale to BCP-47 for speech synthesis */
-function getSpeechLang(locale: string): string {
-  const map: Record<string, string> = { fr: "fr-FR", es: "es-ES", en: "en-US" };
-  return map[locale] || "en-US";
 }
 
 /** Parse <reasoning>...</reasoning> tags from content */
@@ -138,10 +133,12 @@ export const MessageBubble = memo(function MessageBubble({
   const [reasoningOpen, setReasoningOpen] = useState(false);
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [ttsLoading, setTtsLoading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const modelMenuRef = useRef<HTMLDivElement>(null);
   const { t, locale } = useI18n();
   const { user } = useAuth();
-  const hasTTS = typeof window !== "undefined" && "speechSynthesis" in window;
+  const hasTTS = true; // OpenAI TTS always available
 
   // Close model menu on outside click
   useEffect(() => {
@@ -177,33 +174,67 @@ export const MessageBubble = memo(function MessageBubble({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSpeak = () => {
-    if (!hasTTS) return;
-    if (isSpeaking) {
-      window.speechSynthesis.cancel();
+  const handleSpeak = useCallback(async () => {
+    // Stop if already playing
+    if (isSpeaking || ttsLoading) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        audioRef.current = null;
+      }
       setIsSpeaking(false);
+      setTtsLoading(false);
       return;
     }
+
     const textToRead = parsed && parsed.answer ? parsed.answer : message.content;
     const cleaned = stripMarkdown(textToRead);
     if (!cleaned) return;
-    const utterance = new SpeechSynthesisUtterance(cleaned);
-    utterance.lang = getSpeechLang(locale);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    window.speechSynthesis.cancel();
-    setIsSpeaking(true);
-    window.speechSynthesis.speak(utterance);
-  };
 
-  // Cancel TTS on unmount
+    setTtsLoading(true);
+    try {
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: cleaned, lang: locale }),
+      });
+      if (!res.ok) throw new Error("TTS failed");
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+
+      audio.onended = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(url);
+        audioRef.current = null;
+      };
+      audio.onerror = () => {
+        setIsSpeaking(false);
+        setTtsLoading(false);
+        URL.revokeObjectURL(url);
+        audioRef.current = null;
+      };
+
+      setTtsLoading(false);
+      setIsSpeaking(true);
+      await audio.play();
+    } catch {
+      setTtsLoading(false);
+      setIsSpeaking(false);
+    }
+  }, [isSpeaking, ttsLoading, parsed, message.content, locale]);
+
+  // Cleanup audio on unmount
   useEffect(() => {
     return () => {
-      if (isSpeaking && typeof window !== "undefined" && "speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
       }
     };
-  }, [isSpeaking]);
+  }, []);
 
   // Parse suggestions from content
   const rawContent = parsed ? parsed.answer : message.content;
@@ -364,10 +395,13 @@ export const MessageBubble = memo(function MessageBubble({
                 {hasTTS && (
                   <button
                     onClick={handleSpeak}
-                    className="flex items-center justify-center h-10 w-10 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
+                    disabled={ttsLoading}
+                    className="flex items-center justify-center h-10 w-10 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors disabled:opacity-50"
                     aria-label={isSpeaking ? t("stopReading" as TranslationKey) : t("readAloud" as TranslationKey)}
                   >
-                    {isSpeaking ? (
+                    {ttsLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : isSpeaking ? (
                       <VolumeX className="h-4 w-4" />
                     ) : (
                       <Volume2 className="h-4 w-4" />
