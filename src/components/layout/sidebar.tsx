@@ -151,15 +151,39 @@ export function Sidebar({
   const avatarInitial =
     (profile?.display_name?.charAt(0) || user?.email?.charAt(0) || "U").toUpperCase();
 
-  /* Settings + info dropdown items (shared between logged-in and anon) */
-  const settingsDropdownItems = (
+  /* User menu dropdown content (GPT-style) */
+  const userMenuContent = (
     <>
+      {/* User header (non-closable) */}
+      {user && (
+        <>
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+          <div onClick={(e) => e.stopPropagation()} className="flex items-center gap-2.5 px-3 py-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-syntalys-blue text-white text-xs font-semibold flex-shrink-0">
+              {avatarInitial}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-popover-foreground">{displayName}</p>
+              {user.email && displayName !== user.email && (
+                <p className="truncate text-[11px] text-muted-foreground">{user.email}</p>
+              )}
+            </div>
+          </div>
+          <div className="h-px bg-border/50 mx-1 my-0.5" />
+        </>
+      )}
+
+      {/* Core actions */}
       <DropdownItem onClick={() => { onOpenSettings(); onMobileClose(); }}>
         <Settings className="h-3.5 w-3.5" /> {t("settings")}
       </DropdownItem>
       <DropdownItem onClick={() => { onOpenExplore(); onMobileClose(); }}>
         <Compass className="h-3.5 w-3.5" /> {t("explore")}
       </DropdownItem>
+
+      <div className="h-px bg-border/50 mx-1 my-0.5" />
+
+      {/* Help & info */}
       <DropdownItem onClick={() => { onOpenDocumentation(); onMobileClose(); }}>
         <BookOpen className="h-3.5 w-3.5" /> {t("documentation")}
       </DropdownItem>
@@ -169,6 +193,16 @@ export function Sidebar({
       <DropdownItem onClick={() => { onOpenLegal(); onMobileClose(); }}>
         <Scale className="h-3.5 w-3.5" /> {t("legal")}
       </DropdownItem>
+
+      {/* Sign out */}
+      {user && (
+        <>
+          <div className="h-px bg-border/50 mx-1 my-0.5" />
+          <DropdownItem onClick={() => { signOut(); onMobileClose(); }}>
+            <LogOut className="h-3.5 w-3.5" /> {t("signOut")}
+          </DropdownItem>
+        </>
+      )}
     </>
   );
 
@@ -437,150 +471,99 @@ export function Sidebar({
 
       </div>{/* end overflow-hidden wrapper */}
 
-      {/* ─── Footer: User section ─── */}
+      {/* ─── Footer: User section (GPT-style menu) ─── */}
       <div className="border-t border-border/50 p-2">
         {user ? (
-          /* ── Logged in ── */
-          <div
-            className={cn(
-              "flex items-center transition-all duration-300",
-              collapsed ? "flex-col gap-0.5" : "gap-2"
-            )}
-          >
-            {/* Avatar */}
-            <div
-              className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-full bg-syntalys-blue text-white text-xs font-semibold flex-shrink-0 transition-all duration-300",
-                collapsed
-                  ? "h-0 w-0 opacity-0 overflow-hidden"
-                  : "h-8 w-8 opacity-100"
-              )}
-            >
-              {avatarInitial}
-            </div>
-            {/* Name / Email */}
-            <div
-              className={cn(
-                "min-w-0 overflow-hidden transition-all duration-300",
-                collapsed ? "w-0 h-0 opacity-0" : "flex-1 opacity-100"
-              )}
-            >
-              <p className="truncate text-sm font-medium text-sidebar-foreground whitespace-nowrap">
-                {displayName}
-              </p>
-            </div>
-            {/* Settings dropdown */}
-            <Dropdown
-              trigger={
+          /* ── Logged in: entire row is the dropdown trigger ── */
+          <Dropdown
+            trigger={
+              collapsed ? (
                 <button
-                  className={cn(
-                    "flex items-center justify-center rounded-lg text-muted-foreground hover:bg-sidebar-hover transition-all duration-300",
-                    collapsed ? "h-9 w-9 mx-auto" : "h-8 w-8"
-                  )}
-                  aria-label={t("settings")}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg mx-auto hover:bg-sidebar-hover transition-colors"
+                  aria-label={displayName}
                 >
-                  <Settings className="h-4 w-4" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-syntalys-blue text-white text-xs font-semibold">
+                    {avatarInitial}
+                  </div>
                 </button>
-              }
-              align="right"
-              direction="up"
-            >
-              {settingsDropdownItems}
-            </Dropdown>
-            {/* Logout */}
-            <CollapsedTooltip collapsed={collapsed} label={t("signOut")}>
-              <button
-                onClick={signOut}
-                className={cn(
-                  "flex items-center justify-center rounded-lg text-muted-foreground hover:bg-sidebar-hover transition-all duration-300",
-                  collapsed ? "h-9 w-9 mx-auto" : "h-8 w-8"
-                )}
-                aria-label={t("signOut")}
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
-            </CollapsedTooltip>
-          </div>
+              ) : (
+                <button className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-sidebar-hover transition-colors">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-syntalys-blue text-white text-xs font-semibold flex-shrink-0">
+                    {avatarInitial}
+                  </div>
+                  <span className="flex-1 truncate text-sm font-medium text-sidebar-foreground text-left">
+                    {displayName}
+                  </span>
+                  <MoreHorizontal className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                </button>
+              )
+            }
+            align="left"
+            direction="up"
+            className="w-[240px]"
+          >
+            {userMenuContent}
+          </Dropdown>
         ) : (
-          /* ── Anonymous ── */
+          /* ── Anonymous: settings menu + login button ── */
           <div
             className={cn(
               "flex transition-all duration-300",
               collapsed ? "flex-col items-center gap-0.5" : "flex-col gap-2"
             )}
           >
-            {/* Anon badge */}
-            <CollapsedTooltip collapsed={collapsed} label={t("anonymousMode")}>
-              <div
+            {/* Settings dropdown */}
+            <Dropdown
+              trigger={
+                collapsed ? (
+                  <button
+                    className="flex h-9 w-9 items-center justify-center rounded-lg mx-auto text-muted-foreground hover:bg-sidebar-hover transition-colors"
+                    aria-label={t("settings")}
+                  >
+                    <Shield className="h-4 w-4" />
+                  </button>
+                ) : (
+                  <button className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-sidebar-hover transition-colors">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground flex-shrink-0">
+                      <Shield className="h-4 w-4" />
+                    </div>
+                    <span className="flex-1 text-sm text-muted-foreground text-left">
+                      {t("anonymousMode")}
+                    </span>
+                    <MoreHorizontal className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  </button>
+                )
+              }
+              align="left"
+              direction="up"
+              className="w-[240px]"
+            >
+              {userMenuContent}
+            </Dropdown>
+
+            {/* Login button */}
+            <CollapsedTooltip collapsed={collapsed} label={t("signIn")}>
+              <button
+                onClick={onOpenAuth}
                 className={cn(
                   "flex items-center rounded-lg transition-all duration-300",
                   collapsed
-                    ? "h-9 w-9 justify-center mx-auto"
-                    : "px-3 py-1.5 gap-2"
+                    ? "h-9 w-9 justify-center mx-auto text-syntalys-blue hover:bg-sidebar-hover"
+                    : "flex-1 justify-center gap-2 bg-primary px-3 py-2 text-primary-foreground hover:bg-syntalys-blue-light"
                 )}
               >
-                <Shield className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <LogIn className="h-4 w-4 flex-shrink-0" />
                 <span
                   className={cn(
-                    "text-xs text-muted-foreground",
-                    textTransition
+                    "text-sm font-medium",
+                    "whitespace-nowrap overflow-hidden transition-all duration-300",
+                    collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100 ml-1"
                   )}
                 >
-                  {t("anonymousMode")}
+                  {t("signIn")}
                 </span>
-              </div>
+              </button>
             </CollapsedTooltip>
-
-            {/* Settings dropdown + Login row */}
-            <div
-              className={cn(
-                "flex transition-all duration-300",
-                collapsed ? "flex-col items-center gap-0.5" : "gap-2"
-              )}
-            >
-              {/* Settings dropdown */}
-              <Dropdown
-                trigger={
-                  <button
-                    className={cn(
-                      "flex items-center justify-center rounded-lg text-muted-foreground hover:bg-sidebar-hover transition-all duration-300",
-                      collapsed ? "h-9 w-9 mx-auto" : "h-9 w-9 flex-shrink-0"
-                    )}
-                    aria-label={t("settings")}
-                  >
-                    <Settings className="h-4 w-4" />
-                  </button>
-                }
-                align="left"
-                direction="up"
-              >
-                {settingsDropdownItems}
-              </Dropdown>
-
-              {/* Login button */}
-              <CollapsedTooltip collapsed={collapsed} label={t("signIn")}>
-                <button
-                  onClick={onOpenAuth}
-                  className={cn(
-                    "flex items-center rounded-lg transition-all duration-300",
-                    collapsed
-                      ? "h-9 w-9 justify-center mx-auto text-syntalys-blue hover:bg-sidebar-hover"
-                      : "flex-1 justify-center gap-2 bg-primary px-3 py-2 text-primary-foreground hover:bg-syntalys-blue-light"
-                  )}
-                >
-                  <LogIn className="h-4 w-4 flex-shrink-0" />
-                  <span
-                    className={cn(
-                      "text-sm font-medium",
-                      "whitespace-nowrap overflow-hidden transition-all duration-300",
-                      collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100 ml-1"
-                    )}
-                  >
-                    {t("signIn")}
-                  </span>
-                </button>
-              </CollapsedTooltip>
-            </div>
           </div>
         )}
       </div>
