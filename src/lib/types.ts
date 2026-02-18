@@ -41,3 +41,13 @@ export interface StreamMessage {
   role: "user" | "assistant";
   content: string;
 }
+
+export interface UserMemory {
+  id: string;
+  user_id: string | null;
+  content: string;
+  category: "preference" | "fact" | "instruction" | "context" | "general";
+  source: "user_explicit" | "ai_inferred";
+  created_at: string;
+  updated_at: string;
+}

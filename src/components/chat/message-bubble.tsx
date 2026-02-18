@@ -93,16 +93,28 @@ function parseReasoning(content: string): {
   return { reasoning, answer, isReasoningComplete: true };
 }
 
+/** Strip <memory> tags from displayed content */
+function stripMemoryTags(content: string): string {
+  // Strip complete <memory> tags
+  let cleaned = content.replace(/<memory(?:\s+category="[^"]*")?\s*>[\s\S]*?<\/memory>/g, "");
+  // Strip incomplete tags during streaming
+  cleaned = cleaned.replace(/<memory[^>]*>[^<]*$/, "").replace(/<memo[^>]*$/, "");
+  return cleaned.trim();
+}
+
 /** Parse <suggestions>...</suggestions> from content */
 function parseSuggestions(content: string): {
   cleanContent: string;
   suggestions: string[];
 } {
+  // First strip memory tags
+  const withoutMemory = stripMemoryTags(content);
+
   const regex = /<suggestions>([\s\S]*?)<\/suggestions>/;
-  const match = content.match(regex);
+  const match = withoutMemory.match(regex);
   if (!match) {
     // Strip incomplete tags during streaming (e.g. "<suggest" or "<suggestions>partial")
-    const cleaned = content.replace(/<suggestions>[^<]*$/, "").replace(/<suggest[^>]*$/, "").trim();
+    const cleaned = withoutMemory.replace(/<suggestions>[^<]*$/, "").replace(/<suggest[^>]*$/, "").trim();
     return { cleanContent: cleaned, suggestions: [] };
   }
   const raw = match[1].trim();
@@ -110,7 +122,7 @@ function parseSuggestions(content: string): {
     .split("|")
     .map((s) => s.trim())
     .filter((s) => s.length > 0 && s.length < 80);
-  const cleanContent = content.replace(regex, "").trim();
+  const cleanContent = withoutMemory.replace(regex, "").trim();
   return { cleanContent, suggestions };
 }
 

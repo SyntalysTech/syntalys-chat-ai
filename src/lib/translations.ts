@@ -1039,6 +1039,28 @@ const translations = {
     es: "Escribe \"delete\"",
     en: "Type \"delete\"",
   },
+
+  // ── Memory ──
+  memoryTitle: {
+    fr: "Mémoire de l'IA",
+    es: "Memoria de la IA",
+    en: "AI Memory",
+  },
+  memoryDesc: {
+    fr: "SYNTALYS AI se souvient des informations importantes entre les conversations pour personnaliser vos réponses.",
+    es: "SYNTALYS AI recuerda informacion importante entre conversaciones para personalizar tus respuestas.",
+    en: "SYNTALYS AI remembers important information across conversations to personalize your responses.",
+  },
+  memoryEmpty: {
+    fr: "Aucune mémoire enregistrée. L'IA commencera à se souvenir des informations importantes au fil de vos conversations.",
+    es: "Sin memorias guardadas. La IA empezara a recordar informacion importante a medida que converses.",
+    en: "No memories saved yet. The AI will start remembering important information as you chat.",
+  },
+  memoryClearAll: {
+    fr: "Effacer toute la mémoire",
+    es: "Borrar toda la memoria",
+    en: "Clear all memory",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

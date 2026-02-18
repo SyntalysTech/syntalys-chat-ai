@@ -21,8 +21,14 @@ import {
   getAnonUsageCount,
   incrementAnonUsage,
 } from "./chat-store";
+import {
+  getLocalMemories,
+  saveLocalMemory,
+  parseMemoryTags,
+  buildMemoryContext,
+} from "./memory-store";
 import { DEFAULT_MODEL_ID, getModelByIdOrDefault } from "./models";
-import type { ChatThread, ChatMessage, StreamMessage, FileAttachment } from "./types";
+import type { ChatThread, ChatMessage, StreamMessage, FileAttachment, UserMemory } from "./types";
 import { generateId, getAnonId } from "./utils";
 
 interface ChatContextType {
@@ -68,6 +74,27 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const streamStartedAtRef = useRef<number>(0);
   const messagesRef = useRef<ChatMessage[]>([]);
   messagesRef.current = messages;
+  const memoriesRef = useRef<UserMemory[]>([]);
+
+  // Load memories on mount / user change
+  useEffect(() => {
+    async function loadMemories() {
+      if (user) {
+        try {
+          const res = await fetch("/api/memory");
+          if (res.ok) {
+            const { memories } = await res.json();
+            memoriesRef.current = memories || [];
+          }
+        } catch {
+          // Silently fail — memories are best-effort
+        }
+      } else {
+        memoriesRef.current = getLocalMemories();
+      }
+    }
+    loadMemories();
+  }, [user]);
 
   // Auto-recover from stale streaming lock when page regains focus
   // (e.g. iOS PWA backgrounded, stream connection died silently)
@@ -330,6 +357,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             const abortController = new AbortController();
             abortRef.current = abortController;
 
+            // Build memory context for system prompt injection
+            const memCtx = buildMemoryContext(memoriesRef.current);
+
             const response = await fetch("/api/chat", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -340,6 +370,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                 isAnonymous: !user,
                 userName: profile?.display_name || undefined,
                 imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
+                memoryContext: memCtx || undefined,
               }),
               signal: abortController.signal,
             });
@@ -401,6 +432,32 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             // Haptic feedback on successful completion
             if (typeof navigator !== "undefined" && navigator.vibrate) {
               navigator.vibrate(50);
+            }
+
+            // Extract and save memories from AI response
+            const { memories: newMemories } = parseMemoryTags(fullContent);
+            if (newMemories.length > 0) {
+              if (user) {
+                fetch("/api/memory", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ memories: newMemories }),
+                }).then(async (res) => {
+                  if (res.ok) {
+                    // Refresh memories ref
+                    const refreshRes = await fetch("/api/memory");
+                    if (refreshRes.ok) {
+                      const { memories } = await refreshRes.json();
+                      memoriesRef.current = memories || [];
+                    }
+                  }
+                }).catch(() => {});
+              } else {
+                for (const mem of newMemories) {
+                  saveLocalMemory(mem);
+                }
+                memoriesRef.current = getLocalMemories();
+              }
             }
 
             break; // Success — exit retry loop

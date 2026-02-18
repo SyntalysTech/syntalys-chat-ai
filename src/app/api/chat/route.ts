@@ -22,6 +22,7 @@ const requestSchema = z.object({
   anonId: z.string().optional(),
   userName: z.string().max(100).optional(),
   imageUrls: z.array(z.string()).max(5).optional(),
+  memoryContext: z.string().max(5000).optional(),
 });
 
 function getClientIP(req: NextRequest): string {
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { messages, model: modelId, isAnonymous, userName, imageUrls } = parsed.data;
+    const { messages, model: modelId, isAnonymous, userName, imageUrls, memoryContext } = parsed.data;
 
     // Rate limiting for anonymous users — by IP, not client-generated anonId
     if (isAnonymous) {
@@ -141,6 +142,9 @@ export async function POST(req: NextRequest) {
     let systemPrompt = getSystemPrompt(modelConfig.id);
     if (userName) {
       systemPrompt += `\n\nThe user's name is "${userName}". Address them by their name naturally when appropriate (greetings, personalized responses), but don't force it into every sentence.`;
+    }
+    if (memoryContext) {
+      systemPrompt += memoryContext;
     }
 
     // Build input messages for the Responses API

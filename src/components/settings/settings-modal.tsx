@@ -18,7 +18,11 @@ import {
   KeyRound,
   Trash2,
   AlertTriangle,
+  Brain,
+  X,
 } from "lucide-react";
+import type { UserMemory } from "@/lib/types";
+import type { TranslationKey as TK } from "@/lib/translations";
 
 interface SettingsModalProps {
   open: boolean;
@@ -61,12 +65,36 @@ export function SettingsModal({
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
+  // Memory management
+  const [memories, setMemories] = useState<UserMemory[]>([]);
+  const [loadingMemories, setLoadingMemories] = useState(false);
+
   useEffect(() => {
     if (profile) {
       setDisplayName(profile.display_name || "");
       setDefaultModel(profile.default_model || DEFAULT_MODEL_ID);
     }
   }, [profile]);
+
+  // Load memories when modal opens
+  useEffect(() => {
+    if (open && user) {
+      setLoadingMemories(true);
+      fetch("/api/memory")
+        .then((res) => res.json())
+        .then(({ memories: mems }) => setMemories(mems || []))
+        .catch(() => setMemories([]))
+        .finally(() => setLoadingMemories(false));
+    } else if (open && !user) {
+      // Load from localStorage for anonymous users
+      try {
+        const raw = localStorage.getItem("syntalys_anon_memories");
+        setMemories(raw ? JSON.parse(raw) : []);
+      } catch {
+        setMemories([]);
+      }
+    }
+  }, [open, user]);
 
   // Reset states when modal closes
   useEffect(() => {
@@ -78,6 +106,7 @@ export function SettingsModal({
       setShowDeleteChats(false);
       setShowDeleteAccount(false);
       setDeleteConfirmText("");
+      setMemories([]);
     }
   }, [open]);
 
@@ -135,6 +164,39 @@ export function SettingsModal({
     } finally {
       setDeletingChats(false);
     }
+  };
+
+  const handleDeleteMemory = async (memoryId: string) => {
+    if (user) {
+      await fetch("/api/memory", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memoryId }),
+      });
+    } else {
+      try {
+        const raw = localStorage.getItem("syntalys_anon_memories");
+        const mems = raw ? JSON.parse(raw) : [];
+        const filtered = mems.filter((m: UserMemory) => m.id !== memoryId);
+        localStorage.setItem("syntalys_anon_memories", JSON.stringify(filtered));
+      } catch {}
+    }
+    setMemories((prev) => prev.filter((m) => m.id !== memoryId));
+  };
+
+  const handleClearAllMemories = async () => {
+    if (user) {
+      for (const mem of memories) {
+        await fetch("/api/memory", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ memoryId: mem.id }),
+        });
+      }
+    } else {
+      localStorage.removeItem("syntalys_anon_memories");
+    }
+    setMemories([]);
   };
 
   const handleDeleteAccount = async () => {
@@ -359,6 +421,66 @@ export function SettingsModal({
               </div>
             </div>
 
+            {/* Memory Management */}
+            <div className="border-t border-border pt-4">
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-card-foreground">
+                <Brain className="h-4 w-4 text-syntalys-blue" />
+                {t("memoryTitle" as TK)}
+              </h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                {t("memoryDesc" as TK)}
+              </p>
+
+              {loadingMemories ? (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                </div>
+              ) : memories.length === 0 ? (
+                <div className="rounded-lg border border-border/50 bg-muted/30 px-3 py-4 text-center">
+                  <p className="text-xs text-muted-foreground">{t("memoryEmpty" as TK)}</p>
+                </div>
+              ) : (
+                <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
+                  {memories.map((mem) => (
+                    <div
+                      key={mem.id}
+                      className="group flex items-start gap-2 rounded-lg border border-border/50 bg-card px-3 py-2 text-xs"
+                    >
+                      <span
+                        className={cn(
+                          "mt-0.5 flex-shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase",
+                          mem.source === "user_explicit"
+                            ? "bg-syntalys-blue/10 text-syntalys-blue"
+                            : "bg-muted text-muted-foreground"
+                        )}
+                      >
+                        {mem.source === "user_explicit" ? "User" : "AI"}
+                      </span>
+                      <span className="flex-1 text-card-foreground leading-relaxed min-w-0 break-words">
+                        {mem.content}
+                      </span>
+                      <button
+                        onClick={() => handleDeleteMemory(mem.id)}
+                        className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-destructive/10"
+                        aria-label="Delete memory"
+                      >
+                        <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {memories.length > 0 && (
+                <button
+                  onClick={handleClearAllMemories}
+                  className="mt-2 text-xs text-destructive/70 hover:text-destructive transition-colors"
+                >
+                  {t("memoryClearAll" as TK)}
+                </button>
+              )}
+            </div>
+
             {/* Danger Zone */}
             <div className="border-t border-destructive/20 pt-4">
               <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-destructive">
@@ -466,6 +588,41 @@ export function SettingsModal({
               </div>
             </div>
           </>
+        )}
+
+        {/* Memory section for anonymous users */}
+        {!user && memories.length > 0 && (
+          <div className="border-t border-border pt-4">
+            <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-card-foreground">
+              <Brain className="h-4 w-4 text-syntalys-blue" />
+              {t("memoryTitle" as TK)}
+            </h3>
+            <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
+              {memories.map((mem) => (
+                <div
+                  key={mem.id}
+                  className="group flex items-start gap-2 rounded-lg border border-border/50 bg-card px-3 py-2 text-xs"
+                >
+                  <span className="flex-1 text-card-foreground leading-relaxed min-w-0 break-words">
+                    {mem.content}
+                  </span>
+                  <button
+                    onClick={() => handleDeleteMemory(mem.id)}
+                    className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-destructive/10"
+                    aria-label="Delete memory"
+                  >
+                    <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={handleClearAllMemories}
+              className="mt-2 text-xs text-destructive/70 hover:text-destructive transition-colors"
+            >
+              {t("memoryClearAll" as TK)}
+            </button>
+          </div>
         )}
 
         {/* Info */}
