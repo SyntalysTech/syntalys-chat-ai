@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils";
 import type { TranslationKey } from "@/lib/translations";
 import {
   Zap,
+  Rocket,
   Brain,
-  FlaskConical,
-  Heart,
+  Crown,
+  MessageCircle,
   Mail,
   FileText,
   Code2,
@@ -29,10 +30,10 @@ interface ExploreModalProps {
 }
 
 const modelIconMap: Record<string, typeof Zap> = {
-  "talys-2.0": Zap,
-  "talys-2.5": Brain,
-  "talys-3.0": FlaskConical,
-  "milo": Heart,
+  "talys-execute": Rocket,
+  "talys-think": Brain,
+  "talys-apex": Crown,
+  "milo-chat": MessageCircle,
 };
 
 const useCases = [
@@ -98,7 +99,7 @@ export function ExploreModal({ open, onClose, onOpenAuth }: ExploreModalProps) {
                           <span
                             className={cn(
                               "rounded-full px-2 py-0.5 text-[10px] font-semibold flex-shrink-0",
-                              model.badge === "Beta"
+                              model.badge === "Flagship"
                                 ? "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold"
                                 : "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]"
                             )}

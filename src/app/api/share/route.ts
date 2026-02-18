@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       .insert({
         thread_id: crypto.randomUUID(),
         title,
-        model: model || "synta-1.0",
+        model: model || "talys-execute",
         messages: cleanMessages,
       })
       .select("id")

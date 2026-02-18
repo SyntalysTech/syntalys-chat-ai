@@ -465,43 +465,36 @@ const translations = {
     en: "Older",
   },
 
-  // ── Model descriptions (new TALYS generation) ──
-  modelTalys20Desc: {
-    fr: "Rapide, efficace et avec recherche web",
-    es: "Rapido, eficiente y con busqueda web",
-    en: "Fast, efficient, and with web search",
+  // ── Model descriptions (role-based suite) ──
+  modelExecuteDesc: {
+    fr: "Rédaction, code, emails et recherche web — rapide et efficace",
+    es: "Redaccion, codigo, emails y busqueda web — rapido y eficiente",
+    en: "Writing, code, emails, and web search — fast and efficient",
   },
-  modelTalys25Desc: {
-    fr: "Intelligence supérieure, analyse approfondie et raisonnement",
-    es: "Mayor inteligencia, analisis profundo y razonamiento",
-    en: "Higher intelligence, deep analysis, and reasoning",
+  modelThinkDesc: {
+    fr: "Analyse approfondie, raisonnement et prise de décision stratégique",
+    es: "Analisis profundo, razonamiento y toma de decisiones estratégicas",
+    en: "Deep analysis, reasoning, and strategic decision-making",
   },
-  modelTalys30Desc: {
-    fr: "Notre modele le plus avance et intelligent",
-    es: "Nuestro modelo mas avanzado e inteligente",
-    en: "Our most advanced and intelligent model",
+  modelApexDesc: {
+    fr: "Création avancée, résolution complexe et intelligence maximale",
+    es: "Creacion avanzada, resolucion compleja e inteligencia maxima",
+    en: "Advanced creation, complex resolution, and maximum intelligence",
   },
-  modelMiloDesc: {
-    fr: "Rapide, amical et polyvalent",
-    es: "Rapido, amigable y versatil",
-    en: "Fast, friendly, and versatile",
+  modelMiloChatDesc: {
+    fr: "Assistant amical pour conversations et support du quotidien",
+    es: "Asistente amigable para conversaciones y soporte del dia a dia",
+    en: "Friendly assistant for conversations and everyday support",
+  },
+  modelLegacyDesc: {
+    fr: "Modèle de génération précédente",
+    es: "Modelo de generacion anterior",
+    en: "Previous generation model",
   },
   legacyModels: {
     fr: "Modèles anciens",
     es: "Modelos antiguos",
     en: "Legacy models",
-  },
-
-  // ── Model descriptions (legacy) ──
-  modelBaseDesc: {
-    fr: "Modele de base rapide et efficace",
-    es: "Modelo base rapido y eficiente",
-    en: "Fast and efficient base model",
-  },
-  modelSynta10Desc: {
-    fr: "Modèle de base original",
-    es: "Modelo base original",
-    en: "Original base model",
   },
 
   // ── Reasoning ──
@@ -714,25 +707,25 @@ const translations = {
     es: "SYNTALYS AI ofrece varios modelos adaptados a tus necesidades:",
     en: "SYNTALYS AI offers several models adapted to your needs:",
   },
-  docModelTalys20: {
-    fr: "Rapide et efficace pour les taches quotidiennes. Gratuit pour tous les utilisateurs. Ideal pour les conversations, questions rapides et l'aide a la redaction.",
-    es: "Rapido y eficiente para tareas diarias. Gratuito para todos los usuarios. Ideal para conversaciones, preguntas rapidas y ayuda con escritura.",
-    en: "Fast and efficient for daily tasks. Free for all users. Great for conversations, quick questions, and writing help.",
+  docModelExecute: {
+    fr: "Votre moteur de production quotidien. Gratuit. Ideal pour la redaction, le code, les emails, la recherche web et les taches operationnelles. Rapide et efficace.",
+    es: "Tu motor de produccion diario. Gratuito. Ideal para redaccion, codigo, emails, busqueda web y tareas operativas. Rapido y eficiente.",
+    en: "Your daily production engine. Free. Great for writing, code, emails, web search, and operational tasks. Fast and efficient.",
   },
-  docModelTalys25: {
-    fr: "Modele analytique premium avec raisonnement pas a pas. Ideal pour les problemes complexes, le debug de code et l'analyse approfondie. Necessite un compte.",
-    es: "Modelo analitico premium con razonamiento paso a paso. Ideal para problemas complejos, debug de codigo y analisis profundo. Requiere cuenta.",
-    en: "Premium analytical model with step-by-step reasoning. Great for complex problems, code debugging, and deep analysis. Requires an account.",
+  docModelThink: {
+    fr: "Analytique premium avec raisonnement pas a pas. Ideal pour l'architecture technique, l'analyse financiere, la strategie et les decisions complexes. Necessite un compte.",
+    es: "Analitico premium con razonamiento paso a paso. Ideal para arquitectura tecnica, analisis financiero, estrategia y decisiones complejas. Requiere cuenta.",
+    en: "Premium analytical model with step-by-step reasoning. Great for technical architecture, financial analysis, strategy, and complex decisions. Requires an account.",
   },
-  docModelTalys30: {
-    fr: "Le modele le plus avance et intelligent. Combine profondeur analytique, excellence creative et pensee strategique. Necessite un compte.",
-    es: "El modelo mas avanzado e inteligente. Combina profundidad analitica, excelencia creativa y pensamiento estrategico. Requiere cuenta.",
-    en: "The most advanced and intelligent model. Combines analytical depth, creative excellence, and strategic thinking. Requires an account.",
+  docModelApex: {
+    fr: "Le modele flagship. Creation avancee, resolution de problemes ambigus, design de systemes complets et intelligence strategique maximale. Necessite un compte.",
+    es: "El modelo flagship. Creacion avanzada, resolucion de problemas ambiguos, diseno de sistemas completos e inteligencia estrategica maxima. Requiere cuenta.",
+    en: "The flagship model. Advanced creation, ambiguous problem solving, complete systems design, and maximum strategic intelligence. Requires an account.",
   },
-  docModelMilo: {
-    fr: "Modele dedie a la generation d'images a partir de descriptions textuelles. Creez des visuels uniques instantanement. Necessite un compte.",
-    es: "Modelo dedicado a la generacion de imagenes a partir de descripciones de texto. Crea visuales unicos al instante. Requiere cuenta.",
-    en: "Dedicated image generation model from text descriptions. Create unique visuals instantly. Requires an account.",
+  docModelMiloChat: {
+    fr: "Assistant conversationnel amical et accessible. Ideal pour le support, les FAQs, les conversations informelles et l'assistance basique. Gratuit.",
+    es: "Asistente conversacional amigable y accesible. Ideal para soporte, FAQs, conversaciones informales y asistencia basica. Gratuito.",
+    en: "Friendly and approachable conversational assistant. Great for support, FAQs, casual conversations, and basic assistance. Free.",
   },
   docConversations: {
     fr: "Gestion des conversations",
@@ -750,9 +743,9 @@ const translations = {
     en: "Anonymous mode vs. Account",
   },
   docAnonymousContent: {
-    fr: "En mode anonyme, vous avez acces au modele TALYS 2.0 avec une limite de 20 messages par jour. Vos conversations sont stockees localement dans votre navigateur. Avec un compte, vous accedez a tous les modeles (TALYS 2.5, 3.0, Milo), sans limite de messages, et vos conversations sont synchronisees dans le cloud.",
-    es: "En modo anonimo, tienes acceso al modelo TALYS 2.0 con un limite de 20 mensajes por dia. Tus conversaciones se guardan localmente en tu navegador. Con una cuenta, accedes a todos los modelos (TALYS 2.5, 3.0, Milo), sin limite de mensajes, y tus conversaciones se sincronizan en la nube.",
-    en: "In anonymous mode, you have access to the TALYS 2.0 model with a limit of 20 messages per day. Your conversations are stored locally in your browser. With an account, you access all models (TALYS 2.5, 3.0, Milo), with no message limit, and your conversations are synced to the cloud.",
+    fr: "En mode anonyme, vous avez acces a TALYS Execute et Milo Chat avec une limite de 20 messages par jour. Vos conversations sont stockees localement dans votre navigateur. Avec un compte, vous accedez a tous les modeles (TALYS Think, Apex), sans limite de messages, et vos conversations sont synchronisees dans le cloud.",
+    es: "En modo anonimo, tienes acceso a TALYS Execute y Milo Chat con un limite de 20 mensajes por dia. Tus conversaciones se guardan localmente en tu navegador. Con una cuenta, accedes a todos los modelos (TALYS Think, Apex), sin limite de mensajes, y tus conversaciones se sincronizan en la nube.",
+    en: "In anonymous mode, you have access to TALYS Execute and Milo Chat with a limit of 20 messages per day. Your conversations are stored locally in your browser. With an account, you access all models (TALYS Think, Apex), with no message limit, and your conversations are synced to the cloud.",
   },
   docSettings: {
     fr: "Paramètres",

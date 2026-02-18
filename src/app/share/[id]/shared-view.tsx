@@ -39,7 +39,7 @@ function parseReasoning(content: string) {
 
 function SharedMessage({ message }: { message: SharedMessage }) {
   const isUser = message.role === "user";
-  const isReasoning = message.model === "synta-1.0-reasoning" || message.model === "talys-2.5";
+  const isReasoning = message.model === "talys-think" || message.model === "talys-2.5" || message.model === "synta-1.0-reasoning";
   const [reasoningOpen, setReasoningOpen] = useState(false);
 
   const parsed = useMemo(() => {
@@ -128,7 +128,7 @@ export function SharedConversationView({ conversation }: { conversation: SharedC
               <span
                 className={cn(
                   "rounded-full px-2 py-0.5 text-[10px] font-semibold",
-                  model.badge === "Beta"
+                  model.badge === "Flagship"
                     ? "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold"
                     : "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]"
                 )}

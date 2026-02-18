@@ -157,8 +157,8 @@ export const MessageBubble = memo(function MessageBubble({
     [user]
   );
   const isUser = message.role === "user";
-  const isReasoning = message.model === "synta-1.0-reasoning" || message.model === "talys-2.5";
-  const isBeta = message.model === "synta-1.5-beta" || message.model === "talys-3.0";
+  const isReasoning = message.model === "talys-think" || message.model === "talys-2.5" || message.model === "synta-1.0-reasoning";
+  const isBeta = false; // No beta models in current suite
 
   const parsed = useMemo(() => {
     if (!isReasoning || isUser) return null;
@@ -438,7 +438,7 @@ export const MessageBubble = memo(function MessageBubble({
                               <span
                                 className={cn(
                                   "rounded-full px-1.5 py-0.5 text-[9px] font-semibold",
-                                  model.badge === "Beta"
+                                  model.badge === "Flagship"
                                     ? "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold"
                                     : "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]"
                                 )}

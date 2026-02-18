@@ -14,15 +14,20 @@ import {
   Zap,
   Rocket,
   Brain,
-  Atom,
-  Paintbrush,
+  Crown,
+  MessageCircle,
 } from "lucide-react";
 
 const modelIcons: Record<string, typeof Zap> = {
+  "talys-execute": Rocket,
+  "talys-think": Brain,
+  "talys-apex": Crown,
+  "milo-chat": MessageCircle,
+  // Legacy fallbacks
   "talys-2.0": Rocket,
   "talys-2.5": Brain,
-  "talys-3.0": Atom,
-  "milo": Paintbrush,
+  "talys-3.0": Crown,
+  "milo": MessageCircle,
   "synta-1.0": Zap,
 };
 
@@ -62,11 +67,9 @@ function ModelButton({
             <span
               className={cn(
                 "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-                model.badge === "New"
-                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                  : model.badge === "Img"
-                    ? "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold"
-                    : "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]"
+                model.badge === "Flagship"
+                  ? "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold"
+                  : "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]"
               )}
             >
               {model.badge}

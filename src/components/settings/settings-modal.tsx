@@ -319,7 +319,7 @@ export function SettingsModal({
                       <span
                         className={cn(
                           "ml-2 flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
-                          model.badge === "Beta"
+                          model.badge === "Flagship"
                             ? "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold"
                             : "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]"
                         )}
@@ -357,7 +357,7 @@ export function SettingsModal({
                       <span
                         className={cn(
                           "ml-2 flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
-                          model.badge === "Beta"
+                          model.badge === "Flagship"
                             ? "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold"
                             : "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]"
                         )}

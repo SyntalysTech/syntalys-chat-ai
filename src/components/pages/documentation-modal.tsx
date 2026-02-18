@@ -46,28 +46,28 @@ const faqKeys: { q: TranslationKey; a: TranslationKey }[] = [
 
 const modelCards: { name: string; descKey: TranslationKey; badge: string | null; badgeColor: string }[] = [
   {
-    name: "TALYS 2.0",
-    descKey: "docModelTalys20" as TranslationKey,
+    name: "TALYS Execute",
+    descKey: "docModelExecute" as TranslationKey,
     badge: null,
     badgeColor: "",
   },
   {
-    name: "TALYS 2.5",
-    descKey: "docModelTalys25" as TranslationKey,
+    name: "TALYS Think",
+    descKey: "docModelThink" as TranslationKey,
     badge: "Pro",
     badgeColor: "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]",
   },
   {
-    name: "TALYS 3.0",
-    descKey: "docModelTalys30" as TranslationKey,
-    badge: "New",
-    badgeColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+    name: "TALYS Apex",
+    descKey: "docModelApex" as TranslationKey,
+    badge: "Flagship",
+    badgeColor: "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold",
   },
   {
-    name: "Milo",
-    descKey: "docModelMilo" as TranslationKey,
-    badge: "Img",
-    badgeColor: "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold",
+    name: "Milo Chat",
+    descKey: "docModelMiloChat" as TranslationKey,
+    badge: null,
+    badgeColor: "",
   },
 ];
 
