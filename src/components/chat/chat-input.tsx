@@ -458,7 +458,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
               rows={1}
               className={cn(
                 "flex-1 min-w-0 resize-none bg-transparent py-2 text-[16px] sm:text-sm text-foreground placeholder:text-muted-foreground",
-                "outline-none",
+                "outline-none overflow-y-auto scrollbar-none",
                 "max-h-[200px]"
               )}
               aria-label={t("inputPlaceholder") as string}
