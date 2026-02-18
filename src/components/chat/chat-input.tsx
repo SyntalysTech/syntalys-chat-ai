@@ -233,7 +233,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
         const isImage = IMAGE_TYPES.includes(mime) || mime.startsWith("image/");
         const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_DOC_SIZE;
         if (file.size > maxSize) {
-          errors.push(`${file.name}: archivo demasiado grande`);
+          errors.push(`${file.name}: ${t("fileTooLarge" as TranslationKey)}`);
           continue;
         }
         try {
@@ -251,7 +251,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
     } finally {
       setProcessingFiles(false);
     }
-  }, [files.length]);
+  }, [files.length, t]);
 
   const removeFile = (index: number) => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
@@ -417,7 +417,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 <button
                   disabled={limitReached}
                   className={cn(
-                    "flex-shrink-0 flex h-10 w-10 sm:h-9 sm:w-9 mb-0.5 ml-0.5 items-center justify-center rounded-xl sm:rounded-lg transition-colors",
+                    "flex-shrink-0 flex h-11 w-11 sm:h-9 sm:w-9 mb-0.5 ml-0.5 items-center justify-center rounded-xl sm:rounded-lg transition-colors",
                     "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80",
                     limitReached && "opacity-40 cursor-not-allowed"
                   )}
@@ -427,6 +427,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 </button>
               }
               align="left"
+              direction="up"
             >
               <DropdownItem
                 onClick={() => fileInputRef.current?.click()}
@@ -466,7 +467,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 "outline-none",
                 "max-h-[200px]"
               )}
-              aria-label="Mensaje"
+              aria-label={t("inputPlaceholder") as string}
             />
 
             {/* Right-side buttons */}
@@ -476,7 +477,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 <button
                   onClick={toggleListening}
                   className={cn(
-                    "flex h-10 w-10 sm:h-9 sm:w-9 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
+                    "flex h-11 w-11 sm:h-9 sm:w-9 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
                     isListening
                       ? "bg-red-500 text-white animate-pulse shadow-sm"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80"
@@ -496,7 +497,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 onClick={handleSubmit}
                 disabled={!hasContent || isStreaming || limitReached || processingFiles}
                 className={cn(
-                  "flex h-10 w-10 sm:h-9 sm:w-9 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
+                  "flex h-11 w-11 sm:h-9 sm:w-9 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
                   hasContent && !isStreaming && !limitReached && !processingFiles
                     ? "bg-syntalys-blue text-white hover:bg-syntalys-blue-light active:scale-95 shadow-sm"
                     : "bg-muted text-muted-foreground cursor-not-allowed"

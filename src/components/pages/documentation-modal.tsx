@@ -162,7 +162,7 @@ export function DocumentationModal({ open, onClose }: DocumentationModalProps) {
                         <div className="flex items-center gap-2 rounded-md bg-accent/30 px-3 py-2">
                           <kbd className="rounded bg-background px-1.5 py-0.5 text-[10px] font-mono border border-border flex-shrink-0">Shift+Enter</kbd>
                           <span className="text-[11px] text-muted-foreground">
-                            {t("docShortcutsContent").toString().split("|")[1]?.trim().split(":")[1]?.trim() || "New line"}
+                            {t("newLine" as TranslationKey)}
                           </span>
                         </div>
                       </div>

@@ -163,7 +163,7 @@ export function HumanizerView({ onMenuClick }: HumanizerViewProps) {
                   className="flex items-center gap-1 px-2 py-1 -mr-2 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                 >
                   <RotateCcw className="h-3 w-3" />
-                  Reset
+                  {t("humanizerReset")}
                 </button>
               )}
             </div>

@@ -53,6 +53,17 @@ export const MODELS: ModelConfig[] = [
     requiresAuth: false,
     temperature: 0.7,
   },
+  // ── Legacy models ──
+  {
+    id: "synta-1.0",
+    name: "SYNT A 1.0",
+    description: "Modelo base original",
+    descriptionKey: "modelSynta10Desc",
+    openaiModel: "gpt-4o-mini",
+    requiresAuth: false,
+    legacy: true,
+    temperature: 0.7,
+  },
 ];
 
 export const DEFAULT_MODEL_ID = "talys-2.0";

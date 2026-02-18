@@ -498,6 +498,11 @@ const translations = {
     es: "Modelo base rapido y eficiente",
     en: "Fast and efficient base model",
   },
+  modelSynta10Desc: {
+    fr: "Modèle de base original",
+    es: "Modelo base original",
+    en: "Original base model",
+  },
 
   // ── Reasoning ──
   reasoning: {
@@ -970,6 +975,11 @@ const translations = {
     es: "Procesando...",
     en: "Processing...",
   },
+  fileTooLarge: {
+    fr: "Fichier trop volumineux",
+    es: "Archivo demasiado grande",
+    en: "File too large",
+  },
 
   // ── Settings: Password ──
   changePassword: {
@@ -1080,6 +1090,16 @@ const translations = {
     fr: "Texte copié !",
     es: "Texto copiado!",
     en: "Text copied!",
+  },
+  humanizerReset: {
+    fr: "Réinitialiser",
+    es: "Reiniciar",
+    en: "Reset",
+  },
+  newLine: {
+    fr: "Nouvelle ligne",
+    es: "Nueva línea",
+    en: "New line",
   },
   humanizerEmpty: {
     fr: "Entrez du texte ci-dessus pour commencer",

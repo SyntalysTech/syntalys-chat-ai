@@ -478,6 +478,7 @@ export function Sidebar({
                 </button>
               }
               align="right"
+              direction="up"
             >
               {settingsDropdownItems}
             </Dropdown>
@@ -546,6 +547,7 @@ export function Sidebar({
                   </button>
                 }
                 align="right"
+                direction="up"
               >
                 {settingsDropdownItems}
               </Dropdown>

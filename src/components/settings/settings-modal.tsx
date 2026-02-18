@@ -438,7 +438,7 @@ export function SettingsModal({
                   <p className="text-xs text-muted-foreground">{t("memoryEmpty" as TK)}</p>
                 </div>
               ) : (
-                <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
+                <div className="space-y-1.5 max-h-[200px] overflow-y-auto scrollbar-thin">
                   {memories.map((mem) => (
                     <div
                       key={mem.id}
@@ -595,7 +595,7 @@ export function SettingsModal({
               <Brain className="h-4 w-4 text-syntalys-blue" />
               {t("memoryTitle" as TK)}
             </h3>
-            <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
+            <div className="space-y-1.5 max-h-[200px] overflow-y-auto scrollbar-thin">
               {memories.map((mem) => (
                 <div
                   key={mem.id}
@@ -606,10 +606,10 @@ export function SettingsModal({
                   </span>
                   <button
                     onClick={() => handleDeleteMemory(mem.id)}
-                    className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-destructive/10"
+                    className="flex-shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1.5 -mr-1 rounded-lg hover:bg-destructive/10 active:bg-destructive/20"
                     aria-label="Delete memory"
                   >
-                    <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+                    <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
                   </button>
                 </div>
               ))}

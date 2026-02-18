@@ -7,6 +7,7 @@ interface DropdownProps {
   trigger: ReactNode;
   children: ReactNode;
   align?: "left" | "right";
+  direction?: "down" | "up";
   className?: string;
 }
 
@@ -14,6 +15,7 @@ export function Dropdown({
   trigger,
   children,
   align = "left",
+  direction = "down",
   className,
 }: DropdownProps) {
   const [open, setOpen] = useState(false);
@@ -41,8 +43,9 @@ export function Dropdown({
       {open && (
         <div
           className={cn(
-            "absolute z-50 mt-1 min-w-[180px] rounded-lg border border-border bg-popover p-1 shadow-lg",
+            "absolute z-50 min-w-[180px] rounded-lg border border-border bg-popover p-1 shadow-lg",
             "animate-fade-in",
+            direction === "up" ? "bottom-full mb-1" : "top-full mt-1",
             align === "right" ? "right-0" : "left-0",
             className
           )}
@@ -71,7 +74,7 @@ export function DropdownItem({
   return (
     <button
       className={cn(
-        "flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition-colors active:bg-accent/80",
+        "flex w-full items-center gap-2.5 rounded-lg px-3 py-3 sm:py-2.5 text-sm transition-colors min-h-[44px] sm:min-h-0 active:bg-accent/80",
         destructive
           ? "text-destructive hover:bg-destructive/10"
           : "text-popover-foreground hover:bg-accent",

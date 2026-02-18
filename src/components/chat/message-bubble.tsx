@@ -352,7 +352,7 @@ export const MessageBubble = memo(function MessageBubble({
               <div className="flex items-center gap-0.5 sm:gap-1 pt-1.5 sm:pt-1">
                 <button
                   onClick={handleCopy}
-                  className="flex items-center justify-center h-9 w-9 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
+                  className="flex items-center justify-center h-10 w-10 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
                   aria-label={t("copyMessage")}
                 >
                   {copied ? (
@@ -364,7 +364,7 @@ export const MessageBubble = memo(function MessageBubble({
                 {hasTTS && (
                   <button
                     onClick={handleSpeak}
-                    className="flex items-center justify-center h-9 w-9 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
+                    className="flex items-center justify-center h-10 w-10 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
                     aria-label={isSpeaking ? t("stopReading" as TranslationKey) : t("readAloud" as TranslationKey)}
                   >
                     {isSpeaking ? (
@@ -378,7 +378,7 @@ export const MessageBubble = memo(function MessageBubble({
                   <div ref={modelMenuRef} className="relative">
                     <button
                       onClick={() => setModelMenuOpen((o) => !o)}
-                      className="flex items-center justify-center h-9 w-9 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
+                      className="flex items-center justify-center h-10 w-10 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80 transition-colors"
                       aria-label={t("regenerate")}
                     >
                       <RefreshCw className="h-4 w-4" />
