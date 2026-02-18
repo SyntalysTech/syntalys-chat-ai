@@ -29,6 +29,7 @@ import {
   Shield,
   Search,
   X,
+  Palette,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -42,8 +43,8 @@ interface SidebarProps {
   onOpenDocumentation: () => void;
   onOpenSupport: () => void;
   onOpenLegal: () => void;
-  activeView: "chat" | "humanizer";
-  onViewChange: (view: "chat" | "humanizer") => void;
+  activeView: "chat" | "humanizer" | "images";
+  onViewChange: (view: "chat" | "humanizer" | "images") => void;
   isDark: boolean;
 }
 
@@ -285,6 +286,32 @@ export function Sidebar({
             <Sparkles className="h-[18px] w-[18px] flex-shrink-0" />
             <span className={cn("text-sm font-medium", textTransition)}>
               {t("humanizer")}
+            </span>
+          </button>
+        </CollapsedTooltip>
+      </div>
+
+      {/* ─── Images Button ─── */}
+      <div className="px-2 pt-0.5 pb-0">
+        <CollapsedTooltip collapsed={collapsed} label={t("images" as TranslationKey)}>
+          <button
+            onClick={() => {
+              onViewChange("images");
+              onMobileClose();
+            }}
+            className={cn(
+              "flex items-center rounded-lg transition-all duration-300",
+              activeView === "images"
+                ? "bg-syntalys-blue/10 text-syntalys-blue"
+                : "text-muted-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground",
+              collapsed
+                ? "h-9 w-9 justify-center mx-auto p-0"
+                : "w-full px-3 py-2"
+            )}
+          >
+            <Palette className="h-[18px] w-[18px] flex-shrink-0" />
+            <span className={cn("text-sm font-medium", textTransition)}>
+              {t("images" as TranslationKey)}
             </span>
           </button>
         </CollapsedTooltip>

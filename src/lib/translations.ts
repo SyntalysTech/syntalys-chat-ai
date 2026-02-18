@@ -1170,6 +1170,78 @@ const translations = {
     es: "Modo imagen",
     en: "Image mode",
   },
+
+  // ── Images Tab ──
+  images: {
+    fr: "Images",
+    es: "Imagenes",
+    en: "Images",
+  },
+  imagesTitle: {
+    fr: "Images",
+    es: "Imagenes",
+    en: "Images",
+  },
+  imagesSubtitle: {
+    fr: "Créez et retrouvez toutes vos images générées",
+    es: "Crea y encuentra todas tus imagenes generadas",
+    en: "Create and find all your generated images",
+  },
+  imagesPlaceholder: {
+    fr: "Décrivez l'image que vous voulez créer...",
+    es: "Describe la imagen que quieres crear...",
+    en: "Describe the image you want to create...",
+  },
+  imagesGenerate: {
+    fr: "Générer",
+    es: "Generar",
+    en: "Generate",
+  },
+  imagesGenerating: {
+    fr: "Génération en cours...",
+    es: "Generando...",
+    en: "Generating...",
+  },
+  imagesGallery: {
+    fr: "Mes images",
+    es: "Mis imagenes",
+    en: "My images",
+  },
+  imagesEmpty: {
+    fr: "Aucune image pour l'instant. Décrivez ce que vous souhaitez créer !",
+    es: "Aun no tienes imagenes. Describe lo que quieres crear!",
+    en: "No images yet. Describe what you want to create!",
+  },
+  imagesDownload: {
+    fr: "Télécharger",
+    es: "Descargar",
+    en: "Download",
+  },
+  imagesDelete: {
+    fr: "Supprimer",
+    es: "Eliminar",
+    en: "Delete",
+  },
+  imagesDeleteConfirm: {
+    fr: "Supprimer cette image ?",
+    es: "Eliminar esta imagen?",
+    en: "Delete this image?",
+  },
+  imagesAttachRef: {
+    fr: "Ajouter une image de référence",
+    es: "Adjuntar imagen de referencia",
+    en: "Attach reference image",
+  },
+  imagesLoginRequired: {
+    fr: "Connectez-vous pour créer et sauvegarder des images",
+    es: "Inicia sesion para crear y guardar imagenes",
+    en: "Sign in to create and save images",
+  },
+  imagesLoadMore: {
+    fr: "Charger plus",
+    es: "Cargar mas",
+    en: "Load more",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

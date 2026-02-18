@@ -51,3 +51,14 @@ export interface UserMemory {
   created_at: string;
   updated_at: string;
 }
+
+export interface GeneratedImage {
+  id: string;
+  user_id: string;
+  prompt: string;
+  revised_prompt: string | null;
+  image_url: string;
+  storage_path: string;
+  size: string;
+  created_at: string;
+}

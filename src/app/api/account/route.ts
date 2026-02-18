@@ -53,6 +53,17 @@ export async function DELETE(req: NextRequest) {
     // Delete user memories (must happen before deleting auth user)
     await admin.from("user_memories").delete().eq("user_id", user.id);
 
+    // Delete generated images (storage files + db records)
+    const { data: genImages } = await admin
+      .from("generated_images")
+      .select("storage_path")
+      .eq("user_id", user.id);
+    if (genImages && genImages.length > 0) {
+      const paths = genImages.map((img: { storage_path: string }) => img.storage_path);
+      await admin.storage.from("generated-images").remove(paths);
+      await admin.from("generated_images").delete().eq("user_id", user.id);
+    }
+
     await admin.from("profiles").delete().eq("id", user.id);
     await admin.auth.admin.deleteUser(user.id);
 

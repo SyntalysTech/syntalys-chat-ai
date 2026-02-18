@@ -7,6 +7,7 @@ import { useI18n } from "@/lib/i18n-context";
 import { Sidebar } from "./sidebar";
 import { ChatArea } from "@/components/chat/chat-area";
 import { HumanizerView } from "@/components/pages/humanizer-view";
+import { ImagesView } from "@/components/pages/images-view";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { SettingsModal } from "@/components/settings/settings-modal";
 import { ExploreModal } from "@/components/pages/explore-modal";
@@ -27,7 +28,7 @@ export function AppShell() {
   const [documentationOpen, setDocumentationOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
   const [legalOpen, setLegalOpen] = useState(false);
-  const [activeView, setActiveView] = useState<"chat" | "humanizer">("chat");
+  const [activeView, setActiveView] = useState<"chat" | "humanizer" | "images">("chat");
   const [mounted, setMounted] = useState(false);
   const [authTimedOut, setAuthTimedOut] = useState(false);
 
@@ -87,7 +88,9 @@ export function AppShell() {
         isDark={isDark}
       />
 
-      {activeView === "humanizer" ? (
+      {activeView === "images" ? (
+        <ImagesView onMenuClick={() => setMobileOpen(true)} />
+      ) : activeView === "humanizer" ? (
         <HumanizerView onMenuClick={() => setMobileOpen(true)} />
       ) : (
         <ChatArea
