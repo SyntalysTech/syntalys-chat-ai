@@ -320,11 +320,11 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
   );
 
   return (
-    <div className="flex-shrink-0 bg-card/30 pb-safe pl-safe pr-safe">
-      <div className="mx-auto max-w-3xl px-2 sm:px-4 pt-1.5 sm:pt-3 pb-0.5">
+    <div className="flex-shrink-0 pb-safe pl-safe pr-safe">
+      <div className="mx-auto max-w-3xl px-3 sm:px-4 pt-2 sm:pt-3 pb-2 sm:pb-3">
         {/* File error message */}
         {fileError && (
-          <div className="mb-2 flex items-start gap-2 rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive animate-fade-in">
+          <div className="mb-2.5 flex items-start gap-2 rounded-xl bg-destructive/10 px-3 py-2.5 text-xs text-destructive animate-fade-in">
             <AlertCircle className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
             <span className="break-words min-w-0">{fileError}</span>
             <button
@@ -338,7 +338,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
 
         <div
           className={cn(
-            "relative rounded-2xl border border-border bg-card shadow-sm transition-colors",
+            "relative rounded-2xl border border-border/80 bg-card shadow-sm transition-colors",
             "focus-within:border-syntalys-blue/40 focus-within:shadow-md",
             limitReached && "opacity-60"
           )}
@@ -347,24 +347,24 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
         >
           {/* File previews */}
           {files.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 sm:gap-2 px-2.5 sm:px-3 pt-2.5 sm:pt-3">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 px-3 sm:px-3.5 pt-3">
               {files.map((file, i) => {
                 const isImage = file.type.startsWith("image/");
                 return (
                   <div
                     key={i}
-                    className="flex items-center gap-1.5 sm:gap-2 rounded-lg bg-muted/60 px-2.5 sm:px-2.5 py-1.5 sm:py-1.5 text-xs"
+                    className="flex items-center gap-1.5 sm:gap-2 rounded-lg bg-muted/60 px-2.5 py-1.5 text-xs"
                   >
                     {isImage ? (
-                      <ImageIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-syntalys-blue flex-shrink-0" />
+                      <ImageIcon className="h-3.5 w-3.5 text-syntalys-blue flex-shrink-0" />
                     ) : (
-                      <FileText className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-syntalys-blue flex-shrink-0" />
+                      <FileText className="h-3.5 w-3.5 text-syntalys-blue flex-shrink-0" />
                     )}
                     <span className="max-w-[100px] sm:max-w-[120px] truncate text-card-foreground">{file.name}</span>
                     <span className="text-muted-foreground hidden sm:inline">{formatSize(file.size)}</span>
                     <button
                       onClick={() => removeFile(i)}
-                      className="ml-0.5 rounded-full p-1.5 -mr-0.5 hover:bg-accent active:bg-accent/80 transition-colors"
+                      className="ml-0.5 rounded-full p-1 hover:bg-accent active:bg-accent/80 transition-colors"
                     >
                       <X className="h-3.5 w-3.5 text-muted-foreground" />
                     </button>
@@ -380,7 +380,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
             </div>
           )}
 
-          {/* Hidden file input (outside flex row to avoid layout interference) */}
+          {/* Hidden file input */}
           <input
             ref={fileInputRef}
             type="file"
@@ -393,8 +393,8 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
             }}
           />
 
-          {/* Input row — unified p-1.5 padding, items-end for multiline */}
-          <div className="flex items-end gap-1 p-1.5">
+          {/* Input row */}
+          <div className="flex items-end gap-1.5 p-2">
             {/* Left: + dropdown OR image-mode pill */}
             {!imageGenMode ? (
               <Dropdown
@@ -402,7 +402,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                   <button
                     disabled={limitReached}
                     className={cn(
-                      "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg transition-colors",
+                      "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full transition-colors",
                       "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80",
                       limitReached && "opacity-40 cursor-not-allowed"
                     )}
@@ -431,7 +431,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
             ) : (
               <button
                 onClick={() => setImageGenMode(false)}
-                className="flex h-8 flex-shrink-0 items-center gap-1 rounded-lg bg-syntalys-blue/10 text-syntalys-blue px-2 text-xs font-medium hover:bg-syntalys-blue/20 active:bg-syntalys-blue/25 transition-colors"
+                className="flex h-9 flex-shrink-0 items-center gap-1.5 rounded-full bg-syntalys-blue/10 text-syntalys-blue px-3 text-xs font-medium hover:bg-syntalys-blue/20 active:bg-syntalys-blue/25 transition-colors"
               >
                 <Palette className="h-4 w-4 flex-shrink-0" />
                 <X className="h-3.5 w-3.5 flex-shrink-0 opacity-60" />
@@ -457,7 +457,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
               disabled={limitReached}
               rows={1}
               className={cn(
-                "flex-1 min-w-0 resize-none bg-transparent py-1.5 text-[16px] sm:text-sm text-foreground placeholder:text-muted-foreground",
+                "flex-1 min-w-0 resize-none bg-transparent py-2 text-[16px] sm:text-sm text-foreground placeholder:text-muted-foreground",
                 "outline-none",
                 "max-h-[200px]"
               )}
@@ -465,13 +465,13 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
             />
 
             {/* Right-side buttons */}
-            <div className="flex flex-shrink-0 items-center">
+            <div className="flex flex-shrink-0 items-center gap-0.5">
               {/* Voice input button */}
               {hasSpeech && !limitReached && (
                 <button
                   onClick={toggleListening}
                   className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150",
+                    "flex h-9 w-9 items-center justify-center rounded-full transition-all duration-150",
                     isListening
                       ? "bg-red-500 text-white animate-pulse shadow-sm"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80"
@@ -481,7 +481,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                   {isListening ? (
                     <MicOff className="h-4 w-4" />
                   ) : (
-                    <Mic className="h-[18px] w-[18px] sm:h-4 sm:w-4" />
+                    <Mic className="h-[18px] w-[18px]" />
                   )}
                 </button>
               )}
@@ -491,17 +491,17 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 onClick={handleSubmit}
                 disabled={!hasContent || isStreaming || limitReached || processingFiles}
                 className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150",
+                  "flex h-9 w-9 items-center justify-center rounded-full transition-all duration-150",
                   hasContent && !isStreaming && !limitReached && !processingFiles
                     ? "bg-syntalys-blue text-white hover:bg-syntalys-blue-light active:scale-95 shadow-sm"
-                    : "bg-muted text-muted-foreground cursor-not-allowed"
+                    : "text-muted-foreground/40 cursor-not-allowed"
                 )}
                 aria-label={isStreaming ? (t("stop") as string) : (t("sendMessage") as string)}
               >
                 {isStreaming ? (
                   <Square className="h-3.5 w-3.5" />
                 ) : (
-                  <ArrowUp className="h-[18px] w-[18px] sm:h-4 sm:w-4" />
+                  <ArrowUp className="h-5 w-5" />
                 )}
               </button>
             </div>
@@ -510,7 +510,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
 
         {/* Usage indicator for anonymous users */}
         {isAnon && (
-          <div className="mt-2 flex items-center justify-between px-1">
+          <div className="mt-2.5 flex items-center justify-between px-1">
             <p className="text-xs text-muted-foreground">
               {limitReached ? (
                 <span className="text-destructive">
@@ -534,7 +534,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
           </div>
         )}
 
-        <p className="mt-0.5 mb-0.5 text-center text-[10px] sm:text-xs text-muted-foreground/60 leading-tight">
+        <p className="mt-2 text-center text-[10px] sm:text-xs text-muted-foreground/50 leading-relaxed">
           {t("aiDisclaimer")}
         </p>
       </div>
