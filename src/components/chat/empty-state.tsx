@@ -57,7 +57,8 @@ export function EmptyState({ isDark, onSuggestionClick }: EmptyStateProps) {
         {t("emptyStateSubtitle")}
       </p>
 
-      <div className="grid w-full max-w-sm sm:max-w-2xl grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2.5">
+      {/* Mobile: horizontal scroll chips */}
+      <div className="flex sm:hidden w-full overflow-x-auto gap-2 px-1 pb-2 scrollbar-none">
         {suggestions.map((s) => {
           const title = t(s.titleKey) as string;
           const prompt = t(s.promptKey) as string;
@@ -65,16 +66,34 @@ export function EmptyState({ isDark, onSuggestionClick }: EmptyStateProps) {
             <button
               key={s.titleKey}
               onClick={() => onSuggestionClick(prompt)}
-              className="group flex items-center gap-2.5 sm:gap-3 rounded-xl border border-border/60 bg-card px-3 py-2.5 sm:p-3.5 text-left transition-all duration-200 hover:border-syntalys-blue/30 hover:bg-accent hover:shadow-sm active:scale-[0.98]"
+              className="flex items-center gap-2 whitespace-nowrap rounded-full border border-border/60 bg-card px-3.5 py-2 text-left transition-all active:scale-[0.97]"
             >
-              <div className="flex h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 items-center justify-center rounded-lg bg-accent/50 group-hover:bg-syntalys-blue/10 transition-colors">
-                <s.icon className={`h-4 w-4 sm:h-[18px] sm:w-[18px] ${s.color} transition-colors`} />
+              <s.icon className={`h-3.5 w-3.5 flex-shrink-0 ${s.color}`} />
+              <span className="text-[13px] font-medium text-card-foreground">{title}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Desktop: 2-column grid with descriptions */}
+      <div className="hidden sm:grid w-full max-w-2xl grid-cols-2 gap-2.5">
+        {suggestions.map((s) => {
+          const title = t(s.titleKey) as string;
+          const prompt = t(s.promptKey) as string;
+          return (
+            <button
+              key={s.titleKey}
+              onClick={() => onSuggestionClick(prompt)}
+              className="group flex items-center gap-3 rounded-xl border border-border/60 bg-card p-3.5 text-left transition-all duration-200 hover:border-syntalys-blue/30 hover:bg-accent hover:shadow-sm active:scale-[0.98]"
+            >
+              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-accent/50 group-hover:bg-syntalys-blue/10 transition-colors">
+                <s.icon className={`h-[18px] w-[18px] ${s.color} transition-colors`} />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-[13px] sm:text-sm font-medium text-card-foreground leading-tight">
+                <p className="text-sm font-medium text-card-foreground leading-tight">
                   {title}
                 </p>
-                <p className="mt-0.5 text-[11px] sm:text-xs text-muted-foreground line-clamp-1 sm:line-clamp-2 leading-relaxed">
+                <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                   {prompt}
                 </p>
               </div>
