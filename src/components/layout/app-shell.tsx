@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/lib/auth-context";
-import { useChat } from "@/lib/chat-context";
 import { useI18n } from "@/lib/i18n-context";
 import { Sidebar } from "./sidebar";
 import { ChatArea } from "@/components/chat/chat-area";
@@ -18,7 +17,6 @@ import { LegalModal } from "@/components/pages/legal-modal";
 export function AppShell() {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { loading } = useAuth();
-  const { loadThreads } = useChat();
   const { t } = useI18n();
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -49,11 +47,7 @@ export function AppShell() {
 
   const isReady = !loading || authTimedOut;
 
-  useEffect(() => {
-    if (isReady) {
-      loadThreads();
-    }
-  }, [isReady, loadThreads]);
+  // Threads are now auto-loaded inside ChatProvider when user changes
 
   const isDark = mounted ? resolvedTheme === "dark" : true;
 

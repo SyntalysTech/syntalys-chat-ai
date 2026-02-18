@@ -55,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
+    let initialLoadDone = false;
 
     const getUser = async () => {
       try {
@@ -76,7 +77,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (e) {
         console.warn("Session check failed:", e);
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          initialLoadDone = true;
+          setLoading(false);
+        }
       }
     };
     getUser();
@@ -85,6 +89,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
+      // Skip INITIAL_SESSION — getUser() handles the initial load.
+      // Only react to subsequent auth events (sign in, sign out, token refresh).
+      if (!initialLoadDone) return;
+
       setUser(session?.user ?? null);
       if (session?.user) {
         try {
@@ -95,7 +103,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setProfile(null);
       }
-      setLoading(false);
     });
 
     return () => {

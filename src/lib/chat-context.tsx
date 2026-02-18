@@ -129,18 +129,32 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loadThreads = useCallback(async () => {
-    if (user) {
-      const { data } = await supabase
-        .from("chat_threads")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("updated_at", { ascending: false });
-      if (data) setThreads(data as ChatThread[]);
-    } else {
-      setThreads(getLocalThreads());
-      setAnonUsageCount(getAnonUsageCount());
+    try {
+      if (user) {
+        const { data, error } = await supabase
+          .from("chat_threads")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("updated_at", { ascending: false });
+        if (error) {
+          console.error("Failed to load threads:", error.message);
+          return;
+        }
+        if (data) setThreads(data as ChatThread[]);
+      } else {
+        setThreads(getLocalThreads());
+        setAnonUsageCount(getAnonUsageCount());
+      }
+    } catch (err) {
+      console.error("Failed to load threads:", err);
     }
   }, [user, supabase]);
+
+  // Auto-load threads whenever user changes (login, logout, initial load)
+  // This is the primary trigger — no need to rely on app-shell calling loadThreads
+  useEffect(() => {
+    loadThreads();
+  }, [loadThreads]);
 
   const createThread = useCallback(async (): Promise<string> => {
     const model = getModelByIdOrDefault(selectedModel);
