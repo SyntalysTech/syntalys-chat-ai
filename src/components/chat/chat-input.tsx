@@ -122,7 +122,7 @@ interface ChatInputProps {
 
 export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
   const { user } = useAuth();
-  const { sendMessage, isStreaming, anonUsageCount, anonDailyLimit } = useChat();
+  const { sendMessage, isStreaming, stopStreaming, anonUsageCount, anonDailyLimit } = useChat();
   const { t, locale } = useI18n();
   const [value, setValue] = useState("");
   const [files, setFiles] = useState<FileAttachment[]>([]);
@@ -299,8 +299,15 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
     setImageGenMode(false);
     if (textareaRef.current) textareaRef.current.style.height = "auto";
 
-    const accepted = await sendMessage(content, attachments, undefined, wasImageGen || undefined);
-    if (!accepted) {
+    try {
+      const accepted = await sendMessage(content, attachments, undefined, wasImageGen || undefined);
+      if (!accepted) {
+        setValue(savedValue);
+        setFiles(savedFiles);
+        setImageGenMode(wasImageGen);
+      }
+    } catch {
+      // Restore input on unexpected error
       setValue(savedValue);
       setFiles(savedFiles);
       setImageGenMode(wasImageGen);
@@ -504,24 +511,30 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 </button>
               )}
 
-              {/* Send button */}
-              <button
-                onClick={handleSubmit}
-                disabled={!hasContent || isStreaming || limitReached || processingFiles}
-                className={cn(
-                  "flex h-9 w-9 items-center justify-center rounded-full transition-all duration-150",
-                  hasContent && !isStreaming && !limitReached && !processingFiles
-                    ? "bg-syntalys-blue text-white hover:bg-syntalys-blue-light active:scale-95 shadow-sm"
-                    : "text-muted-foreground/40 cursor-not-allowed"
-                )}
-                aria-label={isStreaming ? (t("stop") as string) : (t("sendMessage") as string)}
-              >
-                {isStreaming ? (
+              {/* Send / Stop button */}
+              {isStreaming ? (
+                <button
+                  onClick={stopStreaming}
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 active:scale-95 transition-all duration-150 shadow-sm"
+                  aria-label={t("stop") as string}
+                >
                   <Square className="h-3.5 w-3.5" />
-                ) : (
+                </button>
+              ) : (
+                <button
+                  onClick={handleSubmit}
+                  disabled={!hasContent || limitReached || processingFiles}
+                  className={cn(
+                    "flex h-9 w-9 items-center justify-center rounded-full transition-all duration-150",
+                    hasContent && !limitReached && !processingFiles
+                      ? "bg-syntalys-blue text-white hover:bg-syntalys-blue-light active:scale-95 shadow-sm"
+                      : "text-muted-foreground/40 cursor-not-allowed"
+                  )}
+                  aria-label={t("sendMessage") as string}
+                >
                   <ArrowUp className="h-5 w-5" />
-                )}
-              </button>
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -116,6 +116,7 @@ interface ChatContextType {
   renameThread: (threadId: string, title: string) => Promise<void>;
   sendMessage: (content: string, attachments?: FileAttachment[], modelOverride?: string, imageGen?: boolean) => Promise<boolean>;
   regenerateLastResponse: (modelId?: string) => Promise<void>;
+  stopStreaming: () => void;
   clearCurrentThread: () => void;
   deleteAllThreads: () => Promise<void>;
   // Branching
@@ -365,7 +366,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       // Self-heal stale streaming lock
       if (isStreamingRef.current) {
         const elapsed = Date.now() - streamStartedAtRef.current;
-        if (elapsed > 30_000) {
+        if (elapsed > 15_000) {
           console.warn("[chat] Force-clearing stale streaming lock after", elapsed, "ms");
           abortRef.current?.abort();
           abortRef.current = null;
@@ -779,6 +780,16 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     );
   }, [sendMessage]);
 
+  const stopStreaming = useCallback(() => {
+    if (abortRef.current) {
+      abortRef.current.abort();
+      abortRef.current = null;
+    }
+    isStreamingRef.current = false;
+    setIsStreaming(false);
+    setIsImageGenerating(false);
+  }, []);
+
   /* ── Branching functions ── */
 
   const getBranchInfo = useCallback((messageId: string): { index: number; total: number } | null => {
@@ -861,6 +872,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         renameThread,
         sendMessage,
         regenerateLastResponse,
+        stopStreaming,
         clearCurrentThread,
         deleteAllThreads,
         getBranchInfo,
