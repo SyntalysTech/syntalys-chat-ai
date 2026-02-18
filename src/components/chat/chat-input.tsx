@@ -395,54 +395,54 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
 
           {/* Image gen mode indicator */}
           {imageGenMode && (
-            <div className="flex items-center gap-1.5 px-2.5 sm:px-3 pt-2.5 sm:pt-3">
-              <div className="flex items-center gap-1.5 rounded-full bg-syntalys-blue/10 text-syntalys-blue px-2.5 py-1 text-xs font-medium">
-                <Palette className="h-3 w-3" />
-                {t("imageMode" as TranslationKey)}
-                <button
-                  onClick={() => setImageGenMode(false)}
-                  className="ml-0.5 rounded-full p-0.5 hover:bg-syntalys-blue/20 transition-colors"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </div>
+            <div className="px-3 pt-2">
+              <button
+                onClick={() => setImageGenMode(false)}
+                className="inline-flex items-center gap-1 rounded-full bg-syntalys-blue/10 text-syntalys-blue pl-2 pr-1.5 py-0.5 text-[11px] sm:text-xs font-medium hover:bg-syntalys-blue/15 transition-colors"
+              >
+                <Palette className="h-3 w-3 flex-shrink-0" />
+                <span>{t("imageMode" as TranslationKey)}</span>
+                <X className="h-3 w-3 flex-shrink-0" />
+              </button>
             </div>
           )}
 
           {/* Input row */}
-          <div className="flex items-end gap-0.5">
+          <div className="flex items-end">
             {/* + Action dropdown */}
-            <Dropdown
-              trigger={
-                <button
-                  disabled={limitReached}
-                  className={cn(
-                    "flex-shrink-0 flex h-11 w-11 sm:h-9 sm:w-9 mb-0.5 ml-0.5 items-center justify-center rounded-xl sm:rounded-lg transition-colors",
-                    "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80",
-                    limitReached && "opacity-40 cursor-not-allowed"
-                  )}
-                  aria-label="Actions"
+            <div className="flex-shrink-0 pb-1 pl-1">
+              <Dropdown
+                trigger={
+                  <button
+                    disabled={limitReached}
+                    className={cn(
+                      "flex h-9 w-9 items-center justify-center rounded-xl sm:rounded-lg transition-colors",
+                      "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80",
+                      limitReached && "opacity-40 cursor-not-allowed"
+                    )}
+                    aria-label="Actions"
+                  >
+                    <Plus className="h-5 w-5 sm:h-4.5 sm:w-4.5" />
+                  </button>
+                }
+                align="left"
+                direction="up"
+              >
+                <DropdownItem
+                  onClick={() => fileInputRef.current?.click()}
                 >
-                  <Plus className="h-5 w-5 sm:h-4 sm:w-4" />
-                </button>
-              }
-              align="left"
-              direction="up"
-            >
-              <DropdownItem
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Paperclip className="h-3.5 w-3.5" /> {t("attachFile")}
-              </DropdownItem>
-              <DropdownItem
-                onClick={() => {
-                  setImageGenMode(true);
-                  setTimeout(() => textareaRef.current?.focus(), 0);
-                }}
-              >
-                <Palette className="h-3.5 w-3.5" /> {t("generateImage" as TranslationKey)}
-              </DropdownItem>
-            </Dropdown>
+                  <Paperclip className="h-3.5 w-3.5" /> {t("attachFile")}
+                </DropdownItem>
+                <DropdownItem
+                  onClick={() => {
+                    setImageGenMode(true);
+                    setTimeout(() => textareaRef.current?.focus(), 0);
+                  }}
+                >
+                  <Palette className="h-3.5 w-3.5" /> {t("generateImage" as TranslationKey)}
+                </DropdownItem>
+              </Dropdown>
+            </div>
 
             {/* Textarea */}
             <textarea
@@ -463,7 +463,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
               disabled={limitReached}
               rows={1}
               className={cn(
-                "flex-1 min-w-0 resize-none bg-transparent px-1 sm:px-2 py-2.5 sm:py-2 text-[16px] sm:text-sm text-foreground placeholder:text-muted-foreground",
+                "flex-1 min-w-0 resize-none bg-transparent py-2.5 sm:py-2 text-[16px] sm:text-sm text-foreground placeholder:text-muted-foreground",
                 "outline-none",
                 "max-h-[200px]"
               )}
@@ -471,13 +471,13 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
             />
 
             {/* Right-side buttons */}
-            <div className="flex-shrink-0 flex items-center gap-0.5 mb-0.5 mr-0.5">
+            <div className="flex-shrink-0 flex items-center pb-1 pr-1">
               {/* Voice input button */}
               {hasSpeech && !limitReached && (
                 <button
                   onClick={toggleListening}
                   className={cn(
-                    "flex h-11 w-11 sm:h-9 sm:w-9 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
+                    "flex h-9 w-9 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
                     isListening
                       ? "bg-red-500 text-white animate-pulse shadow-sm"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80"
@@ -485,9 +485,9 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                   aria-label={isListening ? (t("voiceListening" as TranslationKey) as string) : (t("voiceInput" as TranslationKey) as string)}
                 >
                   {isListening ? (
-                    <MicOff className="h-4.5 w-4.5 sm:h-4 sm:w-4" />
+                    <MicOff className="h-4 w-4" />
                   ) : (
-                    <Mic className="h-5 w-5 sm:h-4 sm:w-4" />
+                    <Mic className="h-[18px] w-[18px] sm:h-4 sm:w-4" />
                   )}
                 </button>
               )}
@@ -497,7 +497,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 onClick={handleSubmit}
                 disabled={!hasContent || isStreaming || limitReached || processingFiles}
                 className={cn(
-                  "flex h-11 w-11 sm:h-9 sm:w-9 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
+                  "flex h-9 w-9 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
                   hasContent && !isStreaming && !limitReached && !processingFiles
                     ? "bg-syntalys-blue text-white hover:bg-syntalys-blue-light active:scale-95 shadow-sm"
                     : "bg-muted text-muted-foreground cursor-not-allowed"
@@ -507,7 +507,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 {isStreaming ? (
                   <Square className="h-3.5 w-3.5" />
                 ) : (
-                  <ArrowUp className="h-5 w-5 sm:h-4 sm:w-4" />
+                  <ArrowUp className="h-[18px] w-[18px] sm:h-4 sm:w-4" />
                 )}
               </button>
             </div>
