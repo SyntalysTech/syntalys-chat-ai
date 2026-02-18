@@ -393,25 +393,12 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
             }}
           />
 
-          {/* Image gen mode indicator */}
-          {imageGenMode && (
-            <div className="px-3 pt-2">
-              <button
-                onClick={() => setImageGenMode(false)}
-                className="inline-flex items-center gap-1 rounded-full bg-syntalys-blue/10 text-syntalys-blue pl-2 pr-1.5 py-0.5 text-[11px] sm:text-xs font-medium hover:bg-syntalys-blue/15 transition-colors"
-              >
-                <Palette className="h-3 w-3 flex-shrink-0" />
-                <span>{t("imageMode" as TranslationKey)}</span>
-                <X className="h-3 w-3 flex-shrink-0" />
-              </button>
-            </div>
-          )}
-
           {/* Input row */}
           <div className="flex items-end">
-            {/* + Action dropdown */}
-            <div className="flex-shrink-0 pb-1 pl-1">
-              <Dropdown
+            {/* + Action dropdown (hidden when image mode active to save space) */}
+            {!imageGenMode && (
+              <div className="flex-shrink-0 pb-1 pl-1">
+                <Dropdown
                 trigger={
                   <button
                     disabled={limitReached}
@@ -442,7 +429,19 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                   <Palette className="h-3.5 w-3.5" /> {t("generateImage" as TranslationKey)}
                 </DropdownItem>
               </Dropdown>
-            </div>
+              </div>
+            )}
+
+            {/* Image gen mode pill — inline in the input row */}
+            {imageGenMode && (
+              <button
+                onClick={() => setImageGenMode(false)}
+                className="flex-shrink-0 inline-flex items-center gap-1 rounded-full bg-syntalys-blue/10 text-syntalys-blue pl-2.5 pr-1.5 py-1 ml-1.5 mb-1.5 text-xs font-medium hover:bg-syntalys-blue/20 active:bg-syntalys-blue/25 transition-colors"
+              >
+                <Palette className="h-3.5 w-3.5 flex-shrink-0" />
+                <X className="h-3.5 w-3.5 flex-shrink-0 opacity-60" />
+              </button>
+            )}
 
             {/* Textarea */}
             <textarea
