@@ -263,7 +263,7 @@ export function ModelSelector() {
               {archiveOpen && !isMobile && (
                 <div
                   className={cn(
-                    "absolute top-0 z-50 w-[260px] rounded-xl border border-border bg-popover/95 backdrop-blur-sm p-1.5 shadow-xl animate-fade-in-right",
+                    "absolute top-0 z-50 w-[260px] rounded-xl border border-border bg-popover p-1.5 shadow-xl animate-fade-in-right",
                     archiveDirection === "right"
                       ? "left-full ml-1.5"
                       : "right-full mr-1.5"
