@@ -27,7 +27,7 @@ const translations = {
   },
   documentation: {
     fr: "Documentation",
-    es: "Documentacion",
+    es: "Documentación",
     en: "Documentation",
   },
   support: {
@@ -57,17 +57,17 @@ const translations = {
   },
   signOut: {
     fr: "Déconnexion",
-    es: "Cerrar sesion",
+    es: "Cerrar sesión",
     en: "Sign out",
   },
   anonymousMode: {
     fr: "Mode anonyme",
-    es: "Modo anonimo",
+    es: "Modo anónimo",
     en: "Anonymous mode",
   },
   signIn: {
     fr: "Se connecter",
-    es: "Iniciar sesion",
+    es: "Iniciar sesión",
     en: "Sign in",
   },
   expandSidebar: {
@@ -84,12 +84,12 @@ const translations = {
   // ── Delete confirmation ──
   deleteConversation: {
     fr: "Supprimer la conversation",
-    es: "Eliminar conversacion",
+    es: "Eliminar conversación",
     en: "Delete conversation",
   },
   deleteConfirmMessage: {
     fr: "Cette action est irréversible. La conversation et tous ses messages seront supprimés.",
-    es: "Esta accion no se puede deshacer. Se eliminara la conversacion y todos sus mensajes.",
+    es: "Esta acción no se puede deshacer. Se eliminará la conversación y todos sus mensajes.",
     en: "This action cannot be undone. The conversation and all its messages will be deleted.",
   },
   cancel: {
@@ -106,7 +106,7 @@ const translations = {
   },
   emptyStateSubtitle: {
     fr: "Votre assistant intelligent. Que voulez-vous accomplir ?",
-    es: "Tu asistente inteligente. Que quieres lograr hoy?",
+    es: "Tu asistente inteligente. ¿Qué quieres lograr hoy?",
     en: "Your intelligent assistant. What do you want to accomplish?",
   },
 
@@ -118,7 +118,7 @@ const translations = {
   },
   sugBusinessPrompt: {
     fr: "Aide-moi a creer un business plan complet pour une startup tech, avec analyse de marche, projections financieres et strategie de lancement",
-    es: "Ayudame a crear un plan de negocio completo para una startup tech, con analisis de mercado, proyecciones financieras y estrategia de lanzamiento",
+    es: "Ayúdame a crear un plan de negocio completo para una startup tech, con análisis de mercado, proyecciones financieras y estrategia de lanzamiento",
     en: "Help me create a complete business plan for a tech startup, including market analysis, financial projections, and go-to-market strategy",
   },
   sugIdeas: {
@@ -128,17 +128,17 @@ const translations = {
   },
   sugIdeasPrompt: {
     fr: "Donne-moi 10 idees innovantes et uniques de business pour 2025 qui resolvent de vrais problemes",
-    es: "Dame 10 ideas de negocio innovadoras y unicas para 2025 que resuelvan problemas reales",
+    es: "Dame 10 ideas de negocio innovadoras y únicas para 2025 que resuelvan problemas reales",
     en: "Give me 10 innovative and unique business ideas for 2025 that solve real problems",
   },
   sugAnalyze: {
     fr: "Analyser et strategiser",
-    es: "Analizar y disenar estrategia",
+    es: "Analizar y diseñar estrategia",
     en: "Analyze & strategize",
   },
   sugAnalyzePrompt: {
     fr: "Aide-moi a faire une analyse SWOT de mon business et recommande des actions concretes",
-    es: "Ayudame a hacer un analisis DAFO de mi negocio y recomienda acciones concretas",
+    es: "Ayúdame a hacer un análisis DAFO de mi negocio y recomienda acciones concretas",
     en: "Help me do a SWOT analysis of my business and recommend concrete action items",
   },
   sugDraft: {
@@ -153,12 +153,12 @@ const translations = {
   },
   sugWriteCode: {
     fr: "Code et tech",
-    es: "Codigo y tecnologia",
+    es: "Código y tecnología",
     en: "Code & build",
   },
   sugWriteCodePrompt: {
     fr: "Aide-moi a construire une landing page responsive avec un design moderne en React et Tailwind CSS",
-    es: "Ayudame a construir una landing page responsive con diseno moderno usando React y Tailwind CSS",
+    es: "Ayúdame a construir una landing page responsive con diseño moderno usando React y Tailwind CSS",
     en: "Help me build a responsive landing page with modern design using React and Tailwind CSS",
   },
   sugMarketing: {
@@ -168,7 +168,7 @@ const translations = {
   },
   sugMarketingPrompt: {
     fr: "Conçois une strategie de marketing digital complete pour le lancement d'un nouveau produit SaaS",
-    es: "Disena una estrategia de marketing digital completa para el lanzamiento de un nuevo producto SaaS",
+    es: "Diseña una estrategia de marketing digital completa para el lanzamiento de un nuevo producto SaaS",
     en: "Design a complete digital marketing strategy for launching a new SaaS product",
   },
 
@@ -180,7 +180,7 @@ const translations = {
   },
   inputLimitReached: {
     fr: "Limite quotidienne atteinte. Inscrivez-vous pour continuer.",
-    es: "Limite diario alcanzado. Registrate para continuar.",
+    es: "Límite diario alcanzado. Regístrate para continuar.",
     en: "Daily limit reached. Sign up to continue.",
   },
   sendMessage: {
@@ -195,12 +195,12 @@ const translations = {
   },
   limitReachedShort: {
     fr: "Limite atteinte. Inscrivez-vous pour continuer.",
-    es: "Limite alcanzado. Registrate para continuar.",
+    es: "Límite alcanzado. Regístrate para continuar.",
     en: "Limit reached. Sign up to continue.",
   },
   aiDisclaimer: {
     fr: "SYNTALYS AI peut faire des erreurs. Vérifiez les informations importantes.",
-    es: "SYNTALYS AI puede cometer errores. Verifica la informacion importante.",
+    es: "SYNTALYS AI puede cometer errores. Verifica la información importante.",
     en: "SYNTALYS AI can make mistakes. Verify important information.",
   },
   voiceInput: {
@@ -256,7 +256,7 @@ const translations = {
   // ── Chat Header ──
   menu: {
     fr: "Menu",
-    es: "Menu",
+    es: "Menú",
     en: "Menu",
   },
   share: {
@@ -288,12 +288,12 @@ const translations = {
   },
   signInSubtitle: {
     fr: "Connectez-vous pour accéder à toutes les fonctionnalités",
-    es: "Inicia sesion para acceder a todas las funciones",
+    es: "Inicia sesión para acceder a todas las funciones",
     en: "Sign in to access all features",
   },
   registerSubtitle: {
     fr: "Inscrivez-vous pour débloquer tous les modèles",
-    es: "Registrate para desbloquear todos los modelos",
+    es: "Regístrate para desbloquear todos los modelos",
     en: "Sign up to unlock all models",
   },
   nameOptional: {
@@ -318,7 +318,7 @@ const translations = {
   },
   minChars: {
     fr: "Minimum 6 caractères",
-    es: "Minimo 6 caracteres",
+    es: "Mínimo 6 caracteres",
     en: "Minimum 6 characters",
   },
   yourPassword: {
@@ -328,22 +328,22 @@ const translations = {
   },
   passwordTooShort: {
     fr: "Le mot de passe doit contenir au moins 6 caractères",
-    es: "La contraseña debe tener al menos 6 caracteres",
+    es: "La contraseña debe tener al menos 6 carácteres",
     en: "Password must be at least 6 characters",
   },
   noAccount: {
     fr: "Pas de compte ?",
-    es: "No tienes cuenta?",
+    es: "¿No tienes cuenta?",
     en: "Don't have an account?",
   },
   hasAccount: {
     fr: "Déjà un compte ?",
-    es: "Ya tienes cuenta?",
+    es: "¿Ya tienes cuenta?",
     en: "Already have an account?",
   },
   register: {
     fr: "S'inscrire",
-    es: "Registrate",
+    es: "Regístrate",
     en: "Sign up",
   },
 
@@ -439,7 +439,7 @@ const translations = {
   // ── Model Selector ──
   registerForModels: {
     fr: "Inscrivez-vous pour accéder à tous les modèles",
-    es: "Registrate para acceder a todos los modelos",
+    es: "Regístrate para acceder a todos los modelos",
     en: "Sign up to access all models",
   },
 
@@ -468,27 +468,27 @@ const translations = {
   // ── Model descriptions (role-based suite) ──
   modelExecuteDesc: {
     fr: "Rédaction, code, emails et recherche web — rapide et efficace",
-    es: "Redaccion, codigo, emails y busqueda web — rapido y eficiente",
+    es: "Redacción, código, emails y búsqueda web — rápido y eficiente",
     en: "Writing, code, emails, and web search — fast and efficient",
   },
   modelThinkDesc: {
     fr: "Analyse approfondie, raisonnement et prise de décision stratégique",
-    es: "Analisis profundo, razonamiento y toma de decisiones estratégicas",
+    es: "Análisis profundo, razonamiento y toma de decisiones estratégicas",
     en: "Deep analysis, reasoning, and strategic decision-making",
   },
   modelApexDesc: {
     fr: "Création avancée, résolution complexe et intelligence maximale",
-    es: "Creacion avanzada, resolucion compleja e inteligencia maxima",
+    es: "Creación avanzada, resolución compleja e inteligencia máxima",
     en: "Advanced creation, complex resolution, and maximum intelligence",
   },
   modelMiloChatDesc: {
     fr: "Assistant amical pour conversations et support du quotidien",
-    es: "Asistente amigable para conversaciones y soporte del dia a dia",
+    es: "Asistente amigable para conversaciones y soporte del día a día",
     en: "Friendly assistant for conversations and everyday support",
   },
   modelLegacyDesc: {
     fr: "Modèle de génération précédente",
-    es: "Modelo de generacion anterior",
+    es: "Modelo de generación anterior",
     en: "Previous generation model",
   },
   legacyModels: {
@@ -561,7 +561,7 @@ const translations = {
   // ── Chat Context ──
   newConversation: {
     fr: "Nouvelle conversation",
-    es: "Nueva conversacion",
+    es: "Nueva conversación",
     en: "New conversation",
   },
   responseError: {
@@ -649,7 +649,7 @@ const translations = {
   },
   exploreUseCasesTitle: {
     fr: "Que pouvez-vous faire ?",
-    es: "Que puedes hacer?",
+    es: "¿Qué puedes hacer?",
     en: "What can you do?",
   },
   exploreUseCase1: {
@@ -659,7 +659,7 @@ const translations = {
   },
   exploreUseCase1Desc: {
     fr: "Créez des emails clairs et structurés pour toute situation professionnelle.",
-    es: "Crea emails claros y estructurados para cualquier situacion profesional.",
+    es: "Crea emails claros y estructurados para cualquier situación profesional.",
     en: "Create clear, structured emails for any professional situation.",
   },
   exploreUseCase2: {
@@ -674,12 +674,12 @@ const translations = {
   },
   exploreUseCase3: {
     fr: "Écrire et expliquer du code",
-    es: "Escribir y explicar codigo",
+    es: "Escribir y explicar código",
     en: "Write and explain code",
   },
   exploreUseCase3Desc: {
     fr: "Générez, déboguez et comprenez du code dans de nombreux langages.",
-    es: "Genera, depura y comprende codigo en multiples lenguajes.",
+    es: "Genera, depura y comprende código en múltiples lenguajes.",
     en: "Generate, debug and understand code in many languages.",
   },
   exploreUseCase4: {
@@ -689,7 +689,7 @@ const translations = {
   },
   exploreUseCase4Desc: {
     fr: "Traduisez des textes entre le français, l'espagnol, l'anglais et plus.",
-    es: "Traduce textos entre frances, espanol, ingles y mas.",
+    es: "Traduce textos entre francés, español, inglés y más.",
     en: "Translate text between French, Spanish, English and more.",
   },
   exploreUseCase5: {
@@ -716,22 +716,22 @@ const translations = {
   // ── Documentation Page ──
   docTitle: {
     fr: "Documentation",
-    es: "Documentacion",
+    es: "Documentación",
     en: "Documentation",
   },
   docSubtitle: {
     fr: "Guide complet pour utiliser SYNTALYS Chat AI",
-    es: "Guia completa para usar SYNTALYS Chat AI",
+    es: "Guía completa para usar SYNTALYS Chat AI",
     en: "Complete guide for using SYNTALYS Chat AI",
   },
   docGettingStarted: {
     fr: "Démarrage rapide",
-    es: "Inicio rapido",
+    es: "Inicio rápido",
     en: "Getting started",
   },
   docGettingStartedContent: {
     fr: "Créez un compte ou utilisez le mode anonyme pour commencer à discuter avec SYNTALYS AI. Tapez votre message dans la zone de saisie et appuyez sur Entrée pour envoyer.",
-    es: "Crea una cuenta o usa el modo anonimo para empezar a chatear con SYNTALYS AI. Escribe tu mensaje en el campo de texto y presiona Enter para enviar.",
+    es: "Crea una cuenta o usa el modo anónimo para empezar a chatear con SYNTALYS AI. Escribe tu mensaje en el campo de texto y presiona Enter para enviar.",
     en: "Create an account or use anonymous mode to start chatting with SYNTALYS AI. Type your message in the input field and press Enter to send.",
   },
   docModels: {
@@ -746,42 +746,42 @@ const translations = {
   },
   docModelExecute: {
     fr: "Votre moteur de production quotidien. Gratuit. Ideal pour la redaction, le code, les emails, la recherche web et les taches operationnelles. Rapide et efficace.",
-    es: "Tu motor de produccion diario. Gratuito. Ideal para redaccion, codigo, emails, busqueda web y tareas operativas. Rapido y eficiente.",
+    es: "Tu motor de producción diario. Gratuito. Ideal para redacción, código, emails, búsqueda web y tareas operativas. Rápido y eficiente.",
     en: "Your daily production engine. Free. Great for writing, code, emails, web search, and operational tasks. Fast and efficient.",
   },
   docModelThink: {
     fr: "Analytique premium avec raisonnement pas a pas. Ideal pour l'architecture technique, l'analyse financiere, la strategie et les decisions complexes. Necessite un compte.",
-    es: "Analitico premium con razonamiento paso a paso. Ideal para arquitectura tecnica, analisis financiero, estrategia y decisiones complejas. Requiere cuenta.",
+    es: "Analítico premium con razonamiento paso a paso. Ideal para arquitectura técnica, análisis financiero, estrategia y decisiones complejas. Requiere cuenta.",
     en: "Premium analytical model with step-by-step reasoning. Great for technical architecture, financial analysis, strategy, and complex decisions. Requires an account.",
   },
   docModelApex: {
     fr: "Le modele flagship. Creation avancee, resolution de problemes ambigus, design de systemes complets et intelligence strategique maximale. Necessite un compte.",
-    es: "El modelo flagship. Creacion avanzada, resolucion de problemas ambiguos, diseno de sistemas completos e inteligencia estrategica maxima. Requiere cuenta.",
+    es: "El modelo flagship. Creación avanzada, resolución de problemas ambiguos, diseño de sistemas completos e inteligencia estratégica máxima. Requiere cuenta.",
     en: "The flagship model. Advanced creation, ambiguous problem solving, complete systems design, and maximum strategic intelligence. Requires an account.",
   },
   docModelMiloChat: {
     fr: "Assistant conversationnel amical et accessible. Ideal pour le support, les FAQs, les conversations informelles et l'assistance basique. Gratuit.",
-    es: "Asistente conversacional amigable y accesible. Ideal para soporte, FAQs, conversaciones informales y asistencia basica. Gratuito.",
+    es: "Asistente conversacional amigable y accesible. Ideal para soporte, FAQs, conversaciones informales y asistencia básica. Gratuito.",
     en: "Friendly and approachable conversational assistant. Great for support, FAQs, casual conversations, and basic assistance. Free.",
   },
   docConversations: {
     fr: "Gestion des conversations",
-    es: "Gestion de conversaciones",
+    es: "Gestión de conversaciones",
     en: "Conversation management",
   },
   docConversationsContent: {
     fr: "Vos conversations sont organisées dans la barre latérale par date (aujourd'hui, hier, 7 derniers jours, plus ancien). Vous pouvez renommer ou supprimer une conversation via le menu contextuel. Cliquez sur « Nouveau chat » pour démarrer une nouvelle conversation.",
-    es: "Tus conversaciones se organizan en la barra lateral por fecha (hoy, ayer, ultimos 7 dias, anterior). Puedes renombrar o eliminar una conversacion desde el menu contextual. Haz clic en « Nuevo chat » para iniciar una nueva conversacion.",
+    es: "Tus conversaciones se organizan en la barra lateral por fecha (hoy, ayer, últimos 7 días, anterior). Puedes renombrar o eliminar una conversación desde el menú contextual. Haz clic en « Nuevo chat » para iniciar una nueva conversación.",
     en: "Your conversations are organized in the sidebar by date (today, yesterday, last 7 days, older). You can rename or delete a conversation from the context menu. Click \"New chat\" to start a new conversation.",
   },
   docAnonymous: {
     fr: "Mode anonyme vs. Compte",
-    es: "Modo anonimo vs. Cuenta",
+    es: "Modo anónimo vs. Cuenta",
     en: "Anonymous mode vs. Account",
   },
   docAnonymousContent: {
     fr: "En mode anonyme, vous avez acces a TALYS Execute et Milo Chat avec une limite de 20 messages par jour. Vos conversations sont stockees localement dans votre navigateur. Avec un compte, vous accedez a tous les modeles (TALYS Think, Apex), sans limite de messages, et vos conversations sont synchronisees dans le cloud.",
-    es: "En modo anonimo, tienes acceso a TALYS Execute y Milo Chat con un limite de 20 mensajes por dia. Tus conversaciones se guardan localmente en tu navegador. Con una cuenta, accedes a todos los modelos (TALYS Think, Apex), sin limite de mensajes, y tus conversaciones se sincronizan en la nube.",
+    es: "En modo anónimo, tienes acceso a TALYS Execute y Milo Chat con un límite de 20 mensajes por día. Tus conversaciones se guardan localmente en tu navegador. Con una cuenta, accedes a todos los modelos (TALYS Think, Apex), sin límite de mensajes, y tus conversaciones se sincronizan en la nube.",
     en: "In anonymous mode, you have access to TALYS Execute and Milo Chat with a limit of 20 messages per day. Your conversations are stored locally in your browser. With an account, you access all models (TALYS Think, Apex), with no message limit, and your conversations are synced to the cloud.",
   },
   docSettings: {
@@ -791,7 +791,7 @@ const translations = {
   },
   docSettingsContent: {
     fr: "Personnalisez votre expérience : choisissez le thème (clair, sombre ou système), la langue (français, espagnol, anglais), votre nom d'affichage et votre modèle par défaut. Les paramètres sont accessibles depuis l'icône dans la barre latérale.",
-    es: "Personaliza tu experiencia: elige el tema (claro, oscuro o sistema), el idioma (frances, espanol, ingles), tu nombre para mostrar y tu modelo por defecto. Los ajustes se encuentran en el icono de la barra lateral.",
+    es: "Personaliza tu experiencia: elige el tema (claro, oscuro o sistema), el idioma (francés, español, inglés), tu nombre para mostrar y tu modelo por defecto. Los ajustes se encuentran en el icono de la barra lateral.",
     en: "Customize your experience: choose the theme (light, dark or system), language (French, Spanish, English), your display name and default model. Settings are accessible from the icon in the sidebar.",
   },
   docShortcuts: {
@@ -801,7 +801,7 @@ const translations = {
   },
   docShortcutsContent: {
     fr: "Entrée : envoyer le message | Maj + Entrée : saut de ligne",
-    es: "Enter: enviar mensaje | Shift + Enter: salto de linea",
+    es: "Enter: enviar mensaje | Shift + Enter: salto de línea",
     en: "Enter: send message | Shift + Enter: new line",
   },
   docFaqTitle: {
@@ -811,54 +811,54 @@ const translations = {
   },
   docFaq1Q: {
     fr: "Où sont stockées mes données ?",
-    es: "Donde se guardan mis datos?",
+    es: "¿Dónde se guardan mis datos?",
     en: "Where is my data stored?",
   },
   docFaq1A: {
     fr: "Si vous avez un compte, vos conversations sont stockées de manière sécurisée dans le cloud (Supabase). En mode anonyme, tout reste dans votre navigateur.",
-    es: "Si tienes cuenta, tus conversaciones se guardan de forma segura en la nube (Supabase). En modo anonimo, todo se queda en tu navegador.",
+    es: "Si tienes cuenta, tus conversaciones se guardan de forma segura en la nube (Supabase). En modo anónimo, todo se queda en tu navegador.",
     en: "If you have an account, your conversations are securely stored in the cloud (Supabase). In anonymous mode, everything stays in your browser.",
   },
   docFaq2Q: {
     fr: "Puis-je supprimer mon compte ?",
-    es: "Puedo eliminar mi cuenta?",
+    es: "¿Puedo eliminar mi cuenta?",
     en: "Can I delete my account?",
   },
   docFaq2A: {
     fr: "Contactez-nous à hello@syntalys.ch pour toute demande de suppression de compte.",
-    es: "Contactanos en hello@syntalys.ch para cualquier solicitud de eliminacion de cuenta.",
+    es: "Contáctanos en hello@syntalys.ch para cualquier solicitud de eliminación de cuenta.",
     en: "Contact us at hello@syntalys.ch for any account deletion request.",
   },
   docFaq3Q: {
     fr: "L'IA peut-elle se tromper ?",
-    es: "Puede la IA equivocarse?",
+    es: "¿Puede la IA equivocarse?",
     en: "Can the AI make mistakes?",
   },
   docFaq3A: {
     fr: "Oui. SYNTALYS AI peut faire des erreurs. Vérifiez toujours les informations importantes avant de les utiliser.",
-    es: "Si. SYNTALYS AI puede cometer errores. Verifica siempre la informacion importante antes de usarla.",
+    es: "Sí. SYNTALYS AI puede cometer errores. Verifica siempre la información importante antes de usarla.",
     en: "Yes. SYNTALYS AI can make mistakes. Always verify important information before using it.",
   },
 
   // ── Support Page ──
   supportTitle: {
     fr: "Besoin d'aide ?",
-    es: "Necesitas ayuda?",
+    es: "¿Necesitas ayuda?",
     en: "Need help?",
   },
   supportSubtitle: {
     fr: "Notre équipe est disponible pour répondre à vos questions et résoudre vos problèmes.",
-    es: "Nuestro equipo esta disponible para responder tus preguntas y resolver tus problemas.",
+    es: "Nuestro equipo está disponible para responder tus preguntas y resolver tus problemas.",
     en: "Our team is available to answer your questions and solve your problems.",
   },
   supportContactTitle: {
     fr: "Contactez-nous",
-    es: "Contactanos",
+    es: "Contáctanos",
     en: "Contact us",
   },
   supportContactDesc: {
     fr: "Envoyez-nous un email et nous vous répondrons dans les plus brefs délais.",
-    es: "Envianos un email y te responderemos lo antes posible.",
+    es: "Envíanos un email y te responderemos lo antes posible.",
     en: "Send us an email and we'll get back to you as soon as possible.",
   },
   supportResponseTime: {
@@ -873,12 +873,12 @@ const translations = {
   },
   supportUsefulLinks: {
     fr: "Liens utiles",
-    es: "Enlaces utiles",
+    es: "Enlaces útiles",
     en: "Useful links",
   },
   supportViewDoc: {
     fr: "Consulter la documentation",
-    es: "Consultar la documentacion",
+    es: "Consultar la documentación",
     en: "View documentation",
   },
   supportViewFaq: {
@@ -893,24 +893,24 @@ const translations = {
   },
   supportBugDesc: {
     fr: "Si vous rencontrez un bug, décrivez le problème en détail dans votre email afin que nous puissions le résoudre rapidement.",
-    es: "Si encuentras un bug, describe el problema en detalle en tu email para que podamos resolverlo rapidamente.",
+    es: "Si encuentras un bug, describe el problema en detalle en tu email para que podamos resolverlo rápidamente.",
     en: "If you encounter a bug, describe the problem in detail in your email so we can resolve it quickly.",
   },
 
   // ── Legal Page ──
   legalTitle: {
     fr: "Mentions légales",
-    es: "Informacion legal",
+    es: "Información legal",
     en: "Legal notice",
   },
   legalInfoTitle: {
     fr: "Informations légales",
-    es: "Informacion legal",
+    es: "Información legal",
     en: "Legal information",
   },
   legalForm: {
     fr: "Forme juridique",
-    es: "Forma juridica",
+    es: "Forma jurídica",
     en: "Legal form",
   },
   legalFormValue: {
@@ -925,7 +925,7 @@ const translations = {
   },
   legalAddress: {
     fr: "Adresse",
-    es: "Direccion",
+    es: "Dirección",
     en: "Address",
   },
   legalEmail: {
@@ -945,17 +945,17 @@ const translations = {
   },
   legalHostingContent: {
     fr: "Application hébergée par Vercel Inc. (San Francisco, USA). Base de données hébergée par Supabase Inc.",
-    es: "Aplicacion alojada por Vercel Inc. (San Francisco, USA). Base de datos alojada por Supabase Inc.",
+    es: "Aplicación alojada por Vercel Inc. (San Francisco, USA). Base de datos alojada por Supabase Inc.",
     en: "Application hosted by Vercel Inc. (San Francisco, USA). Database hosted by Supabase Inc.",
   },
   legalDataTitle: {
     fr: "Protection des données",
-    es: "Proteccion de datos",
+    es: "Protección de datos",
     en: "Data protection",
   },
   legalDataContent: {
     fr: "Les données des utilisateurs authentifiés sont stockées de manière sécurisée dans Supabase. Les utilisateurs anonymes utilisent le stockage local du navigateur. Les messages sont traités par OpenAI pour la génération des réponses. Aucune donnée personnelle n'est partagée avec des tiers en dehors de ce traitement.",
-    es: "Los datos de los usuarios autenticados se almacenan de forma segura en Supabase. Los usuarios anonimos usan el almacenamiento local del navegador. Los mensajes son procesados por OpenAI para la generacion de respuestas. Ningun dato personal se comparte con terceros fuera de este procesamiento.",
+    es: "Los datos de los usuarios autenticados se almacenan de forma segura en Supabase. Los usuarios anónimos usan el almacenamiento local del navegador. Los mensajes son procesados por OpenAI para la generación de respuestas. Ningún dato personal se comparte con terceros fuera de este procesamiento.",
     en: "Authenticated user data is securely stored in Supabase. Anonymous users use browser local storage. Messages are processed by OpenAI for response generation. No personal data is shared with third parties outside of this processing.",
   },
   legalAiTitle: {
@@ -975,7 +975,7 @@ const translations = {
   },
   legalCookiesContent: {
     fr: "Ce site utilise le stockage local du navigateur pour sauvegarder vos préférences (thème, langue) et les sessions anonymes. Aucun cookie tiers n'est utilisé à des fins publicitaires.",
-    es: "Este sitio utiliza el almacenamiento local del navegador para guardar tus preferencias (tema, idioma) y las sesiones anonimas. No se usan cookies de terceros con fines publicitarios.",
+    es: "Este sitio utiliza el almacenamiento local del navegador para guardar tus preferencias (tema, idioma) y las sesiones anónimas. No se usan cookies de terceros con fines publicitarios.",
     en: "This site uses browser local storage to save your preferences (theme, language) and anonymous sessions. No third-party cookies are used for advertising purposes.",
   },
   legalIpTitle: {
@@ -985,7 +985,7 @@ const translations = {
   },
   legalIpContent: {
     fr: "L'ensemble du contenu de ce site (textes, logos, images, code) est protégé par le droit d'auteur.",
-    es: "Todo el contenido de este sitio (textos, logos, imagenes, codigo) esta protegido por derechos de autor.",
+    es: "Todo el contenido de este sitio (textos, logos, imágenes, código) está protegido por derechos de autor.",
     en: "All content on this site (text, logos, images, code) is protected by copyright.",
   },
 
@@ -1145,12 +1145,12 @@ const translations = {
   },
   memoryDesc: {
     fr: "SYNTALYS AI se souvient des informations importantes entre les conversations pour personnaliser vos réponses.",
-    es: "SYNTALYS AI recuerda informacion importante entre conversaciones para personalizar tus respuestas.",
+    es: "SYNTALYS AI recuerda información importante entre conversaciones para personalizar tus respuestas.",
     en: "SYNTALYS AI remembers important information across conversations to personalize your responses.",
   },
   memoryEmpty: {
     fr: "Aucune mémoire enregistrée. L'IA commencera à se souvenir des informations importantes au fil de vos conversations.",
-    es: "Sin memorias guardadas. La IA empezara a recordar informacion importante a medida que converses.",
+    es: "Sin memorias guardadas. La IA empezará a recordar información importante a medida que converses.",
     en: "No memories saved yet. The AI will start remembering important information as you chat.",
   },
   memoryClearAll: {
@@ -1179,17 +1179,17 @@ const translations = {
   // ── Images Tab ──
   images: {
     fr: "Images",
-    es: "Imagenes",
+    es: "Imágenes",
     en: "Images",
   },
   imagesTitle: {
     fr: "Images",
-    es: "Imagenes",
+    es: "Imágenes",
     en: "Images",
   },
   imagesSubtitle: {
     fr: "Créez et retrouvez toutes vos images générées",
-    es: "Crea y encuentra todas tus imagenes generadas",
+    es: "Crea y encuentra todas tus imágenes generadas",
     en: "Create and find all your generated images",
   },
   imagesPlaceholder: {
@@ -1209,12 +1209,12 @@ const translations = {
   },
   imagesGallery: {
     fr: "Mes images",
-    es: "Mis imagenes",
+    es: "Mis imágenes",
     en: "My images",
   },
   imagesEmpty: {
     fr: "Aucune image pour l'instant. Décrivez ce que vous souhaitez créer !",
-    es: "Aun no tienes imagenes. Describe lo que quieres crear!",
+    es: "Aún no tienes imágenes. ¡Describe lo que quieres crear!",
     en: "No images yet. Describe what you want to create!",
   },
   imagesDownload: {
@@ -1229,7 +1229,7 @@ const translations = {
   },
   imagesDeleteConfirm: {
     fr: "Supprimer cette image ?",
-    es: "Eliminar esta imagen?",
+    es: "¿Eliminar esta imagen?",
     en: "Delete this image?",
   },
   imagesAttachRef: {
@@ -1239,12 +1239,12 @@ const translations = {
   },
   imagesLoginRequired: {
     fr: "Connectez-vous pour créer et sauvegarder des images",
-    es: "Inicia sesion para crear y guardar imagenes",
+    es: "Inicia sesión para crear y guardar imágenes",
     en: "Sign in to create and save images",
   },
   imagesLoadMore: {
     fr: "Charger plus",
-    es: "Cargar mas",
+    es: "Cargar más",
     en: "Load more",
   },
 } as const;
