@@ -11,9 +11,7 @@ import {
   ChevronDown,
   ChevronRight,
   Check,
-  Sparkles,
   Zap,
-  FlaskConical,
   Rocket,
   Brain,
   Atom,
@@ -23,11 +21,9 @@ import {
 const modelIcons: Record<string, typeof Zap> = {
   "talys-2.0": Rocket,
   "talys-2.5": Brain,
-  "talys-3.0-beta": Atom,
+  "talys-3.0": Atom,
   "milo": Paintbrush,
   "synta-1.0": Zap,
-  "synta-1.0-reasoning": Sparkles,
-  "synta-1.5-beta": FlaskConical,
 };
 
 function ModelButton({
@@ -66,9 +62,11 @@ function ModelButton({
             <span
               className={cn(
                 "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-                model.badge === "Beta"
-                  ? "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold"
-                  : "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]"
+                model.badge === "New"
+                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : model.badge === "Img"
+                    ? "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold"
+                    : "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]"
               )}
             >
               {model.badge}

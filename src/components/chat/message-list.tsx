@@ -6,9 +6,10 @@ import { MessageBubble } from "./message-bubble";
 
 interface MessageListProps {
   isDark: boolean;
+  onSuggestionClick?: (prompt: string) => void;
 }
 
-export function MessageList({ isDark }: MessageListProps) {
+export function MessageList({ isDark, onSuggestionClick }: MessageListProps) {
   const { messages, isStreaming, regenerateLastResponse } = useChat();
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -41,6 +42,9 @@ export function MessageList({ isDark }: MessageListProps) {
               idx === actualLastAssistantIdx
                 ? (modelId?: string) => regenerateLastResponse(modelId)
                 : undefined
+            }
+            onSuggestionClick={
+              idx === actualLastAssistantIdx ? onSuggestionClick : undefined
             }
             isDark={isDark}
           />

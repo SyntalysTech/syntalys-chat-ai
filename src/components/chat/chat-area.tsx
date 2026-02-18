@@ -30,7 +30,7 @@ export function ChatArea({ onMenuClick, isDark }: ChatAreaProps) {
       <ChatHeader onMenuClick={onMenuClick} />
 
       {hasMessages ? (
-        <MessageList isDark={isDark} />
+        <MessageList isDark={isDark} onSuggestionClick={handleSuggestionClick} />
       ) : (
         <EmptyState isDark={isDark} onSuggestionClick={handleSuggestionClick} />
       )}

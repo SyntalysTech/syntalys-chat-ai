@@ -105,71 +105,71 @@ const translations = {
     en: "SYNTALYS AI",
   },
   emptyStateSubtitle: {
-    fr: "Votre assistant intelligent. Posez vos questions.",
-    es: "Tu asistente inteligente. Pregunta lo que necesites.",
-    en: "Your intelligent assistant. Ask anything you need.",
+    fr: "Votre assistant intelligent. Que voulez-vous accomplir ?",
+    es: "Tu asistente inteligente. Que quieres lograr hoy?",
+    en: "Your intelligent assistant. What do you want to accomplish?",
   },
 
   // ── Suggestions ──
-  sugWriteCode: {
-    fr: "Écrire du code",
-    es: "Escribe codigo",
-    en: "Write code",
+  sugBusiness: {
+    fr: "Strategie business",
+    es: "Estrategia de negocio",
+    en: "Business strategy",
   },
-  sugWriteCodePrompt: {
-    fr: "Aide-moi à créer une fonction Python qui trie une liste",
-    es: "Ayudame a crear una funcion en Python que ordene una lista",
-    en: "Help me create a Python function that sorts a list",
-  },
-  sugSummarize: {
-    fr: "Résumer un texte",
-    es: "Resume un texto",
-    en: "Summarize text",
-  },
-  sugSummarizePrompt: {
-    fr: "Résume les points clés d'un texte long",
-    es: "Resume los puntos clave de un texto largo",
-    en: "Summarize the key points of a long text",
+  sugBusinessPrompt: {
+    fr: "Aide-moi a creer un business plan complet pour une startup tech, avec analyse de marche, projections financieres et strategie de lancement",
+    es: "Ayudame a crear un plan de negocio completo para una startup tech, con analisis de mercado, proyecciones financieras y estrategia de lanzamiento",
+    en: "Help me create a complete business plan for a tech startup, including market analysis, financial projections, and go-to-market strategy",
   },
   sugIdeas: {
-    fr: "Générer des idées",
-    es: "Genera ideas",
-    en: "Generate ideas",
+    fr: "Brainstorming creatif",
+    es: "Lluvia de ideas",
+    en: "Creative brainstorming",
   },
   sugIdeasPrompt: {
-    fr: "Donne-moi 5 idées innovantes pour une startup technologique",
-    es: "Dame 5 ideas innovadoras para una startup tecnologica",
-    en: "Give me 5 innovative ideas for a tech startup",
-  },
-  sugTranslate: {
-    fr: "Traduire du contenu",
-    es: "Traduce contenido",
-    en: "Translate content",
-  },
-  sugTranslatePrompt: {
-    fr: "Traduis ce texte de l'espagnol au français",
-    es: "Traduce este texto del espanol al frances",
-    en: "Translate this text from Spanish to French",
+    fr: "Donne-moi 10 idees innovantes et uniques de business pour 2025 qui resolvent de vrais problemes",
+    es: "Dame 10 ideas de negocio innovadoras y unicas para 2025 que resuelvan problemas reales",
+    en: "Give me 10 innovative and unique business ideas for 2025 that solve real problems",
   },
   sugAnalyze: {
-    fr: "Analyser des données",
-    es: "Analiza datos",
-    en: "Analyze data",
+    fr: "Analyser et strategiser",
+    es: "Analizar y disenar estrategia",
+    en: "Analyze & strategize",
   },
   sugAnalyzePrompt: {
-    fr: "Explique comment analyser les tendances dans un jeu de données",
-    es: "Explica como analizar tendencias en un dataset",
-    en: "Explain how to analyze trends in a dataset",
+    fr: "Aide-moi a faire une analyse SWOT de mon business et recommande des actions concretes",
+    es: "Ayudame a hacer un analisis DAFO de mi negocio y recomienda acciones concretas",
+    en: "Help me do a SWOT analysis of my business and recommend concrete action items",
   },
   sugDraft: {
-    fr: "Rédiger du contenu",
-    es: "Redacta contenido",
-    en: "Draft content",
+    fr: "Redaction pro",
+    es: "Escritura profesional",
+    en: "Professional writing",
   },
   sugDraftPrompt: {
-    fr: "Rédige un email professionnel pour présenter un projet",
-    es: "Escribe un email profesional para presentar un proyecto",
-    en: "Write a professional email to present a project",
+    fr: "Redige un email professionnel convaincant pour presenter notre nouveau produit a des investisseurs potentiels",
+    es: "Escribe un email profesional convincente para presentar nuestro nuevo producto a inversores potenciales",
+    en: "Write a compelling professional email to present our new product to potential investors",
+  },
+  sugWriteCode: {
+    fr: "Code et tech",
+    es: "Codigo y tecnologia",
+    en: "Code & build",
+  },
+  sugWriteCodePrompt: {
+    fr: "Aide-moi a construire une landing page responsive avec un design moderne en React et Tailwind CSS",
+    es: "Ayudame a construir una landing page responsive con diseno moderno usando React y Tailwind CSS",
+    en: "Help me build a responsive landing page with modern design using React and Tailwind CSS",
+  },
+  sugMarketing: {
+    fr: "Marketing digital",
+    es: "Marketing digital",
+    en: "Digital marketing",
+  },
+  sugMarketingPrompt: {
+    fr: "Conçois une strategie de marketing digital complete pour le lancement d'un nouveau produit SaaS",
+    es: "Disena una estrategia de marketing digital completa para el lanzamiento de un nuevo producto SaaS",
+    en: "Design a complete digital marketing strategy for launching a new SaaS product",
   },
 
   // ── Chat Input ──
@@ -477,9 +477,9 @@ const translations = {
     en: "Higher intelligence, deep analysis, and reasoning",
   },
   modelTalys30Desc: {
-    fr: "Notre modèle le plus avancé avec des capacités de dernière génération",
-    es: "Nuestro modelo mas avanzado con capacidades de ultima generacion",
-    en: "Our most advanced model with cutting-edge capabilities",
+    fr: "Notre modele le plus avance et intelligent",
+    es: "Nuestro modelo mas avanzado e inteligente",
+    en: "Our most advanced and intelligent model",
   },
   modelMiloDesc: {
     fr: "Génère des images à partir de texte",
@@ -494,19 +494,9 @@ const translations = {
 
   // ── Model descriptions (legacy) ──
   modelBaseDesc: {
-    fr: "Modèle de base rapide et efficace",
+    fr: "Modele de base rapide et efficace",
     es: "Modelo base rapido y eficiente",
     en: "Fast and efficient base model",
-  },
-  modelReasoningDesc: {
-    fr: "Raisonnement avancé pour les tâches complexes",
-    es: "Razonamiento avanzado para tareas complejas",
-    en: "Advanced reasoning for complex tasks",
-  },
-  modelBetaDesc: {
-    fr: "Dernier modèle avec des capacités étendues",
-    es: "Ultimo modelo con capacidades ampliadas",
-    en: "Latest model with expanded capabilities",
   },
 
   // ── Reasoning ──
@@ -715,24 +705,29 @@ const translations = {
     en: "Models",
   },
   docModelsContent: {
-    fr: "SYNTALYS AI propose trois modèles adaptés à vos besoins :",
-    es: "SYNTALYS AI ofrece tres modelos adaptados a tus necesidades:",
-    en: "SYNTALYS AI offers three models adapted to your needs:",
+    fr: "SYNTALYS AI propose plusieurs modeles adaptes a vos besoins :",
+    es: "SYNTALYS AI ofrece varios modelos adaptados a tus necesidades:",
+    en: "SYNTALYS AI offers several models adapted to your needs:",
   },
-  docModelBase: {
-    fr: "Rapide et efficace pour les tâches quotidiennes. Disponible pour tous les utilisateurs.",
-    es: "Rapido y eficiente para tareas diarias. Disponible para todos los usuarios.",
-    en: "Fast and efficient for daily tasks. Available to all users.",
+  docModelTalys20: {
+    fr: "Rapide et efficace pour les taches quotidiennes. Gratuit pour tous les utilisateurs. Ideal pour les conversations, questions rapides et l'aide a la redaction.",
+    es: "Rapido y eficiente para tareas diarias. Gratuito para todos los usuarios. Ideal para conversaciones, preguntas rapidas y ayuda con escritura.",
+    en: "Fast and efficient for daily tasks. Free for all users. Great for conversations, quick questions, and writing help.",
   },
-  docModelReasoning: {
-    fr: "Affiche son raisonnement étape par étape avant de répondre. Idéal pour les problèmes complexes. Nécessite un compte.",
-    es: "Muestra su razonamiento paso a paso antes de responder. Ideal para problemas complejos. Requiere cuenta.",
-    en: "Shows step-by-step reasoning before answering. Ideal for complex problems. Requires an account.",
+  docModelTalys25: {
+    fr: "Modele analytique premium avec raisonnement pas a pas. Ideal pour les problemes complexes, le debug de code et l'analyse approfondie. Necessite un compte.",
+    es: "Modelo analitico premium con razonamiento paso a paso. Ideal para problemas complejos, debug de codigo y analisis profundo. Requiere cuenta.",
+    en: "Premium analytical model with step-by-step reasoning. Great for complex problems, code debugging, and deep analysis. Requires an account.",
   },
-  docModelBeta: {
-    fr: "Dernière version avec des capacités étendues en créativité, code et analyse. Nécessite un compte.",
-    es: "Ultima version con capacidades ampliadas en creatividad, codigo y analisis. Requiere cuenta.",
-    en: "Latest version with expanded capabilities in creativity, code and analysis. Requires an account.",
+  docModelTalys30: {
+    fr: "Le modele le plus avance et intelligent. Combine profondeur analytique, excellence creative et pensee strategique. Necessite un compte.",
+    es: "El modelo mas avanzado e inteligente. Combina profundidad analitica, excelencia creativa y pensamiento estrategico. Requiere cuenta.",
+    en: "The most advanced and intelligent model. Combines analytical depth, creative excellence, and strategic thinking. Requires an account.",
+  },
+  docModelMilo: {
+    fr: "Modele dedie a la generation d'images a partir de descriptions textuelles. Creez des visuels uniques instantanement. Necessite un compte.",
+    es: "Modelo dedicado a la generacion de imagenes a partir de descripciones de texto. Crea visuales unicos al instante. Requiere cuenta.",
+    en: "Dedicated image generation model from text descriptions. Create unique visuals instantly. Requires an account.",
   },
   docConversations: {
     fr: "Gestion des conversations",
@@ -750,9 +745,9 @@ const translations = {
     en: "Anonymous mode vs. Account",
   },
   docAnonymousContent: {
-    fr: "En mode anonyme, vous avez accès au modèle SYNT A 1.0 avec une limite de 20 messages par jour. Vos conversations sont stockées localement dans votre navigateur. Avec un compte, vous accédez à tous les modèles, sans limite de messages, et vos conversations sont synchronisées dans le cloud.",
-    es: "En modo anonimo, tienes acceso al modelo SYNT A 1.0 con un limite de 20 mensajes por dia. Tus conversaciones se guardan localmente en tu navegador. Con una cuenta, accedes a todos los modelos, sin limite de mensajes, y tus conversaciones se sincronizan en la nube.",
-    en: "In anonymous mode, you have access to the SYNT A 1.0 model with a limit of 20 messages per day. Your conversations are stored locally in your browser. With an account, you access all models, with no message limit, and your conversations are synced to the cloud.",
+    fr: "En mode anonyme, vous avez acces au modele TALYS 2.0 avec une limite de 20 messages par jour. Vos conversations sont stockees localement dans votre navigateur. Avec un compte, vous accedez a tous les modeles (TALYS 2.5, 3.0, Milo), sans limite de messages, et vos conversations sont synchronisees dans le cloud.",
+    es: "En modo anonimo, tienes acceso al modelo TALYS 2.0 con un limite de 20 mensajes por dia. Tus conversaciones se guardan localmente en tu navegador. Con una cuenta, accedes a todos los modelos (TALYS 2.5, 3.0, Milo), sin limite de mensajes, y tus conversaciones se sincronizan en la nube.",
+    en: "In anonymous mode, you have access to the TALYS 2.0 model with a limit of 20 messages per day. Your conversations are stored locally in your browser. With an account, you access all models (TALYS 2.5, 3.0, Milo), with no message limit, and your conversations are synced to the cloud.",
   },
   docSettings: {
     fr: "Paramètres",

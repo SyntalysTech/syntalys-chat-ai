@@ -44,6 +44,33 @@ const faqKeys: { q: TranslationKey; a: TranslationKey }[] = [
   { q: "docFaq3Q", a: "docFaq3A" },
 ];
 
+const modelCards: { name: string; descKey: TranslationKey; badge: string | null; badgeColor: string }[] = [
+  {
+    name: "TALYS 2.0",
+    descKey: "docModelTalys20" as TranslationKey,
+    badge: null,
+    badgeColor: "",
+  },
+  {
+    name: "TALYS 2.5",
+    descKey: "docModelTalys25" as TranslationKey,
+    badge: "Pro",
+    badgeColor: "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]",
+  },
+  {
+    name: "TALYS 3.0",
+    descKey: "docModelTalys30" as TranslationKey,
+    badge: "New",
+    badgeColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  },
+  {
+    name: "Milo",
+    descKey: "docModelMilo" as TranslationKey,
+    badge: "Img",
+    badgeColor: "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold",
+  },
+];
+
 export function DocumentationModal({ open, onClose }: DocumentationModalProps) {
   const { t } = useI18n();
   const [openSection, setOpenSection] = useState<number | null>(0);
@@ -102,11 +129,7 @@ export function DocumentationModal({ open, onClose }: DocumentationModalProps) {
                     {/* Models extra */}
                     {section.extra === "models" && (
                       <div className="mt-3 space-y-2">
-                        {[
-                          { name: "SYNT A 1.0", descKey: "docModelBase" as TranslationKey, badge: null },
-                          { name: "SYNT A 1.0 Reasoning", descKey: "docModelReasoning" as TranslationKey, badge: "Pro" },
-                          { name: "SYNT A 1.5 Beta", descKey: "docModelBeta" as TranslationKey, badge: "Beta" },
-                        ].map((m) => (
+                        {modelCards.map((m) => (
                           <div key={m.name} className="rounded-md bg-accent/30 p-2 sm:p-2.5">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <span className="text-xs font-semibold text-card-foreground">{m.name}</span>
@@ -114,9 +137,7 @@ export function DocumentationModal({ open, onClose }: DocumentationModalProps) {
                                 <span
                                   className={cn(
                                     "rounded-full px-1.5 py-0.5 text-[9px] font-semibold",
-                                    m.badge === "Beta"
-                                      ? "bg-syntalys-gold/15 text-syntalys-gold-dark dark:text-syntalys-gold"
-                                      : "bg-syntalys-blue/10 text-syntalys-blue dark:bg-[#4a8fd4]/15 dark:text-[#4a8fd4]"
+                                    m.badgeColor
                                   )}
                                 >
                                   {m.badge}

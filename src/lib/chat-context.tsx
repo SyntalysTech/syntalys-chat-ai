@@ -6,6 +6,7 @@ import {
   useState,
   useCallback,
   useRef,
+  useEffect,
   type ReactNode,
 } from "react";
 import { createClient } from "./supabase-client";
@@ -38,7 +39,7 @@ interface ChatContextType {
   selectThread: (threadId: string) => Promise<void>;
   deleteThread: (threadId: string) => Promise<void>;
   renameThread: (threadId: string, title: string) => Promise<void>;
-  sendMessage: (content: string, attachments?: FileAttachment[], modelOverride?: string) => Promise<void>;
+  sendMessage: (content: string, attachments?: FileAttachment[], modelOverride?: string) => Promise<boolean>;
   regenerateLastResponse: (modelId?: string) => Promise<void>;
   clearCurrentThread: () => void;
   deleteAllThreads: () => Promise<void>;
@@ -64,8 +65,29 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [anonUsageCount, setAnonUsageCount] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
   const isStreamingRef = useRef(false);
+  const streamStartedAtRef = useRef<number>(0);
   const messagesRef = useRef<ChatMessage[]>([]);
   messagesRef.current = messages;
+
+  // Auto-recover from stale streaming lock when page regains focus
+  // (e.g. iOS PWA backgrounded, stream connection died silently)
+  useEffect(() => {
+    const STALE_THRESHOLD = 120_000; // 2 minutes
+    const handleVisibilityChange = () => {
+      if (
+        document.visibilityState === "visible" &&
+        isStreamingRef.current &&
+        Date.now() - streamStartedAtRef.current > STALE_THRESHOLD
+      ) {
+        abortRef.current?.abort();
+        abortRef.current = null;
+        isStreamingRef.current = false;
+        setIsStreaming(false);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
 
   const loadThreads = useCallback(async () => {
     if (user) {
@@ -193,18 +215,28 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   );
 
   const sendMessage = useCallback(
-    async (content: string, attachments?: FileAttachment[], modelOverride?: string) => {
-      // Use ref to prevent stale closure from blocking sends
-      if (isStreamingRef.current) return;
+    async (content: string, attachments?: FileAttachment[], modelOverride?: string): Promise<boolean> => {
+      // Self-heal stale streaming lock (e.g. iOS PWA backgrounded, stream died)
+      if (isStreamingRef.current) {
+        const elapsed = Date.now() - streamStartedAtRef.current;
+        if (elapsed > 120_000) {
+          abortRef.current?.abort();
+          abortRef.current = null;
+          isStreamingRef.current = false;
+        } else {
+          return false;
+        }
+      }
 
       // Check anonymous limit
       if (!user) {
         const usage = getAnonUsageCount();
-        if (usage >= ANON_DAILY_LIMIT) return;
+        if (usage >= ANON_DAILY_LIMIT) return false;
       }
 
       // Lock immediately via ref (avoids stale closure issues)
       isStreamingRef.current = true;
+      streamStartedAtRef.current = Date.now();
       setIsStreaming(true);
 
       const effectiveModel = modelOverride || selectedModel;
@@ -400,7 +432,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           }
         }
       } catch (err) {
-        if ((err as Error).name === "AbortError") return;
+        if ((err as Error).name === "AbortError") return true;
         if (assistantMessage) {
           setMessages((prev) =>
             prev.map((m) =>
@@ -420,6 +452,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setIsStreaming(false);
         abortRef.current = null;
       }
+      return true;
     },
     [
       user,

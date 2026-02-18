@@ -267,12 +267,20 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
     const content = value.trim() || (files.length > 0 ? t("attachedFiles") as string : "");
     const attachments = files.length > 0 ? [...files] : undefined;
 
+    // Save input state before clearing (restore if send is rejected)
+    const savedValue = value;
+    const savedFiles = files;
+
     setValue("");
     setFiles([]);
     setFileError("");
     if (textareaRef.current) textareaRef.current.style.height = "auto";
 
-    await sendMessage(content, attachments);
+    const accepted = await sendMessage(content, attachments);
+    if (!accepted) {
+      setValue(savedValue);
+      setFiles(savedFiles);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

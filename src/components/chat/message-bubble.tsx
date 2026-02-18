@@ -19,6 +19,7 @@ import {
   ImageIcon,
   Volume2,
   VolumeX,
+  ArrowUpRight,
 } from "lucide-react";
 import Image from "next/image";
 import type { ChatMessage } from "@/lib/types";
@@ -28,6 +29,7 @@ interface MessageBubbleProps {
   isLast: boolean;
   isStreaming: boolean;
   onRegenerate?: (modelId?: string) => void;
+  onSuggestionClick?: (prompt: string) => void;
   isDark: boolean;
 }
 
@@ -91,11 +93,33 @@ function parseReasoning(content: string): {
   return { reasoning, answer, isReasoningComplete: true };
 }
 
+/** Parse <suggestions>...</suggestions> from content */
+function parseSuggestions(content: string): {
+  cleanContent: string;
+  suggestions: string[];
+} {
+  const regex = /<suggestions>([\s\S]*?)<\/suggestions>/;
+  const match = content.match(regex);
+  if (!match) {
+    // Strip incomplete tags during streaming (e.g. "<suggest" or "<suggestions>partial")
+    const cleaned = content.replace(/<suggestions>[^<]*$/, "").replace(/<suggest[^>]*$/, "").trim();
+    return { cleanContent: cleaned, suggestions: [] };
+  }
+  const raw = match[1].trim();
+  const suggestions = raw
+    .split("|")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0 && s.length < 80);
+  const cleanContent = content.replace(regex, "").trim();
+  return { cleanContent, suggestions };
+}
+
 export const MessageBubble = memo(function MessageBubble({
   message,
   isLast,
   isStreaming,
   onRegenerate,
+  onSuggestionClick,
   isDark,
 }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
@@ -125,7 +149,7 @@ export const MessageBubble = memo(function MessageBubble({
   );
   const isUser = message.role === "user";
   const isReasoning = message.model === "synta-1.0-reasoning" || message.model === "talys-2.5";
-  const isBeta = message.model === "synta-1.5-beta" || message.model === "talys-3.0-beta";
+  const isBeta = message.model === "synta-1.5-beta" || message.model === "talys-3.0";
 
   const parsed = useMemo(() => {
     if (!isReasoning || isUser) return null;
@@ -169,8 +193,15 @@ export const MessageBubble = memo(function MessageBubble({
     };
   }, [isSpeaking]);
 
-  // Determine what content to render for assistant
-  const displayContent = parsed ? parsed.answer : message.content;
+  // Parse suggestions from content
+  const rawContent = parsed ? parsed.answer : message.content;
+  const suggestionsData = useMemo(
+    () => (!isUser ? parseSuggestions(rawContent) : { cleanContent: rawContent, suggestions: [] }),
+    [rawContent, isUser]
+  );
+  const displayContent = suggestionsData.cleanContent;
+  const followUpSuggestions = suggestionsData.suggestions;
+
   const hasReasoning = parsed && parsed.reasoning;
   const reasoningStillStreaming =
     isStreaming && isLast && parsed && !parsed.isReasoningComplete;
@@ -375,6 +406,22 @@ export const MessageBubble = memo(function MessageBubble({
                     )}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Smart Follow-up Suggestions */}
+            {isLast && !isStreaming && followUpSuggestions.length > 0 && onSuggestionClick && (
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 pt-2 sm:pt-3 animate-fade-in">
+                {followUpSuggestions.map((suggestion, i) => (
+                  <button
+                    key={i}
+                    onClick={() => onSuggestionClick(suggestion)}
+                    className="group/chip flex items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-[13px] text-muted-foreground transition-all duration-200 hover:border-syntalys-blue/40 hover:bg-syntalys-blue/5 hover:text-foreground active:scale-[0.97]"
+                  >
+                    <span className="leading-snug">{suggestion}</span>
+                    <ArrowUpRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0 opacity-0 -translate-x-1 group-hover/chip:opacity-100 group-hover/chip:translate-x-0 transition-all duration-200 text-syntalys-blue" />
+                  </button>
+                ))}
               </div>
             )}
           </div>

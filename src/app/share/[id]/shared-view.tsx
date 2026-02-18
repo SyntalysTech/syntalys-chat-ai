@@ -39,7 +39,7 @@ function parseReasoning(content: string) {
 
 function SharedMessage({ message }: { message: SharedMessage }) {
   const isUser = message.role === "user";
-  const isReasoning = message.model === "synta-1.0-reasoning";
+  const isReasoning = message.model === "synta-1.0-reasoning" || message.model === "talys-2.5";
   const [reasoningOpen, setReasoningOpen] = useState(false);
 
   const parsed = useMemo(() => {
