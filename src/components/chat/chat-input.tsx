@@ -338,8 +338,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
 
         <div
           className={cn(
-            "relative rounded-2xl border border-border/80 bg-card shadow-sm transition-colors",
-            "focus-within:border-syntalys-blue/40 focus-within:shadow-md",
+            "relative rounded-2xl border border-border/80 bg-card shadow-sm",
             limitReached && "opacity-60"
           )}
           onDragOver={(e) => e.preventDefault()}
@@ -458,7 +457,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
               rows={1}
               className={cn(
                 "flex-1 min-w-0 resize-none bg-transparent py-2 text-[16px] sm:text-sm text-foreground placeholder:text-muted-foreground",
-                "outline-none overflow-y-auto scrollbar-none",
+                "outline-none ring-0 border-none focus:outline-none focus:ring-0 focus:border-none overflow-y-auto scrollbar-none",
                 "max-h-[200px]"
               )}
               aria-label={t("inputPlaceholder") as string}

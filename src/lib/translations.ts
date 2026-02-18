@@ -1166,9 +1166,9 @@ const translations = {
     en: "Create an image",
   },
   describeImagePlaceholder: {
-    fr: "Décrivez l'image que vous voulez...",
-    es: "Describe la imagen que quieres...",
-    en: "Describe the image you want...",
+    fr: "Décrivez votre image...",
+    es: "Describe tu imagen...",
+    en: "Describe your image...",
   },
   imageMode: {
     fr: "Mode image",

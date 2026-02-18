@@ -257,6 +257,9 @@
 *:focus-visible {
   @apply outline-2 outline-offset-2 outline-ring;
 }
+textarea:focus-visible {
+  outline: none;
+}
 
 /* Textarea auto-resize helper */
 .auto-grow-wrap {
