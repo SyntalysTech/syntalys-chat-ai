@@ -7,6 +7,7 @@ import {
   useCallback,
   useRef,
   useEffect,
+  useMemo,
   type ReactNode,
 } from "react";
 import { createClient } from "./supabase-client";
@@ -61,7 +62,8 @@ const ANON_DAILY_LIMIT = parseInt(
 export function ChatProvider({ children }: { children: ReactNode }) {
   const { user, profile } = useAuth();
   const { t } = useI18n();
-  const supabase = createClient();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const supabase = useMemo(() => createClient(), []);
 
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [currentThread, setCurrentThread] = useState<ChatThread | null>(null);
@@ -270,7 +272,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       // Self-heal stale streaming lock (e.g. stream died silently)
       if (isStreamingRef.current) {
         const elapsed = Date.now() - streamStartedAtRef.current;
-        if (elapsed > 45_000) {
+        if (elapsed > 30_000) {
+          console.warn("[chat] Force-clearing stale streaming lock after", elapsed, "ms");
           abortRef.current?.abort();
           abortRef.current = null;
           isStreamingRef.current = false;
@@ -285,6 +288,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         if (usage >= ANON_DAILY_LIMIT) return false;
       }
 
+      // Snapshot current messages BEFORE any state mutations
+      // This prevents race conditions with React rendering between setMessages calls
+      const previousMessages = messagesRef.current;
+
       // Lock immediately via ref (avoids stale closure issues)
       isStreamingRef.current = true;
       streamStartedAtRef.current = Date.now();
@@ -292,20 +299,20 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
       const effectiveModel = modelOverride || selectedModel;
       let assistantMessage: ChatMessage | null = null;
+      let isNewThread = false;
 
       try {
         let threadId = currentThread?.id;
 
         // Auto-create thread if needed
         if (!threadId) {
+          isNewThread = true;
           try {
             threadId = await createThread();
-          } catch {
-            // Thread creation failed (e.g. Supabase session not ready) — restore input
+          } catch (e) {
+            console.error("[chat] Thread creation failed:", e);
             return false;
           }
-          // Clear messages for the fresh thread
-          setMessages([]);
         }
 
         const userMessage: ChatMessage = {
@@ -320,24 +327,29 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
         // Save user message
         if (user) {
-          await supabase.from("chat_messages").insert({
+          const { error: insertErr } = await supabase.from("chat_messages").insert({
             thread_id: threadId,
             role: "user",
             content,
           });
+          if (insertErr) console.error("[chat] User message insert failed:", insertErr.message);
         } else {
           addLocalMessage(threadId, userMessage);
         }
 
-        setMessages((prev) => [...prev, userMessage]);
+        // For new threads, start fresh; for existing, append
+        setMessages((prev) => isNewThread ? [userMessage] : [...prev, userMessage]);
 
-        // Update title from first message (use ref for current messages)
-        const currentMsgs = user
-          ? messagesRef.current
-          : getLocalMessages(threadId).filter((m) => m.id !== userMessage.id);
-        if (currentMsgs.filter((m) => m.role === "user").length === 0) {
+        // Update title from first user message (fire-and-forget, don't block streaming)
+        if (isNewThread) {
           const title = content.slice(0, 50) + (content.length > 50 ? "..." : "");
-          await renameThread(threadId, title);
+          renameThread(threadId, title).catch(() => {});
+        } else {
+          const prevUserCount = previousMessages.filter((m) => m.role === "user").length;
+          if (prevUserCount === 0) {
+            const title = content.slice(0, 50) + (content.length > 50 ? "..." : "");
+            renameThread(threadId, title).catch(() => {});
+          }
         }
 
         // Prepare streaming
@@ -369,14 +381,19 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           ? `${content}\n\n[Attached documents]${docContext}`
           : content;
 
-        // Use ref for current messages to avoid stale closure
-        const historyForApi: StreamMessage[] = [
-          ...messagesRef.current.map((m) => ({
-            role: m.role as "user" | "assistant",
-            content: m.content,
-          })),
-          { role: "user" as const, content: lastContent },
-        ];
+        // Build API history from the snapshot taken BEFORE state mutations
+        // This avoids race conditions where React renders mid-execution and
+        // the ref includes the new user/assistant messages (causing duplicates
+        // or empty content that fails server validation)
+        const historyForApi: StreamMessage[] = isNewThread
+          ? [{ role: "user" as const, content: lastContent }]
+          : [
+              ...previousMessages.map((m) => ({
+                role: m.role as "user" | "assistant",
+                content: m.content,
+              })),
+              { role: "user" as const, content: lastContent },
+            ];
 
         // Retry loop for network/server errors
         const MAX_RETRIES = 2;
@@ -548,7 +565,25 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           }
         }
       } catch (err) {
-        if ((err as Error).name === "AbortError") return true;
+        const errName = (err as Error).name;
+        const errMsg = (err as Error).message;
+        console.error("[chat] sendMessage error:", errName, errMsg);
+
+        if (errName === "AbortError") {
+          // If nothing was streamed, restore the user's input
+          const assistantContent = assistantMessage
+            ? messagesRef.current.find((m) => m.id === assistantMessage!.id)?.content
+            : "";
+          if (!assistantContent) {
+            // Remove the empty assistant and user message placeholders
+            if (assistantMessage) {
+              setMessages((prev) => prev.filter((m) => m.id !== assistantMessage!.id));
+            }
+            return false;
+          }
+          return true;
+        }
+
         if (assistantMessage) {
           setMessages((prev) =>
             prev.map((m) =>
