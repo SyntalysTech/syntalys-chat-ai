@@ -177,7 +177,7 @@ export async function POST(req: NextRequest) {
       input: inputMessages,
       tools: [{ type: "web_search_preview", search_context_size: "medium" }],
       stream: true,
-      temperature: 0.7,
+      temperature: modelConfig.temperature ?? 0.6,
       max_output_tokens: 16384,
     });
 

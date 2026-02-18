@@ -555,6 +555,47 @@ const translations = {
     en: "Sorry, an error occurred. Please try again.",
   },
 
+  // ── Streaming UX ──
+  thinkingIndicator: {
+    fr: "SYNTALYS AI réfléchit...",
+    es: "SYNTALYS AI está pensando...",
+    en: "SYNTALYS AI is thinking...",
+  },
+  reconnecting: {
+    fr: "Reconnexion en cours...",
+    es: "Reconectando...",
+    en: "Reconnecting...",
+  },
+
+  // ── Sidebar Search ──
+  searchChats: {
+    fr: "Rechercher...",
+    es: "Buscar...",
+    en: "Search...",
+  },
+  noSearchResults: {
+    fr: "Aucun résultat trouvé",
+    es: "No se encontraron resultados",
+    en: "No results found",
+  },
+
+  // ── Export ──
+  exportChat: {
+    fr: "Exporter la conversation",
+    es: "Exportar conversación",
+    en: "Export conversation",
+  },
+  exportMarkdown: {
+    fr: "Exporter en Markdown (.md)",
+    es: "Exportar como Markdown (.md)",
+    en: "Export as Markdown (.md)",
+  },
+  exportText: {
+    fr: "Exporter en texte (.txt)",
+    es: "Exportar como texto (.txt)",
+    en: "Export as text (.txt)",
+  },
+
   // ── Explore Page ──
   exploreTitle: {
     fr: "Explorer SYNTALYS AI",

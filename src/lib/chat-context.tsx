@@ -261,9 +261,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         };
         setMessages((prev) => [...prev, assistantMessage!]);
 
-        const abortController = new AbortController();
-        abortRef.current = abortController;
-
         // Build image URLs and document context from attachments
         const imageUrls: string[] = [];
         let docContext = "";
@@ -291,67 +288,116 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           { role: "user" as const, content: lastContent },
         ];
 
-        const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            messages: historyForApi,
-            model: effectiveModel,
-            threadId,
-            isAnonymous: !user,
-            userName: profile?.display_name || undefined,
-            imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
-          }),
-          signal: abortController.signal,
-        });
+        // Retry loop for network/server errors
+        const MAX_RETRIES = 2;
+        const RETRY_DELAYS = [1000, 3000];
+        const msgId = assistantMessage!.id;
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          // If server says rate limit reached, force client state
-          if (response.status === 429 && !user) {
-            setAnonUsageCount(ANON_DAILY_LIMIT);
+        for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+          try {
+            const abortController = new AbortController();
+            abortRef.current = abortController;
+
+            const response = await fetch("/api/chat", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                messages: historyForApi,
+                model: effectiveModel,
+                threadId,
+                isAnonymous: !user,
+                userName: profile?.display_name || undefined,
+                imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
+              }),
+              signal: abortController.signal,
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({}));
+              if (response.status === 429 && !user) {
+                setAnonUsageCount(ANON_DAILY_LIMIT);
+              }
+              // Don't retry client errors (4xx)
+              if (response.status >= 400 && response.status < 500) {
+                throw Object.assign(
+                  new Error(errorData.error || (t("responseError") as string)),
+                  { noRetry: true }
+                );
+              }
+              throw new Error(errorData.error || (t("responseError") as string));
+            }
+
+            const reader = response.body?.getReader();
+            if (!reader) throw new Error("No stream available");
+
+            const decoder = new TextDecoder();
+            let fullContent = "";
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              const chunk = decoder.decode(value, { stream: true });
+              fullContent += chunk;
+
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === msgId
+                    ? { ...m, content: fullContent }
+                    : m
+                )
+              );
+            }
+
+            // Save assistant message
+            if (user) {
+              await supabase.from("chat_messages").insert({
+                thread_id: threadId,
+                role: "assistant",
+                content: fullContent,
+                model: effectiveModel,
+              });
+            } else {
+              addLocalMessage(threadId, {
+                ...assistantMessage,
+                content: fullContent,
+              });
+              incrementAnonUsage();
+              setAnonUsageCount(getAnonUsageCount());
+            }
+
+            // Haptic feedback on successful completion
+            if (typeof navigator !== "undefined" && navigator.vibrate) {
+              navigator.vibrate(50);
+            }
+
+            break; // Success — exit retry loop
+
+          } catch (retryErr) {
+            // Always propagate abort and no-retry errors
+            if ((retryErr as Error).name === "AbortError") throw retryErr;
+            if ((retryErr as { noRetry?: boolean }).noRetry) throw retryErr;
+
+            if (attempt < MAX_RETRIES) {
+              // Show reconnecting state briefly
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === msgId
+                    ? { ...m, content: t("reconnecting") as string }
+                    : m
+                )
+              );
+              await new Promise((r) => setTimeout(r, RETRY_DELAYS[attempt]));
+              // Clear content to re-trigger thinking indicator
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === msgId ? { ...m, content: "" } : m
+                )
+              );
+              continue;
+            }
+            throw retryErr; // Exhausted retries
           }
-          throw new Error(errorData.error || (t("responseError") as string));
-        }
-
-        const reader = response.body?.getReader();
-        if (!reader) throw new Error("No stream available");
-
-        const decoder = new TextDecoder();
-        let fullContent = "";
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value, { stream: true });
-          fullContent += chunk;
-
-          const msgId = assistantMessage!.id;
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.id === msgId
-                ? { ...m, content: fullContent }
-                : m
-            )
-          );
-        }
-
-        // Save assistant message
-        if (user) {
-          await supabase.from("chat_messages").insert({
-            thread_id: threadId,
-            role: "assistant",
-            content: fullContent,
-            model: effectiveModel,
-          });
-        } else {
-          addLocalMessage(threadId, {
-            ...assistantMessage,
-            content: fullContent,
-          });
-          incrementAnonUsage();
-          setAnonUsageCount(getAnonUsageCount());
         }
       } catch (err) {
         if ((err as Error).name === "AbortError") return;

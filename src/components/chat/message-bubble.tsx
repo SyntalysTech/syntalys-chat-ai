@@ -292,10 +292,15 @@ export const MessageBubble = memo(function MessageBubble({
             {displayContent ? (
               <MarkdownRenderer content={displayContent} />
             ) : isStreaming && isLast && !reasoningStillStreaming ? (
-              <div className="flex items-center gap-1 py-2">
-                <div className="h-2 w-2 rounded-full bg-syntalys-blue animate-typing-dot-1" />
-                <div className="h-2 w-2 rounded-full bg-syntalys-blue animate-typing-dot-2" />
-                <div className="h-2 w-2 rounded-full bg-syntalys-blue animate-typing-dot-3" />
+              <div className="flex items-center gap-2.5 py-2 animate-fade-in">
+                <span className="text-sm text-muted-foreground font-medium">
+                  {t("thinkingIndicator")}
+                </span>
+                <div className="flex items-center gap-1">
+                  <div className="h-1.5 w-1.5 rounded-full bg-syntalys-blue animate-typing-dot-1" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-syntalys-blue animate-typing-dot-2" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-syntalys-blue animate-typing-dot-3" />
+                </div>
               </div>
             ) : null}
 

@@ -4,8 +4,53 @@ import { useState, useCallback } from "react";
 import { useChat } from "@/lib/chat-context";
 import { useI18n } from "@/lib/i18n-context";
 import { ModelSelector } from "./model-selector";
-import { Menu, Share2, Check, Loader2, AlertCircle } from "lucide-react";
+import { Menu, Share2, Check, Loader2, AlertCircle, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dropdown, DropdownItem } from "@/components/ui/dropdown";
+import type { ChatMessage } from "@/lib/types";
+
+function formatAsMarkdown(title: string, msgs: ChatMessage[]): string {
+  const lines: string[] = [`# ${title}`, ""];
+  for (const msg of msgs) {
+    if (msg.role === "system") continue;
+    const role = msg.role === "user" ? "**User**" : "**SYNTALYS AI**";
+    lines.push(`### ${role}`);
+    lines.push("");
+    lines.push(msg.content);
+    lines.push("");
+    lines.push("---");
+    lines.push("");
+  }
+  return lines.join("\n");
+}
+
+function formatAsText(title: string, msgs: ChatMessage[]): string {
+  const lines: string[] = [title, "=".repeat(title.length), ""];
+  for (const msg of msgs) {
+    if (msg.role === "system") continue;
+    const role = msg.role === "user" ? "User" : "SYNTALYS AI";
+    lines.push(`[${role}]`);
+    lines.push(msg.content);
+    lines.push("");
+  }
+  return lines.join("\n");
+}
+
+function downloadFile(content: string, filename: string, mimeType: string) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function safeName(title: string): string {
+  return title.replace(/[^a-zA-Z0-9\s-]/g, "").trim().replace(/\s+/g, "-") || "chat";
+}
 
 interface ChatHeaderProps {
   onMenuClick: () => void;
@@ -61,6 +106,18 @@ export function ChatHeader({ onMenuClick }: ChatHeaderProps) {
     }
   }, [currentThread, messages, shareState]);
 
+  const handleExportMd = useCallback(() => {
+    if (!currentThread || messages.length === 0) return;
+    const content = formatAsMarkdown(currentThread.title, messages);
+    downloadFile(content, `${safeName(currentThread.title)}.md`, "text/markdown");
+  }, [currentThread, messages]);
+
+  const handleExportTxt = useCallback(() => {
+    if (!currentThread || messages.length === 0) return;
+    const content = formatAsText(currentThread.title, messages);
+    downloadFile(content, `${safeName(currentThread.title)}.txt`, "text/plain");
+  }, [currentThread, messages]);
+
   const getIcon = () => {
     switch (shareState) {
       case "loading":
@@ -100,17 +157,41 @@ export function ChatHeader({ onMenuClick }: ChatHeaderProps) {
 
       <div className="flex items-center gap-1">
         {currentThread && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground"
-            aria-label={t("share") as string}
-            onClick={handleShare}
-            disabled={shareState === "loading"}
-            title={getTitle()}
-          >
-            {getIcon()}
-          </Button>
+          <>
+            <Dropdown
+              trigger={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground"
+                  aria-label={t("exportChat") as string}
+                  title={t("exportChat") as string}
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+              }
+              align="right"
+            >
+              <DropdownItem onClick={handleExportMd}>
+                {t("exportMarkdown")}
+              </DropdownItem>
+              <DropdownItem onClick={handleExportTxt}>
+                {t("exportText")}
+              </DropdownItem>
+            </Dropdown>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground"
+              aria-label={t("share") as string}
+              onClick={handleShare}
+              disabled={shareState === "loading"}
+              title={getTitle()}
+            >
+              {getIcon()}
+            </Button>
+          </>
         )}
       </div>
     </header>
