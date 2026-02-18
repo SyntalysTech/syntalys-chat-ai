@@ -1040,6 +1040,53 @@ const translations = {
     en: "Type \"delete\"",
   },
 
+  // ── Humanizer ──
+  humanizer: {
+    fr: "Humaniseur",
+    es: "Humanizador",
+    en: "Humanizer",
+  },
+  humanizerTitle: {
+    fr: "Humaniseur de texte",
+    es: "Humanizador de texto",
+    en: "Text Humanizer",
+  },
+  humanizerSubtitle: {
+    fr: "Collez un texte généré par IA et transformez-le en écriture naturelle et humaine.",
+    es: "Pega un texto generado por IA y transfórmalo en escritura natural y humana.",
+    en: "Paste AI-generated text and transform it into natural, human writing.",
+  },
+  humanizerPlaceholder: {
+    fr: "Collez ici le texte à humaniser...",
+    es: "Pega aquí el texto a humanizar...",
+    en: "Paste the text to humanize here...",
+  },
+  humanizerButton: {
+    fr: "Humaniser",
+    es: "Humanizar",
+    en: "Humanize",
+  },
+  humanizerProcessing: {
+    fr: "Transformation en cours...",
+    es: "Transformando...",
+    en: "Transforming...",
+  },
+  humanizerResult: {
+    fr: "Résultat",
+    es: "Resultado",
+    en: "Result",
+  },
+  humanizerCopied: {
+    fr: "Texte copié !",
+    es: "Texto copiado!",
+    en: "Text copied!",
+  },
+  humanizerEmpty: {
+    fr: "Entrez du texte ci-dessus pour commencer",
+    es: "Introduce texto arriba para comenzar",
+    en: "Enter text above to get started",
+  },
+
   // ── Memory ──
   memoryTitle: {
     fr: "Mémoire de l'IA",

@@ -13,6 +13,7 @@ import { ExploreModal } from "@/components/pages/explore-modal";
 import { DocumentationModal } from "@/components/pages/documentation-modal";
 import { SupportModal } from "@/components/pages/support-modal";
 import { LegalModal } from "@/components/pages/legal-modal";
+import { HumanizerModal } from "@/components/pages/humanizer-modal";
 
 export function AppShell() {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -28,6 +29,7 @@ export function AppShell() {
   const [documentationOpen, setDocumentationOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
   const [legalOpen, setLegalOpen] = useState(false);
+  const [humanizerOpen, setHumanizerOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [authTimedOut, setAuthTimedOut] = useState(false);
 
@@ -86,6 +88,7 @@ export function AppShell() {
         onOpenDocumentation={() => setDocumentationOpen(true)}
         onOpenSupport={() => setSupportOpen(true)}
         onOpenLegal={() => setLegalOpen(true)}
+        onOpenHumanizer={() => setHumanizerOpen(true)}
         isDark={isDark}
       />
 
@@ -133,6 +136,11 @@ export function AppShell() {
       <LegalModal
         open={legalOpen}
         onClose={() => setLegalOpen(false)}
+      />
+
+      <HumanizerModal
+        open={humanizerOpen}
+        onClose={() => setHumanizerOpen(false)}
       />
     </div>
   );

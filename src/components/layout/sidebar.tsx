@@ -22,6 +22,7 @@ import {
   BookOpen,
   HelpCircle,
   Scale,
+  Sparkles,
   MoreHorizontal,
   Pencil,
   Trash2,
@@ -41,6 +42,7 @@ interface SidebarProps {
   onOpenDocumentation: () => void;
   onOpenSupport: () => void;
   onOpenLegal: () => void;
+  onOpenHumanizer: () => void;
   isDark: boolean;
 }
 
@@ -75,6 +77,7 @@ export function Sidebar({
   onOpenDocumentation,
   onOpenSupport,
   onOpenLegal,
+  onOpenHumanizer,
   isDark,
 }: SidebarProps) {
   const { user, signOut } = useAuth();
@@ -132,6 +135,7 @@ export function Sidebar({
     : "/logos/logo-icono-solo-blue.png";
 
   const navLinks = [
+    { icon: Sparkles, labelKey: "humanizer" as const, onClick: onOpenHumanizer },
     { icon: Compass, labelKey: "explore" as const, onClick: onOpenExplore },
     { icon: BookOpen, labelKey: "documentation" as const, onClick: onOpenDocumentation },
     { icon: HelpCircle, labelKey: "support" as const, onClick: onOpenSupport },
