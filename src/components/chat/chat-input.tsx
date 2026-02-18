@@ -320,7 +320,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
   );
 
   return (
-    <div className="flex-shrink-0 border-t border-border/50 bg-card/30 pb-safe pl-safe pr-safe">
+    <div className="flex-shrink-0 bg-card/30 pb-safe pl-safe pr-safe">
       <div className="mx-auto max-w-3xl px-2 sm:px-4 pt-1.5 sm:pt-3 pb-0.5">
         {/* File error message */}
         {fileError && (

@@ -143,7 +143,7 @@ export function ChatHeader({ onMenuClick }: ChatHeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border/50 bg-background/80 backdrop-blur-md px-1.5 sm:px-4 py-1 sm:py-2">
+    <header className="sticky top-0 z-30 flex items-center justify-between bg-background/80 backdrop-blur-md px-1.5 sm:px-4 py-1 sm:py-2">
       <div className="flex items-center gap-0.5 sm:gap-2">
         <button
           onClick={onMenuClick}
