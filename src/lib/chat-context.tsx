@@ -96,24 +96,36 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     loadMemories();
   }, [user]);
 
-  // Auto-recover from stale streaming lock when page regains focus
-  // (e.g. iOS PWA backgrounded, stream connection died silently)
+  // Auto-recover from stale streaming lock:
+  // 1. When page regains focus (iOS PWA backgrounded, stream died)
+  // 2. Periodic interval check every 10s (catches hangs while user is on page)
   useEffect(() => {
-    const STALE_THRESHOLD = 120_000; // 2 minutes
-    const handleVisibilityChange = () => {
+    const STALE_THRESHOLD = 45_000; // 45 seconds
+
+    const recoverIfStale = () => {
       if (
-        document.visibilityState === "visible" &&
         isStreamingRef.current &&
         Date.now() - streamStartedAtRef.current > STALE_THRESHOLD
       ) {
+        console.warn("[chat] Recovering from stale streaming lock");
         abortRef.current?.abort();
         abortRef.current = null;
         isStreamingRef.current = false;
         setIsStreaming(false);
       }
     };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") recoverIfStale();
+    };
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+    const intervalId = setInterval(recoverIfStale, 10_000);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      clearInterval(intervalId);
+    };
   }, []);
 
   const loadThreads = useCallback(async () => {
@@ -241,10 +253,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const sendMessage = useCallback(
     async (content: string, attachments?: FileAttachment[], modelOverride?: string, imageGen?: boolean): Promise<boolean> => {
-      // Self-heal stale streaming lock (e.g. iOS PWA backgrounded, stream died)
+      // Self-heal stale streaming lock (e.g. stream died silently)
       if (isStreamingRef.current) {
         const elapsed = Date.now() - streamStartedAtRef.current;
-        if (elapsed > 120_000) {
+        if (elapsed > 45_000) {
           abortRef.current?.abort();
           abortRef.current = null;
           isStreamingRef.current = false;
@@ -362,26 +374,36 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             const abortController = new AbortController();
             abortRef.current = abortController;
 
+            // Hard timeout: abort entire request after 90s
+            const requestTimeout = setTimeout(() => abortController.abort(), 90_000);
+
             // Build memory context for system prompt injection
             const memCtx = buildMemoryContext(memoriesRef.current);
 
-            const response = await fetch("/api/chat", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                messages: historyForApi,
-                model: effectiveModel,
-                threadId,
-                isAnonymous: !user,
-                userName: profile?.display_name || undefined,
-                imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
-                memoryContext: memCtx || undefined,
-                imageGen: imageGen || undefined,
-              }),
-              signal: abortController.signal,
-            });
+            let response: Response;
+            try {
+              response = await fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  messages: historyForApi,
+                  model: effectiveModel,
+                  threadId,
+                  isAnonymous: !user,
+                  userName: profile?.display_name || undefined,
+                  imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
+                  memoryContext: memCtx || undefined,
+                  imageGen: imageGen || undefined,
+                }),
+                signal: abortController.signal,
+              });
+            } catch (fetchErr) {
+              clearTimeout(requestTimeout);
+              throw fetchErr;
+            }
 
             if (!response.ok) {
+              clearTimeout(requestTimeout);
               const errorData = await response.json().catch(() => ({}));
               if (response.status === 429 && !user) {
                 setAnonUsageCount(ANON_DAILY_LIMIT);
@@ -397,25 +419,42 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             }
 
             const reader = response.body?.getReader();
-            if (!reader) throw new Error("No stream available");
+            if (!reader) {
+              clearTimeout(requestTimeout);
+              throw new Error("No stream available");
+            }
 
             const decoder = new TextDecoder();
             let fullContent = "";
 
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
+            // Chunk timeout: abort if no data received for 30s
+            let chunkTimer: ReturnType<typeof setTimeout>;
+            const resetChunkTimer = () => {
+              clearTimeout(chunkTimer);
+              chunkTimer = setTimeout(() => abortController.abort(), 30_000);
+            };
 
-              const chunk = decoder.decode(value, { stream: true });
-              fullContent += chunk;
+            try {
+              resetChunkTimer();
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
 
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === msgId
-                    ? { ...m, content: fullContent }
-                    : m
-                )
-              );
+                resetChunkTimer();
+                const chunk = decoder.decode(value, { stream: true });
+                fullContent += chunk;
+
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === msgId
+                      ? { ...m, content: fullContent }
+                      : m
+                  )
+                );
+              }
+            } finally {
+              clearTimeout(chunkTimer!);
+              clearTimeout(requestTimeout);
             }
 
             // Save assistant message
