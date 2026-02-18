@@ -130,6 +130,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
   const [fileError, setFileError] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [imageGenMode, setImageGenMode] = useState(false);
+  const [pwaKeyboardOpen, setPwaKeyboardOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -140,6 +141,24 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
   const remaining = isAnon ? anonDailyLimit - anonUsageCount : Infinity;
   const hasContent = value.trim() || files.length > 0;
   const hasSpeech = !!getSpeechRecognition();
+
+  // In PWA standalone mode, detect keyboard via visualViewport to remove
+  // safe-area bottom padding (iOS doesn't update env() when keyboard opens)
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches
+      || (window.navigator as any).standalone === true;
+    if (!isStandalone || !window.visualViewport) return;
+
+    const handler = () => {
+      const diff = window.innerHeight - window.visualViewport!.height;
+      setPwaKeyboardOpen(diff > 100);
+    };
+
+    window.visualViewport.addEventListener("resize", handler);
+    handler();
+    return () => window.visualViewport!.removeEventListener("resize", handler);
+  }, []);
 
   const adjustHeight = useCallback(() => {
     const ta = textareaRef.current;
@@ -320,8 +339,8 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
   );
 
   return (
-    <div className="flex-shrink-0 pb-safe pl-safe pr-safe">
-      <div className="mx-auto max-w-3xl px-3 sm:px-4 pt-2 sm:pt-3 pb-2 sm:pb-3">
+    <div className={cn("flex-shrink-0 pl-safe pr-safe", !pwaKeyboardOpen && "pb-safe")}>
+      <div className="mx-auto max-w-3xl px-3 sm:px-4 pt-2 sm:pt-3 pb-0.5 sm:pb-2">
         {/* File error message */}
         {fileError && (
           <div className="mb-2.5 flex items-start gap-2 rounded-xl bg-destructive/10 px-3 py-2.5 text-xs text-destructive animate-fade-in">
@@ -509,7 +528,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
 
         {/* Usage indicator for anonymous users */}
         {isAnon && (
-          <div className="mt-2.5 flex items-center justify-between px-1">
+          <div className="mt-1.5 sm:mt-2.5 flex items-center justify-between px-1">
             <p className="text-xs text-muted-foreground">
               {limitReached ? (
                 <span className="text-destructive">
@@ -533,7 +552,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
           </div>
         )}
 
-        <p className="mt-2 text-center text-[10px] sm:text-xs text-muted-foreground/50 leading-relaxed">
+        <p className="mt-1 sm:mt-2 text-center text-[10px] sm:text-xs text-muted-foreground/50 leading-relaxed">
           {t("aiDisclaimer")}
         </p>
       </div>
