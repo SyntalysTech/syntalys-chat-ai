@@ -173,7 +173,7 @@ export function Sidebar({
   );
 
   const sidebarInner = (
-    <div className="flex h-full flex-col bg-sidebar overflow-hidden">
+    <div className="flex h-full flex-col bg-sidebar">
       {/* ─── Header: Logo + Toggle ─── */}
       <div className="flex items-center justify-between border-b border-border/50 px-2 py-3 min-h-[56px]">
         <div className="flex items-center min-w-0 flex-1">
@@ -226,6 +226,9 @@ export function Sidebar({
           <PanelLeftClose className="h-[18px] w-[18px]" />
         </button>
       </div>
+
+      {/* Overflow-hidden wrapper for collapsible content (keeps footer free for dropdowns) */}
+      <div className="flex-1 flex flex-col overflow-hidden">
 
       {/* ─── Humanizer Button ─── */}
       <div className="px-2 pt-2 pb-0">
@@ -432,6 +435,8 @@ export function Sidebar({
         )}
       </div>
 
+      </div>{/* end overflow-hidden wrapper */}
+
       {/* ─── Footer: User section ─── */}
       <div className="border-t border-border/50 p-2">
         {user ? (
@@ -477,7 +482,7 @@ export function Sidebar({
                   <Settings className="h-4 w-4" />
                 </button>
               }
-              align="left"
+              align="right"
               direction="up"
             >
               {settingsDropdownItems}
