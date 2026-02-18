@@ -64,6 +64,7 @@ export function SettingsModal({
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleteError, setDeleteError] = useState("");
 
   // Memory management
   const [memories, setMemories] = useState<UserMemory[]>([]);
@@ -199,14 +200,18 @@ export function SettingsModal({
 
   const handleDeleteAccount = async () => {
     setDeletingAccount(true);
+    setDeleteError("");
     try {
       const result = await deleteAccount();
       if (result.error) {
+        setDeleteError(result.error);
         setDeletingAccount(false);
       } else {
         onClose();
+        window.location.reload();
       }
     } catch {
+      setDeleteError("Failed to delete account");
       setDeletingAccount(false);
     }
   };
@@ -555,12 +560,16 @@ export function SettingsModal({
                       placeholder={t("typeDelete") as string}
                       className="border-destructive/30"
                     />
+                    {deleteError && (
+                      <p className="text-xs text-destructive">{deleteError}</p>
+                    )}
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
                         onClick={() => {
                           setShowDeleteAccount(false);
                           setDeleteConfirmText("");
+                          setDeleteError("");
                         }}
                         className="flex-1"
                       >

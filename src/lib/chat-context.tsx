@@ -149,7 +149,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       const thread = data as ChatThread;
       setThreads((prev) => [thread, ...prev]);
       setCurrentThread(thread);
-      setMessages([]);
       return thread.id;
     } else {
       const thread: ChatThread = {
@@ -164,7 +163,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       saveLocalThread(thread);
       setThreads((prev) => [thread, ...prev]);
       setCurrentThread(thread);
-      setMessages([]);
       return thread.id;
     }
   }, [user, supabase, selectedModel, t]);
@@ -274,7 +272,14 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
         // Auto-create thread if needed
         if (!threadId) {
-          threadId = await createThread();
+          try {
+            threadId = await createThread();
+          } catch {
+            // Thread creation failed (e.g. Supabase session not ready) — restore input
+            return false;
+          }
+          // Clear messages for the fresh thread
+          setMessages([]);
         }
 
         const userMessage: ChatMessage = {
@@ -504,6 +509,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                 : m
             )
           );
+        } else {
+          // Error occurred before assistant message was created — restore input
+          return false;
         }
       } finally {
         isStreamingRef.current = false;

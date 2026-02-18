@@ -50,11 +50,15 @@ export async function DELETE(req: NextRequest) {
       await admin.from("chat_threads").delete().eq("user_id", user.id);
     }
 
+    // Delete user memories (must happen before deleting auth user)
+    await admin.from("user_memories").delete().eq("user_id", user.id);
+
     await admin.from("profiles").delete().eq("id", user.id);
     await admin.auth.admin.deleteUser(user.id);
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (err) {
+    console.error("Account deletion error:", err);
     return NextResponse.json({ error: "Failed to delete account" }, { status: 500 });
   }
 }
