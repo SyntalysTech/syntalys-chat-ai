@@ -497,6 +497,38 @@ const translations = {
     en: "Legacy models",
   },
 
+  // ── Engine Archive ──
+  engineArchive: {
+    fr: "Archive des moteurs",
+    es: "Archivo de motores",
+    en: "Engine Archive",
+  },
+  engineArchiveDesc: {
+    fr: "Versions antérieures du moteur TALYS maintenues pour compatibilité et référence technique.",
+    es: "Versiones anteriores del motor TALYS mantenidas por compatibilidad y referencia técnica.",
+    en: "Previous versions of the TALYS engine maintained for compatibility and technical reference.",
+  },
+  legacyReplacedByExecute: {
+    fr: "Remplacé par TALYS Execute",
+    es: "Reemplazado por TALYS Execute",
+    en: "Replaced by TALYS Execute",
+  },
+  legacyIntegratedIntoThink: {
+    fr: "Intégré dans TALYS Think",
+    es: "Integrado en TALYS Think",
+    en: "Integrated into TALYS Think",
+  },
+  legacyReplacedByApex: {
+    fr: "Remplacé par TALYS Apex",
+    es: "Reemplazado por TALYS Apex",
+    en: "Replaced by TALYS Apex",
+  },
+  legacyReplacedByMiloChat: {
+    fr: "Remplacé par Milo Chat",
+    es: "Reemplazado por Milo Chat",
+    en: "Replaced by Milo Chat",
+  },
+
   // ── Reasoning ──
   reasoning: {
     fr: "Raisonnement",

@@ -7,6 +7,7 @@ export interface ModelConfig {
   requiresAuth: boolean;
   badge?: string;
   legacy?: boolean;
+  replacedByKey?: string;
   systemPrompt?: string;
   isImageModel?: boolean;
   temperature?: number;
@@ -64,6 +65,7 @@ export const MODELS: ModelConfig[] = [
     openaiModel: "gpt-4o-mini",
     requiresAuth: false,
     legacy: true,
+    replacedByKey: "legacyReplacedByExecute",
     temperature: 0.6,
   },
   {
@@ -74,6 +76,7 @@ export const MODELS: ModelConfig[] = [
     openaiModel: "gpt-4o",
     requiresAuth: true,
     legacy: true,
+    replacedByKey: "legacyIntegratedIntoThink",
     temperature: 0.5,
   },
   {
@@ -84,6 +87,7 @@ export const MODELS: ModelConfig[] = [
     openaiModel: "gpt-4o",
     requiresAuth: true,
     legacy: true,
+    replacedByKey: "legacyReplacedByApex",
     temperature: 0.65,
   },
   {
@@ -94,6 +98,7 @@ export const MODELS: ModelConfig[] = [
     openaiModel: "gpt-4o-mini",
     requiresAuth: false,
     legacy: true,
+    replacedByKey: "legacyReplacedByMiloChat",
     temperature: 0.7,
   },
   {
@@ -104,6 +109,7 @@ export const MODELS: ModelConfig[] = [
     openaiModel: "gpt-4o-mini",
     requiresAuth: false,
     legacy: true,
+    replacedByKey: "legacyReplacedByExecute",
     temperature: 0.7,
   },
 ];
