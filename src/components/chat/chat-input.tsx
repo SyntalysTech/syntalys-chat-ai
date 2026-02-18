@@ -7,7 +7,8 @@ import { useChat } from "@/lib/chat-context";
 import { useI18n } from "@/lib/i18n-context";
 import { getMessagesRemaining } from "@/lib/translations";
 import type { TranslationKey } from "@/lib/translations";
-import { ArrowUp, Square, Paperclip, X, FileText, ImageIcon, Loader2, AlertCircle, Mic, MicOff } from "lucide-react";
+import { ArrowUp, Square, Paperclip, X, FileText, ImageIcon, Loader2, AlertCircle, Mic, MicOff, Plus, Palette } from "lucide-react";
+import { Dropdown, DropdownItem } from "@/components/ui/dropdown";
 import type { FileAttachment } from "@/lib/types";
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
@@ -128,6 +129,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
   const [processingFiles, setProcessingFiles] = useState(false);
   const [fileError, setFileError] = useState("");
   const [isListening, setIsListening] = useState(false);
+  const [imageGenMode, setImageGenMode] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -270,16 +272,19 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
     // Save input state before clearing (restore if send is rejected)
     const savedValue = value;
     const savedFiles = files;
+    const wasImageGen = imageGenMode;
 
     setValue("");
     setFiles([]);
     setFileError("");
+    setImageGenMode(false);
     if (textareaRef.current) textareaRef.current.style.height = "auto";
 
-    const accepted = await sendMessage(content, attachments);
+    const accepted = await sendMessage(content, attachments, undefined, wasImageGen || undefined);
     if (!accepted) {
       setValue(savedValue);
       setFiles(savedFiles);
+      setImageGenMode(wasImageGen);
     }
   };
 
@@ -316,7 +321,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
 
   return (
     <div className="flex-shrink-0 border-t border-border/50 bg-card/30 pb-safe pl-safe pr-safe">
-      <div className="mx-auto max-w-3xl px-2 sm:px-4 pt-2 sm:pt-3 pb-1">
+      <div className="mx-auto max-w-3xl px-2 sm:px-4 pt-1.5 sm:pt-3 pb-0.5">
         {/* File error message */}
         {fileError && (
           <div className="mb-2 flex items-start gap-2 rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive animate-fade-in">
@@ -388,21 +393,55 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
             }}
           />
 
+          {/* Image gen mode indicator */}
+          {imageGenMode && (
+            <div className="flex items-center gap-1.5 px-2.5 sm:px-3 pt-2.5 sm:pt-3">
+              <div className="flex items-center gap-1.5 rounded-full bg-syntalys-blue/10 text-syntalys-blue px-2.5 py-1 text-xs font-medium">
+                <Palette className="h-3 w-3" />
+                {t("imageMode" as TranslationKey)}
+                <button
+                  onClick={() => setImageGenMode(false)}
+                  className="ml-0.5 rounded-full p-0.5 hover:bg-syntalys-blue/20 transition-colors"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Input row */}
           <div className="flex items-end gap-0.5">
-            {/* Attach button */}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={limitReached || files.length >= MAX_FILES || processingFiles}
-              className={cn(
-                "flex-shrink-0 flex h-10 w-10 sm:h-9 sm:w-9 mb-0.5 ml-0.5 items-center justify-center rounded-xl sm:rounded-lg transition-colors",
-                "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80",
-                (limitReached || files.length >= MAX_FILES) && "opacity-40 cursor-not-allowed"
-              )}
-              aria-label={t("attachFile") as string}
+            {/* + Action dropdown */}
+            <Dropdown
+              trigger={
+                <button
+                  disabled={limitReached}
+                  className={cn(
+                    "flex-shrink-0 flex h-10 w-10 sm:h-9 sm:w-9 mb-0.5 ml-0.5 items-center justify-center rounded-xl sm:rounded-lg transition-colors",
+                    "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80",
+                    limitReached && "opacity-40 cursor-not-allowed"
+                  )}
+                  aria-label="Actions"
+                >
+                  <Plus className="h-5 w-5 sm:h-4 sm:w-4" />
+                </button>
+              }
+              align="left"
             >
-              <Paperclip className="h-5 w-5 sm:h-4 sm:w-4" />
-            </button>
+              <DropdownItem
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Paperclip className="h-3.5 w-3.5" /> {t("attachFile")}
+              </DropdownItem>
+              <DropdownItem
+                onClick={() => {
+                  setImageGenMode(true);
+                  setTimeout(() => textareaRef.current?.focus(), 0);
+                }}
+              >
+                <Palette className="h-3.5 w-3.5" /> {t("generateImage" as TranslationKey)}
+              </DropdownItem>
+            </Dropdown>
 
             {/* Textarea */}
             <textarea
@@ -416,7 +455,9 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                   ? (t("voiceListening" as TranslationKey) as string)
                   : limitReached
                     ? (t("inputLimitReached") as string)
-                    : (t("inputPlaceholder") as string)
+                    : imageGenMode
+                      ? (t("describeImagePlaceholder" as TranslationKey) as string)
+                      : (t("inputPlaceholder") as string)
               }
               disabled={limitReached}
               rows={1}
@@ -498,7 +539,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
           </div>
         )}
 
-        <p className="mt-1 text-center text-[11px] sm:text-xs text-muted-foreground/60">
+        <p className="mt-0.5 mb-0.5 text-center text-[10px] sm:text-xs text-muted-foreground/60 leading-tight">
           {t("aiDisclaimer")}
         </p>
       </div>

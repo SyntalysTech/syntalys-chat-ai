@@ -11,6 +11,7 @@ import {
   Zap,
   Brain,
   FlaskConical,
+  Heart,
   Mail,
   FileText,
   Code2,
@@ -27,7 +28,12 @@ interface ExploreModalProps {
   onOpenAuth: () => void;
 }
 
-const modelIcons = [Zap, Brain, FlaskConical];
+const modelIconMap: Record<string, typeof Zap> = {
+  "talys-2.0": Zap,
+  "talys-2.5": Brain,
+  "talys-3.0": FlaskConical,
+  "milo": Heart,
+};
 
 const useCases = [
   { titleKey: "exploreUseCase1", descKey: "exploreUseCase1Desc", icon: Mail },
@@ -72,8 +78,8 @@ export function ExploreModal({ open, onClose, onOpenAuth }: ExploreModalProps) {
             {t("exploreModelsTitle")}
           </h3>
           <div className="space-y-2">
-            {MODELS.map((model, i) => {
-              const Icon = modelIcons[i];
+            {MODELS.map((model) => {
+              const Icon = modelIconMap[model.id] || Zap;
               return (
                 <div
                   key={model.id}

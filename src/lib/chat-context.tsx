@@ -45,7 +45,7 @@ interface ChatContextType {
   selectThread: (threadId: string) => Promise<void>;
   deleteThread: (threadId: string) => Promise<void>;
   renameThread: (threadId: string, title: string) => Promise<void>;
-  sendMessage: (content: string, attachments?: FileAttachment[], modelOverride?: string) => Promise<boolean>;
+  sendMessage: (content: string, attachments?: FileAttachment[], modelOverride?: string, imageGen?: boolean) => Promise<boolean>;
   regenerateLastResponse: (modelId?: string) => Promise<void>;
   clearCurrentThread: () => void;
   deleteAllThreads: () => Promise<void>;
@@ -242,7 +242,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   );
 
   const sendMessage = useCallback(
-    async (content: string, attachments?: FileAttachment[], modelOverride?: string): Promise<boolean> => {
+    async (content: string, attachments?: FileAttachment[], modelOverride?: string, imageGen?: boolean): Promise<boolean> => {
       // Self-heal stale streaming lock (e.g. iOS PWA backgrounded, stream died)
       if (isStreamingRef.current) {
         const elapsed = Date.now() - streamStartedAtRef.current;
@@ -371,6 +371,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                 userName: profile?.display_name || undefined,
                 imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
                 memoryContext: memCtx || undefined,
+                imageGen: imageGen || undefined,
               }),
               signal: abortController.signal,
             });

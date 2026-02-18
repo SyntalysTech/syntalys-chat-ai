@@ -482,9 +482,9 @@ const translations = {
     en: "Our most advanced and intelligent model",
   },
   modelMiloDesc: {
-    fr: "Génère des images à partir de texte",
-    es: "Genera imagenes a partir de texto",
-    en: "Generate images from text",
+    fr: "Rapide, amical et polyvalent",
+    es: "Rapido, amigable y versatil",
+    en: "Fast, friendly, and versatile",
   },
   legacyModels: {
     fr: "Modèles anciens",
@@ -1107,6 +1107,23 @@ const translations = {
     fr: "Effacer toute la mémoire",
     es: "Borrar toda la memoria",
     en: "Clear all memory",
+  },
+
+  // ── Image Generation ──
+  generateImage: {
+    fr: "Créer une image",
+    es: "Crear una imagen",
+    en: "Create an image",
+  },
+  describeImagePlaceholder: {
+    fr: "Décrivez l'image que vous voulez...",
+    es: "Describe la imagen que quieres...",
+    en: "Describe the image you want...",
+  },
+  imageMode: {
+    fr: "Mode image",
+    es: "Modo imagen",
+    en: "Image mode",
   },
 } as const;
 

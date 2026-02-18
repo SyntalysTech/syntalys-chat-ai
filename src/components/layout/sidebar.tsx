@@ -42,7 +42,8 @@ interface SidebarProps {
   onOpenDocumentation: () => void;
   onOpenSupport: () => void;
   onOpenLegal: () => void;
-  onOpenHumanizer: () => void;
+  activeView: "chat" | "humanizer";
+  onViewChange: (view: "chat" | "humanizer") => void;
   isDark: boolean;
 }
 
@@ -77,10 +78,11 @@ export function Sidebar({
   onOpenDocumentation,
   onOpenSupport,
   onOpenLegal,
-  onOpenHumanizer,
+  activeView,
+  onViewChange,
   isDark,
 }: SidebarProps) {
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const {
     threads,
     currentThread,
@@ -98,11 +100,13 @@ export function Sidebar({
 
   const handleNewChat = () => {
     clearCurrentThread();
+    onViewChange("chat");
     onMobileClose();
   };
 
   const handleSelectThread = async (id: string) => {
     await selectThread(id);
+    onViewChange("chat");
     onMobileClose();
   };
 
@@ -134,14 +138,6 @@ export function Sidebar({
     ? "/logos/logo-icono-solo-white.png"
     : "/logos/logo-icono-solo-blue.png";
 
-  const navLinks = [
-    { icon: Sparkles, labelKey: "humanizer" as const, onClick: onOpenHumanizer },
-    { icon: Compass, labelKey: "explore" as const, onClick: onOpenExplore },
-    { icon: BookOpen, labelKey: "documentation" as const, onClick: onOpenDocumentation },
-    { icon: HelpCircle, labelKey: "support" as const, onClick: onOpenSupport },
-    { icon: Scale, labelKey: "legal" as const, onClick: onOpenLegal },
-  ];
-
   // Common transition class for text that fades in/out
   const textTransition = cn(
     "whitespace-nowrap overflow-hidden transition-all duration-300",
@@ -150,13 +146,37 @@ export function Sidebar({
       : "w-auto opacity-100 ml-2.5"
   );
 
+  // Display name: prefer profile name, fallback to email
+  const displayName = profile?.display_name || user?.email || "";
+  const avatarInitial =
+    (profile?.display_name?.charAt(0) || user?.email?.charAt(0) || "U").toUpperCase();
+
+  /* Settings + info dropdown items (shared between logged-in and anon) */
+  const settingsDropdownItems = (
+    <>
+      <DropdownItem onClick={() => { onOpenSettings(); onMobileClose(); }}>
+        <Settings className="h-3.5 w-3.5" /> {t("settings")}
+      </DropdownItem>
+      <DropdownItem onClick={() => { onOpenExplore(); onMobileClose(); }}>
+        <Compass className="h-3.5 w-3.5" /> {t("explore")}
+      </DropdownItem>
+      <DropdownItem onClick={() => { onOpenDocumentation(); onMobileClose(); }}>
+        <BookOpen className="h-3.5 w-3.5" /> {t("documentation")}
+      </DropdownItem>
+      <DropdownItem onClick={() => { onOpenSupport(); onMobileClose(); }}>
+        <HelpCircle className="h-3.5 w-3.5" /> {t("support")}
+      </DropdownItem>
+      <DropdownItem onClick={() => { onOpenLegal(); onMobileClose(); }}>
+        <Scale className="h-3.5 w-3.5" /> {t("legal")}
+      </DropdownItem>
+    </>
+  );
+
   const sidebarInner = (
     <div className="flex h-full flex-col bg-sidebar overflow-hidden">
       {/* ─── Header: Logo + Toggle ─── */}
       <div className="flex items-center justify-between border-b border-border/50 px-2 py-3 min-h-[56px]">
-        {/* Left: Horizontal logo (expanded) / Toggle+logo icon (collapsed) */}
         <div className="flex items-center min-w-0 flex-1">
-          {/* Horizontal logo - visible when expanded */}
           <div
             className={cn(
               "overflow-hidden transition-all duration-300 flex-shrink-0",
@@ -171,8 +191,6 @@ export function Sidebar({
               className="h-7 w-auto"
             />
           </div>
-
-          {/* Collapsed: toggle icon, logo on hover */}
           <div
             className={cn(
               "flex-shrink-0 transition-all duration-300",
@@ -197,8 +215,6 @@ export function Sidebar({
             </button>
           </div>
         </div>
-
-        {/* Right: Close toggle - visible when expanded */}
         <button
           onClick={onToggle}
           className={cn(
@@ -209,6 +225,32 @@ export function Sidebar({
         >
           <PanelLeftClose className="h-[18px] w-[18px]" />
         </button>
+      </div>
+
+      {/* ─── Humanizer Button ─── */}
+      <div className="px-2 pt-2 pb-0">
+        <CollapsedTooltip collapsed={collapsed} label={t("humanizer")}>
+          <button
+            onClick={() => {
+              onViewChange("humanizer");
+              onMobileClose();
+            }}
+            className={cn(
+              "flex items-center rounded-lg transition-all duration-300",
+              activeView === "humanizer"
+                ? "bg-syntalys-gold/10 text-syntalys-gold"
+                : "text-muted-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground",
+              collapsed
+                ? "h-9 w-9 justify-center mx-auto p-0"
+                : "w-full px-3 py-2"
+            )}
+          >
+            <Sparkles className="h-[18px] w-[18px] flex-shrink-0" />
+            <span className={cn("text-sm font-medium", textTransition)}>
+              {t("humanizer")}
+            </span>
+          </button>
+        </CollapsedTooltip>
       </div>
 
       {/* ─── New Chat Button ─── */}
@@ -299,7 +341,7 @@ export function Sidebar({
                       key={thread.id}
                       className={cn(
                         "group relative flex items-center rounded-lg transition-colors",
-                        currentThread?.id === thread.id
+                        currentThread?.id === thread.id && activeView === "chat"
                           ? "bg-accent text-accent-foreground"
                           : "hover:bg-sidebar-hover text-sidebar-foreground"
                       )}
@@ -376,7 +418,7 @@ export function Sidebar({
                     onClick={() => handleSelectThread(thread.id)}
                     className={cn(
                       "flex h-9 w-9 items-center justify-center rounded-lg transition-colors mx-auto",
-                      currentThread?.id === thread.id
+                      currentThread?.id === thread.id && activeView === "chat"
                         ? "bg-accent text-accent-foreground"
                         : "text-muted-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground"
                     )}
@@ -390,36 +432,6 @@ export function Sidebar({
         )}
       </div>
 
-      {/* ─── Nav Links ─── */}
-      <div className="border-t border-border/50 py-2 px-2">
-        {navLinks.map((link) => (
-          <CollapsedTooltip
-            key={link.labelKey}
-            collapsed={collapsed}
-            label={t(link.labelKey)}
-          >
-            <button
-              onClick={() => {
-                link.onClick();
-                onMobileClose();
-              }}
-              className={cn(
-                "flex items-center rounded-lg transition-all duration-300",
-                "text-muted-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground",
-                collapsed
-                  ? "h-9 w-9 justify-center mx-auto mb-0.5"
-                  : "w-full px-3 py-2 mb-0"
-              )}
-            >
-              <link.icon className="h-4 w-4 flex-shrink-0" />
-              <span className={cn("text-sm", textTransition)}>
-                {t(link.labelKey)}
-              </span>
-            </button>
-          </CollapsedTooltip>
-        ))}
-      </div>
-
       {/* ─── Footer: User section ─── */}
       <div className="border-t border-border/50 p-2">
         {user ? (
@@ -430,7 +442,7 @@ export function Sidebar({
               collapsed ? "flex-col gap-0.5" : "gap-2"
             )}
           >
-            {/* Avatar - only in expanded */}
+            {/* Avatar */}
             <div
               className={cn(
                 "flex h-8 w-8 items-center justify-center rounded-full bg-syntalys-blue text-white text-xs font-semibold flex-shrink-0 transition-all duration-300",
@@ -439,9 +451,9 @@ export function Sidebar({
                   : "h-8 w-8 opacity-100"
               )}
             >
-              {user.email?.charAt(0).toUpperCase() || "U"}
+              {avatarInitial}
             </div>
-            {/* Email text */}
+            {/* Name / Email */}
             <div
               className={cn(
                 "min-w-0 overflow-hidden transition-all duration-300",
@@ -449,22 +461,26 @@ export function Sidebar({
               )}
             >
               <p className="truncate text-sm font-medium text-sidebar-foreground whitespace-nowrap">
-                {user.email}
+                {displayName}
               </p>
             </div>
-            {/* Settings */}
-            <CollapsedTooltip collapsed={collapsed} label={t("settings")}>
-              <button
-                onClick={onOpenSettings}
-                className={cn(
-                  "flex items-center justify-center rounded-lg text-muted-foreground hover:bg-sidebar-hover transition-all duration-300",
-                  collapsed ? "h-9 w-9 mx-auto" : "h-8 w-8"
-                )}
-                aria-label={t("settings")}
-              >
-                <Settings className="h-4 w-4" />
-              </button>
-            </CollapsedTooltip>
+            {/* Settings dropdown */}
+            <Dropdown
+              trigger={
+                <button
+                  className={cn(
+                    "flex items-center justify-center rounded-lg text-muted-foreground hover:bg-sidebar-hover transition-all duration-300",
+                    collapsed ? "h-9 w-9 mx-auto" : "h-8 w-8"
+                  )}
+                  aria-label={t("settings")}
+                >
+                  <Settings className="h-4 w-4" />
+                </button>
+              }
+              align="right"
+            >
+              {settingsDropdownItems}
+            </Dropdown>
             {/* Logout */}
             <CollapsedTooltip collapsed={collapsed} label={t("signOut")}>
               <button
@@ -509,26 +525,30 @@ export function Sidebar({
               </div>
             </CollapsedTooltip>
 
-            {/* Settings + Login row */}
+            {/* Settings dropdown + Login row */}
             <div
               className={cn(
                 "flex transition-all duration-300",
                 collapsed ? "flex-col items-center gap-0.5" : "gap-2"
               )}
             >
-              {/* Settings */}
-              <CollapsedTooltip collapsed={collapsed} label={t("settings")}>
-                <button
-                  onClick={onOpenSettings}
-                  className={cn(
-                    "flex items-center justify-center rounded-lg text-muted-foreground hover:bg-sidebar-hover transition-all duration-300",
-                    collapsed ? "h-9 w-9 mx-auto" : "h-9 w-9 flex-shrink-0"
-                  )}
-                  aria-label={t("settings")}
-                >
-                  <Settings className="h-4 w-4" />
-                </button>
-              </CollapsedTooltip>
+              {/* Settings dropdown */}
+              <Dropdown
+                trigger={
+                  <button
+                    className={cn(
+                      "flex items-center justify-center rounded-lg text-muted-foreground hover:bg-sidebar-hover transition-all duration-300",
+                      collapsed ? "h-9 w-9 mx-auto" : "h-9 w-9 flex-shrink-0"
+                    )}
+                    aria-label={t("settings")}
+                  >
+                    <Settings className="h-4 w-4" />
+                  </button>
+                }
+                align="right"
+              >
+                {settingsDropdownItems}
+              </Dropdown>
 
               {/* Login button */}
               <CollapsedTooltip collapsed={collapsed} label={t("signIn")}>
@@ -600,7 +620,7 @@ export function Sidebar({
         {sidebarInner}
       </aside>
 
-      {/* Delete confirmation — rendered AFTER sidebar so it stacks on top on mobile */}
+      {/* Delete confirmation */}
       <Modal
         open={deleteConfirmId !== null}
         onClose={() => setDeleteConfirmId(null)}

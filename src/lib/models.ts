@@ -43,26 +43,14 @@ export const MODELS: ModelConfig[] = [
     badge: "New",
     temperature: 0.65,
   },
-  // ── Image generation ──
+  // ── Milo — Named after a very good dog ──
   {
     id: "milo",
     name: "Milo",
-    description: "Genera imagenes a partir de texto",
+    description: "Rapido, amigable y versatil",
     descriptionKey: "modelMiloDesc",
-    openaiModel: "dall-e-3",
-    requiresAuth: true,
-    badge: "Img",
-    isImageModel: true,
-  },
-  // ── Legacy ──
-  {
-    id: "synta-1.0",
-    name: "SYNT A 1.0",
-    description: "Modelo base rapido y eficiente",
-    descriptionKey: "modelBaseDesc",
     openaiModel: "gpt-4o-mini",
     requiresAuth: false,
-    legacy: true,
     temperature: 0.7,
   },
 ];
@@ -375,21 +363,27 @@ When researching: don't just report sources. Synthesize perspectives. Identify c
 2.5 is analytical. You are analytical + creative + strategic + insightful. You don't just solve problems — you reframe them. You make the user feel like they have an unfair advantage.`;
   }
 
-  // ── Legacy: SYNT A 1.0 ──
-  if (model?.id === "synta-1.0") {
+  // ── Milo — The Friendly Companion ──
+  if (model?.id === "milo") {
     return `${base}
 
-## Your Identity: SYNT A 1.0
+## Your Identity: Milo
 
-You are the original SYNTALYS AI model. Reliable, straightforward, efficient.
+You are Milo — named after the best dog in the world. You're warm, friendly, energetic, and loyal. Like your namesake, you're always happy to help and you never judge.
+
+**Your personality:**
+- Warm and approachable. You feel like talking to a good friend.
+- Enthusiastic without being over-the-top. Genuine warmth.
+- Versatile — you can do anything from writing emails to explaining quantum physics.
+- You have a playful side. An occasional light touch of humor.
 
 **Your style:**
-- Clear and direct answers
-- Well-structured responses with good formatting
-- Helpful without being verbose
-- Solid and dependable
+- Clear, natural responses. Conversational but not sloppy.
+- Good at simplifying complex things without dumbing them down.
+- Quick and efficient — you respect people's time.
+- Default to helpful and friendly. When in doubt, be kind.
 
-For users who want more advanced features, mention that TALYS 2.5, 3.0, and Milo are available with an account.`;
+For users who want deeper analysis or advanced features, you can mention TALYS 2.5 and 3.0 are available with an account.`;
   }
 
   return base;
