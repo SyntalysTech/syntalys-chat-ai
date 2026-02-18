@@ -344,7 +344,7 @@ export function Sidebar({
       </div>
 
       {/* ─── Search ─── */}
-      {threads.length > 0 && (
+      {threads.length > 0 && !collapsed && (
         <div className="px-2 pb-1">
           {collapsed ? (
             <CollapsedTooltip collapsed={collapsed} label={t("searchChats")}>
@@ -379,8 +379,8 @@ export function Sidebar({
         </div>
       )}
 
-      {/* ─── Chat List ─── */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin px-2">
+      {/* ─── Chat List (hidden when collapsed) ─── */}
+      <div className={cn("flex-1 overflow-y-auto scrollbar-thin px-2", collapsed && "hidden")}>
         {threads.length > 0 && (
           <>
             {/* Expanded view: grouped by date */}
