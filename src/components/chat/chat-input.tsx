@@ -393,23 +393,22 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
             }}
           />
 
-          {/* Input row */}
-          <div className="flex items-end">
-            {/* + Action dropdown (hidden when image mode active to save space) */}
-            {!imageGenMode && (
-              <div className="flex-shrink-0 pb-1 pl-1">
-                <Dropdown
+          {/* Input row — unified p-1.5 padding, items-end for multiline */}
+          <div className="flex items-end gap-1 p-1.5">
+            {/* Left: + dropdown OR image-mode pill */}
+            {!imageGenMode ? (
+              <Dropdown
                 trigger={
                   <button
                     disabled={limitReached}
                     className={cn(
-                      "flex h-9 w-9 items-center justify-center rounded-xl sm:rounded-lg transition-colors",
+                      "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg transition-colors",
                       "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80",
                       limitReached && "opacity-40 cursor-not-allowed"
                     )}
                     aria-label="Actions"
                   >
-                    <Plus className="h-5 w-5 sm:h-4.5 sm:w-4.5" />
+                    <Plus className="h-5 w-5" />
                   </button>
                 }
                 align="left"
@@ -429,16 +428,12 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                   <Palette className="h-3.5 w-3.5" /> {t("generateImage" as TranslationKey)}
                 </DropdownItem>
               </Dropdown>
-              </div>
-            )}
-
-            {/* Image gen mode pill — inline in the input row */}
-            {imageGenMode && (
+            ) : (
               <button
                 onClick={() => setImageGenMode(false)}
-                className="flex-shrink-0 inline-flex items-center gap-1 rounded-full bg-syntalys-blue/10 text-syntalys-blue pl-2.5 pr-1.5 py-1 ml-1.5 mb-1.5 text-xs font-medium hover:bg-syntalys-blue/20 active:bg-syntalys-blue/25 transition-colors"
+                className="flex h-8 flex-shrink-0 items-center gap-1 rounded-lg bg-syntalys-blue/10 text-syntalys-blue px-2 text-xs font-medium hover:bg-syntalys-blue/20 active:bg-syntalys-blue/25 transition-colors"
               >
-                <Palette className="h-3.5 w-3.5 flex-shrink-0" />
+                <Palette className="h-4 w-4 flex-shrink-0" />
                 <X className="h-3.5 w-3.5 flex-shrink-0 opacity-60" />
               </button>
             )}
@@ -462,7 +457,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
               disabled={limitReached}
               rows={1}
               className={cn(
-                "flex-1 min-w-0 resize-none bg-transparent py-2.5 sm:py-2 text-[16px] sm:text-sm text-foreground placeholder:text-muted-foreground",
+                "flex-1 min-w-0 resize-none bg-transparent py-1.5 text-[16px] sm:text-sm text-foreground placeholder:text-muted-foreground",
                 "outline-none",
                 "max-h-[200px]"
               )}
@@ -470,13 +465,13 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
             />
 
             {/* Right-side buttons */}
-            <div className="flex-shrink-0 flex items-center pb-1 pr-1">
+            <div className="flex flex-shrink-0 items-center">
               {/* Voice input button */}
               {hasSpeech && !limitReached && (
                 <button
                   onClick={toggleListening}
                   className={cn(
-                    "flex h-9 w-9 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
+                    "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150",
                     isListening
                       ? "bg-red-500 text-white animate-pulse shadow-sm"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent active:bg-accent/80"
@@ -496,7 +491,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
                 onClick={handleSubmit}
                 disabled={!hasContent || isStreaming || limitReached || processingFiles}
                 className={cn(
-                  "flex h-9 w-9 items-center justify-center rounded-xl sm:rounded-lg transition-all duration-150",
+                  "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150",
                   hasContent && !isStreaming && !limitReached && !processingFiles
                     ? "bg-syntalys-blue text-white hover:bg-syntalys-blue-light active:scale-95 shadow-sm"
                     : "bg-muted text-muted-foreground cursor-not-allowed"
