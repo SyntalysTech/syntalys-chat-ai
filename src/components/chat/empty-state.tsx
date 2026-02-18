@@ -57,7 +57,7 @@ export function EmptyState({ isDark, onSuggestionClick }: EmptyStateProps) {
         {t("emptyStateSubtitle")}
       </p>
 
-      <div className="grid w-full max-w-2xl grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2.5">
+      <div className="grid w-full max-w-sm sm:max-w-2xl grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2.5">
         {suggestions.map((s) => {
           const title = t(s.titleKey) as string;
           const prompt = t(s.promptKey) as string;
