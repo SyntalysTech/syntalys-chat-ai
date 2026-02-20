@@ -32,6 +32,17 @@ import { DEFAULT_MODEL_ID, getModelByIdOrDefault } from "./models";
 import type { ChatThread, ChatMessage, StreamMessage, FileAttachment, UserMemory } from "./types";
 import { generateId, getAnonId } from "./utils";
 
+/* ── Timeout helper ── */
+function withTimeout<T>(promise: Promise<T> | PromiseLike<T>, ms: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new Error("DB_TIMEOUT")), ms);
+    }),
+  ]).finally(() => clearTimeout(timer));
+}
+
 /* ── Tree helper functions ── */
 
 /** Walk the message tree following active-branch choices, returning a linear visible path. */
@@ -149,6 +160,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const abortRef = useRef<AbortController | null>(null);
   const isStreamingRef = useRef(false);
   const streamStartedAtRef = useRef<number>(0);
+  const streamSessionRef = useRef<string>("");
   const allMessagesRef = useRef<ChatMessage[]>([]);
   allMessagesRef.current = allMessages;
   const memoriesRef = useRef<UserMemory[]>([]);
@@ -183,7 +195,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   // Auto-recover from stale streaming lock
   useEffect(() => {
-    const STALE_THRESHOLD = 45_000;
+    const STALE_THRESHOLD = 25_000;
 
     const recoverIfStale = () => {
       if (
@@ -194,7 +206,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         abortRef.current?.abort();
         abortRef.current = null;
         isStreamingRef.current = false;
+        streamSessionRef.current = "";
         setIsStreaming(false);
+        setIsImageGenerating(false);
       }
     };
 
@@ -371,6 +385,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           abortRef.current?.abort();
           abortRef.current = null;
           isStreamingRef.current = false;
+          streamSessionRef.current = "";
+          setIsStreaming(false);
+          setIsImageGenerating(false);
         } else {
           return false;
         }
@@ -383,9 +400,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       }
 
       const previousMessages = messagesRef.current;
+      const sessionId = generateId();
 
       isStreamingRef.current = true;
       streamStartedAtRef.current = Date.now();
+      streamSessionRef.current = sessionId;
       setIsStreaming(true);
       if (imageGen) setIsImageGenerating(true);
 
@@ -400,9 +419,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           if (isRegenerate) return false;
           isNewThread = true;
           try {
-            threadId = await createThread();
+            threadId = await withTimeout(createThread(), 10_000);
           } catch (e) {
-            console.error("[chat] Thread creation failed:", e);
+            console.error("[chat] Thread creation failed/timed out:", e);
             return false;
           }
         }
@@ -454,16 +473,20 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             attachments: attachments?.map(({ name, type, size }) => ({ name, type, size })),
           };
 
-          // Save user message
+          // Save user message (non-blocking to prevent UI hangs)
           if (user) {
-            const { error: insertErr } = await supabase.from("chat_messages").insert({
-              id: userMessage.id,
-              thread_id: threadId,
-              role: "user",
-              content,
-              parent_id: userParentId,
-            });
-            if (insertErr) console.error("[chat] User message insert failed:", insertErr.message);
+            withTimeout(
+              supabase.from("chat_messages").insert({
+                id: userMessage.id,
+                thread_id: threadId,
+                role: "user",
+                content,
+                parent_id: userParentId,
+              }),
+              10_000
+            ).then(({ error: insertErr }) => {
+              if (insertErr) console.error("[chat] User message insert failed:", insertErr.message);
+            }).catch((e) => console.error("[chat] User message insert error:", e));
           } else {
             addLocalMessage(threadId, userMessage);
           }
@@ -628,16 +651,21 @@ export function ChatProvider({ children }: { children: ReactNode }) {
               clearTimeout(requestTimeout);
             }
 
-            // Save assistant message
+            // Save assistant message (non-blocking to prevent UI hangs)
             if (user) {
-              await supabase.from("chat_messages").insert({
-                id: assistantMessage!.id,
-                thread_id: threadId,
-                role: "assistant",
-                content: fullContent,
-                model: effectiveModel,
-                parent_id: assistantMessage!.parent_id,
-              });
+              withTimeout(
+                supabase.from("chat_messages").insert({
+                  id: assistantMessage!.id,
+                  thread_id: threadId,
+                  role: "assistant",
+                  content: fullContent,
+                  model: effectiveModel,
+                  parent_id: assistantMessage!.parent_id,
+                }),
+                10_000
+              ).then(({ error: saveErr }) => {
+                if (saveErr) console.error("[chat] Assistant message save failed:", saveErr.message);
+              }).catch((e) => console.error("[chat] Assistant message save error:", e));
             } else {
               addLocalMessage(threadId, {
                 ...assistantMessage!,
@@ -737,10 +765,15 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           return false;
         }
       } finally {
-        isStreamingRef.current = false;
-        setIsStreaming(false);
-        setIsImageGenerating(false);
-        abortRef.current = null;
+        // Only clear lock if this session is still the active one
+        // (prevents a stale finally from clearing a newer session's lock)
+        if (streamSessionRef.current === sessionId) {
+          isStreamingRef.current = false;
+          streamSessionRef.current = "";
+          setIsStreaming(false);
+          setIsImageGenerating(false);
+          abortRef.current = null;
+        }
       }
       return true;
     },
@@ -786,6 +819,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       abortRef.current = null;
     }
     isStreamingRef.current = false;
+    streamSessionRef.current = "";
     setIsStreaming(false);
     setIsImageGenerating(false);
   }, []);

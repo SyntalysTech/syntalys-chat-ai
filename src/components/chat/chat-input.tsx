@@ -133,6 +133,7 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
   const [pwaKeyboardOpen, setPwaKeyboardOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const submittingRef = useRef(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
 
@@ -278,6 +279,9 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
 
   const handleSubmit = async () => {
     if ((!value.trim() && files.length === 0) || isStreaming || limitReached) return;
+    // Prevent double-submit (React state batching can delay isStreaming update)
+    if (submittingRef.current) return;
+    submittingRef.current = true;
 
     // Stop listening if active
     if (isListening) {
@@ -311,6 +315,8 @@ export function ChatInput({ draft, onDraftConsumed }: ChatInputProps) {
       setValue(savedValue);
       setFiles(savedFiles);
       setImageGenMode(wasImageGen);
+    } finally {
+      submittingRef.current = false;
     }
   };
 
