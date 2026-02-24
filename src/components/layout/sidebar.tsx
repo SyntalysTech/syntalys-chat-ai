@@ -30,6 +30,12 @@ import {
   Search,
   X,
   Palette,
+  FolderPlus,
+  Folder,
+  FolderOpen,
+  ChevronRight,
+  ArrowRightToLine,
+  ArrowLeftFromLine,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -91,6 +97,11 @@ export function Sidebar({
     deleteThread,
     renameThread,
     clearCurrentThread,
+    folders,
+    createFolder,
+    renameFolder,
+    deleteFolder,
+    moveThreadToFolder,
   } = useChat();
   const { t } = useI18n();
 
@@ -98,6 +109,10 @@ export function Sidebar({
   const [editTitle, setEditTitle] = useState("");
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
+  const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
+  const [editFolderName, setEditFolderName] = useState("");
+  const [deleteFolderConfirmId, setDeleteFolderConfirmId] = useState<string | null>(null);
 
   const handleNewChat = () => {
     clearCurrentThread();
@@ -122,6 +137,40 @@ export function Sidebar({
     }
     setEditingId(null);
     setEditTitle("");
+  };
+
+  const toggleFolder = (folderId: string) => {
+    setExpandedFolders((prev) => {
+      const next = new Set(prev);
+      if (next.has(folderId)) next.delete(folderId);
+      else next.add(folderId);
+      return next;
+    });
+  };
+
+  const handleNewFolder = async () => {
+    const id = await createFolder(t("newFolder"));
+    if (id) setExpandedFolders((prev) => new Set(prev).add(id));
+  };
+
+  const handleStartFolderRename = (id: string, name: string) => {
+    setEditingFolderId(id);
+    setEditFolderName(name);
+  };
+
+  const handleFinishFolderRename = async () => {
+    if (editingFolderId && editFolderName.trim()) {
+      await renameFolder(editingFolderId, editFolderName.trim());
+    }
+    setEditingFolderId(null);
+    setEditFolderName("");
+  };
+
+  const handleConfirmDeleteFolder = async () => {
+    if (deleteFolderConfirmId) {
+      await deleteFolder(deleteFolderConfirmId);
+      setDeleteFolderConfirmId(null);
+    }
   };
 
   const filteredThreads = searchQuery.trim()
@@ -151,6 +200,78 @@ export function Sidebar({
   const displayName = profile?.display_name || user?.email || "";
   const avatarInitial =
     (profile?.display_name?.charAt(0) || user?.email?.charAt(0) || "U").toUpperCase();
+
+  /* ── Reusable thread item renderer ── */
+  const renderThreadItem = (thread: typeof threads[number]) => (
+    <div
+      key={thread.id}
+      className={cn(
+        "group relative flex items-center rounded-lg transition-colors",
+        currentThread?.id === thread.id && activeView === "chat"
+          ? "bg-accent text-accent-foreground"
+          : "hover:bg-sidebar-hover text-sidebar-foreground"
+      )}
+    >
+      {editingId === thread.id ? (
+        <input
+          value={editTitle}
+          onChange={(e) => setEditTitle(e.target.value)}
+          onBlur={handleFinishRename}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleFinishRename();
+            if (e.key === "Escape") { setEditingId(null); setEditTitle(""); }
+          }}
+          className="flex-1 bg-transparent px-3 py-2 text-sm outline-none"
+          autoFocus
+        />
+      ) : (
+        <button
+          className="flex-1 truncate px-3 py-2 text-left text-sm"
+          onClick={() => handleSelectThread(thread.id)}
+        >
+          {truncate(thread.title, 30)}
+        </button>
+      )}
+      {editingId !== thread.id && (
+        <div className="absolute right-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+          <Dropdown
+            trigger={
+              <button className="rounded-lg p-1.5 hover:bg-accent active:bg-accent/80">
+                <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+              </button>
+            }
+            align="right"
+          >
+            <DropdownItem onClick={() => handleStartRename(thread.id, thread.title)}>
+              <Pencil className="h-3.5 w-3.5" /> {t("rename")}
+            </DropdownItem>
+            {/* Move to folder */}
+            {user && folders.length > 0 && (
+              <>
+                <div className="h-px bg-border/50 mx-1 my-0.5" />
+                {thread.folder_id ? (
+                  <DropdownItem onClick={() => moveThreadToFolder(thread.id, null)}>
+                    <ArrowLeftFromLine className="h-3.5 w-3.5" /> {t("removeFromFolder")}
+                  </DropdownItem>
+                ) : null}
+                {folders
+                  .filter((f) => f.id !== thread.folder_id)
+                  .map((f) => (
+                    <DropdownItem key={f.id} onClick={() => moveThreadToFolder(thread.id, f.id)}>
+                      <ArrowRightToLine className="h-3.5 w-3.5" /> {f.name}
+                    </DropdownItem>
+                  ))}
+              </>
+            )}
+            <div className="h-px bg-border/50 mx-1 my-0.5" />
+            <DropdownItem destructive onClick={() => setDeleteConfirmId(thread.id)}>
+              <Trash2 className="h-3.5 w-3.5" /> {t("delete")}
+            </DropdownItem>
+          </Dropdown>
+        </div>
+      )}
+    </div>
+  );
 
   /* User menu dropdown content (GPT-style) */
   const userMenuContent = (
@@ -383,7 +504,7 @@ export function Sidebar({
       <div className={cn("flex-1 overflow-y-auto scrollbar-thin px-2", collapsed && "hidden")}>
         {threads.length > 0 && (
           <>
-            {/* Expanded view: grouped by date */}
+            {/* Expanded view */}
             <div
               className={cn(
                 "transition-opacity duration-300",
@@ -395,74 +516,103 @@ export function Sidebar({
                   {t("noSearchResults")}
                 </p>
               )}
-              {grouped.map((group) => (
-                <div key={group.label} className="mb-3">
-                  <div className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    {t(group.label as TranslationKey) as string}
-                  </div>
-                  {group.chats.map((thread) => (
-                    <div
-                      key={thread.id}
-                      className={cn(
-                        "group relative flex items-center rounded-lg transition-colors",
-                        currentThread?.id === thread.id && activeView === "chat"
-                          ? "bg-accent text-accent-foreground"
-                          : "hover:bg-sidebar-hover text-sidebar-foreground"
-                      )}
-                    >
-                      {editingId === thread.id ? (
-                        <input
-                          value={editTitle}
-                          onChange={(e) => setEditTitle(e.target.value)}
-                          onBlur={handleFinishRename}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") handleFinishRename();
-                            if (e.key === "Escape") {
-                              setEditingId(null);
-                              setEditTitle("");
-                            }
-                          }}
-                          className="flex-1 bg-transparent px-3 py-2 text-sm outline-none"
-                          autoFocus
-                        />
-                      ) : (
-                        <button
-                          className="flex-1 truncate px-3 py-2 text-left text-sm"
-                          onClick={() => handleSelectThread(thread.id)}
-                        >
-                          {truncate(thread.title, 30)}
-                        </button>
-                      )}
-                      {editingId !== thread.id && (
-                        <div className="absolute right-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                          <Dropdown
-                            trigger={
-                              <button className="rounded-lg p-1.5 hover:bg-accent active:bg-accent/80">
-                                <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-                              </button>
-                            }
-                            align="right"
+
+              {/* ── Folders ── */}
+              {!searchQuery.trim() && folders.length > 0 && (
+                <div className="mb-2">
+                  {folders.map((folder) => {
+                    const folderThreads = filteredThreads.filter((t) => t.folder_id === folder.id);
+                    const isOpen = expandedFolders.has(folder.id);
+                    return (
+                      <div key={folder.id} className="mb-0.5">
+                        {/* Folder header */}
+                        <div className="group/folder relative flex items-center rounded-lg hover:bg-sidebar-hover transition-colors">
+                          <button
+                            className="flex flex-1 items-center gap-1.5 px-2 py-1.5 text-sm font-medium text-muted-foreground min-w-0"
+                            onClick={() => toggleFolder(folder.id)}
                           >
-                            <DropdownItem
-                              onClick={() =>
-                                handleStartRename(thread.id, thread.title)
-                              }
-                            >
-                              <Pencil className="h-3.5 w-3.5" /> {t("rename")}
-                            </DropdownItem>
-                            <DropdownItem
-                              destructive
-                              onClick={() => setDeleteConfirmId(thread.id)}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" /> {t("delete")}
-                            </DropdownItem>
-                          </Dropdown>
+                            <ChevronRight className={cn("h-3.5 w-3.5 flex-shrink-0 transition-transform duration-200", isOpen && "rotate-90")} />
+                            {isOpen ? <FolderOpen className="h-4 w-4 flex-shrink-0" /> : <Folder className="h-4 w-4 flex-shrink-0" />}
+                            {editingFolderId === folder.id ? (
+                              <input
+                                value={editFolderName}
+                                onChange={(e) => setEditFolderName(e.target.value)}
+                                onBlur={handleFinishFolderRename}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") handleFinishFolderRename();
+                                  if (e.key === "Escape") { setEditingFolderId(null); setEditFolderName(""); }
+                                }}
+                                className="flex-1 bg-transparent text-sm text-sidebar-foreground outline-none min-w-0"
+                                autoFocus
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            ) : (
+                              <span className="truncate">{folder.name}</span>
+                            )}
+                            <span className="text-xs text-muted-foreground/60 flex-shrink-0">{folderThreads.length}</span>
+                          </button>
+                          {editingFolderId !== folder.id && (
+                            <div className="absolute right-1 sm:opacity-0 sm:group-hover/folder:opacity-100 transition-opacity">
+                              <Dropdown
+                                trigger={
+                                  <button className="rounded-lg p-1 hover:bg-accent active:bg-accent/80">
+                                    <MoreHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
+                                  </button>
+                                }
+                                align="right"
+                              >
+                                <DropdownItem onClick={() => handleStartFolderRename(folder.id, folder.name)}>
+                                  <Pencil className="h-3.5 w-3.5" /> {t("renameFolder")}
+                                </DropdownItem>
+                                <DropdownItem destructive onClick={() => setDeleteFolderConfirmId(folder.id)}>
+                                  <Trash2 className="h-3.5 w-3.5" /> {t("deleteFolder")}
+                                </DropdownItem>
+                              </Dropdown>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  ))}
+                        {/* Folder threads */}
+                        {isOpen && (
+                          <div className="ml-3 border-l border-border/40 pl-1">
+                            {folderThreads.length === 0 ? (
+                              <p className="px-3 py-2 text-xs text-muted-foreground/50 italic">{t("folderEmpty" as TranslationKey)}</p>
+                            ) : (
+                              folderThreads.map((thread) => renderThreadItem(thread))
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
+              )}
+
+              {/* ── New Folder button (inline, subtle) ── */}
+              {!searchQuery.trim() && !collapsed && user && (
+                <button
+                  onClick={handleNewFolder}
+                  className="flex items-center gap-1.5 px-2 py-1 mb-2 rounded-lg text-xs text-muted-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground transition-colors w-full"
+                >
+                  <FolderPlus className="h-3.5 w-3.5" />
+                  {t("newFolder")}
+                </button>
+              )}
+
+              {/* ── Ungrouped threads (no folder), grouped by date ── */}
+              {(() => {
+                const ungrouped = searchQuery.trim()
+                  ? filteredThreads
+                  : filteredThreads.filter((t) => !t.folder_id);
+                const ungroupedGrouped = groupChatsByDate(ungrouped);
+                return ungroupedGrouped.map((group) => (
+                  <div key={group.label} className="mb-3">
+                    <div className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      {t(group.label as TranslationKey) as string}
+                    </div>
+                    {group.chats.map((thread) => renderThreadItem(thread))}
+                  </div>
+                ));
+              })()}
             </div>
 
             {/* Collapsed view: icon-only */}
@@ -637,7 +787,7 @@ export function Sidebar({
         {sidebarInner}
       </aside>
 
-      {/* Delete confirmation */}
+      {/* Delete thread confirmation */}
       <Modal
         open={deleteConfirmId !== null}
         onClose={() => setDeleteConfirmId(null)}
@@ -655,6 +805,31 @@ export function Sidebar({
           </button>
           <button
             onClick={handleConfirmDelete}
+            className="rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-white hover:bg-destructive/90 transition-colors"
+          >
+            {t("delete")}
+          </button>
+        </div>
+      </Modal>
+
+      {/* Delete folder confirmation */}
+      <Modal
+        open={deleteFolderConfirmId !== null}
+        onClose={() => setDeleteFolderConfirmId(null)}
+        title={t("deleteFolder")}
+      >
+        <p className="text-sm text-muted-foreground mb-6">
+          {t("deleteFolderConfirm")}
+        </p>
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={() => setDeleteFolderConfirmId(null)}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-card-foreground hover:bg-accent transition-colors"
+          >
+            {t("cancel")}
+          </button>
+          <button
+            onClick={handleConfirmDeleteFolder}
             className="rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-white hover:bg-destructive/90 transition-colors"
           >
             {t("delete")}

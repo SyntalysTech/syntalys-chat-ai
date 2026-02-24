@@ -29,7 +29,7 @@ import {
   buildMemoryContext,
 } from "./memory-store";
 import { DEFAULT_MODEL_ID, getModelByIdOrDefault } from "./models";
-import type { ChatThread, ChatMessage, StreamMessage, FileAttachment, UserMemory } from "./types";
+import type { ChatThread, ChatMessage, StreamMessage, FileAttachment, UserMemory, ChatFolder } from "./types";
 import { generateId, getAnonId } from "./utils";
 
 /* ── Timeout helper ── */
@@ -134,6 +134,12 @@ interface ChatContextType {
   getBranchInfo: (messageId: string) => { index: number; total: number } | null;
   navigateBranch: (messageId: string, direction: "prev" | "next") => void;
   editAndResend: (messageId: string, newContent: string, attachments?: FileAttachment[]) => Promise<boolean>;
+  // Folders
+  folders: ChatFolder[];
+  createFolder: (name: string) => Promise<string | null>;
+  renameFolder: (folderId: string, name: string) => Promise<void>;
+  deleteFolder: (folderId: string) => Promise<void>;
+  moveThreadToFolder: (threadId: string, folderId: string | null) => Promise<void>;
 }
 
 const ChatContext = createContext<ChatContextType | null>(null);
@@ -150,6 +156,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const supabase = useMemo(() => createClient(), []);
 
   const [threads, setThreads] = useState<ChatThread[]>([]);
+  const [folders, setFolders] = useState<ChatFolder[]>([]);
   const [currentThread, setCurrentThread] = useState<ChatThread | null>(null);
   const [allMessages, setAllMessages] = useState<ChatMessage[]>([]);
   const [activeBranches, setActiveBranches] = useState<Record<string, string>>({});
@@ -247,9 +254,57 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
   }, [user, supabase]);
 
+  const loadFolders = useCallback(async () => {
+    if (!user) { setFolders([]); return; }
+    try {
+      const { data } = await supabase
+        .from("chat_folders")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("position", { ascending: true });
+      if (data) setFolders(data as ChatFolder[]);
+    } catch { /* silent */ }
+  }, [user, supabase]);
+
   useEffect(() => {
     loadThreads();
-  }, [loadThreads]);
+    loadFolders();
+  }, [loadThreads, loadFolders]);
+
+  const createFolder = useCallback(async (name: string): Promise<string | null> => {
+    if (!user) return null;
+    const pos = folders.length;
+    const { data, error } = await supabase
+      .from("chat_folders")
+      .insert({ user_id: user.id, name, position: pos })
+      .select()
+      .single();
+    if (error || !data) return null;
+    const folder = data as ChatFolder;
+    setFolders((prev) => [...prev, folder]);
+    return folder.id;
+  }, [user, supabase, folders.length]);
+
+  const renameFolder = useCallback(async (folderId: string, name: string) => {
+    if (!user) return;
+    await supabase.from("chat_folders").update({ name }).eq("id", folderId);
+    setFolders((prev) => prev.map((f) => f.id === folderId ? { ...f, name } : f));
+  }, [user, supabase]);
+
+  const deleteFolder = useCallback(async (folderId: string) => {
+    if (!user) return;
+    // Un-assign all threads in this folder first (set folder_id = null)
+    await supabase.from("chat_threads").update({ folder_id: null }).eq("folder_id", folderId);
+    setThreads((prev) => prev.map((t) => t.folder_id === folderId ? { ...t, folder_id: null } : t));
+    await supabase.from("chat_folders").delete().eq("id", folderId);
+    setFolders((prev) => prev.filter((f) => f.id !== folderId));
+  }, [user, supabase]);
+
+  const moveThreadToFolder = useCallback(async (threadId: string, folderId: string | null) => {
+    if (!user) return;
+    await supabase.from("chat_threads").update({ folder_id: folderId }).eq("id", threadId);
+    setThreads((prev) => prev.map((t) => t.id === threadId ? { ...t, folder_id: folderId } : t));
+  }, [user, supabase]);
 
   const createThread = useCallback(async (): Promise<string> => {
     const model = getModelByIdOrDefault(selectedModel);
@@ -278,6 +333,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         anon_id: getAnonId(),
         title: t("newConversation") as string,
         model: model.id,
+        folder_id: null,
         created_at: now,
         updated_at: now,
       };
@@ -912,6 +968,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         getBranchInfo,
         navigateBranch,
         editAndResend,
+        folders,
+        createFolder,
+        renameFolder,
+        deleteFolder,
+        moveThreadToFolder,
       }}
     >
       {children}

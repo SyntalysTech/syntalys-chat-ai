@@ -1,9 +1,19 @@
+export interface ChatFolder {
+  id: string;
+  user_id: string;
+  name: string;
+  color: string | null;
+  position: number;
+  created_at: string;
+}
+
 export interface ChatThread {
   id: string;
   user_id: string | null;
   anon_id: string | null;
   title: string;
   model: string;
+  folder_id: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -1059,6 +1059,53 @@ const translations = {
     es: "¿Estás seguro? Todas tus conversaciones se eliminarán permanentemente.",
     en: "Are you sure? All your conversations will be permanently deleted.",
   },
+  // ── Folders ──
+  newFolder: {
+    fr: "Nouveau dossier",
+    es: "Nueva carpeta",
+    en: "New folder",
+  },
+  folderName: {
+    fr: "Nom du dossier",
+    es: "Nombre de la carpeta",
+    en: "Folder name",
+  },
+  renameFolder: {
+    fr: "Renommer le dossier",
+    es: "Renombrar carpeta",
+    en: "Rename folder",
+  },
+  deleteFolder: {
+    fr: "Supprimer le dossier",
+    es: "Eliminar carpeta",
+    en: "Delete folder",
+  },
+  deleteFolderConfirm: {
+    fr: "Les conversations du dossier seront déplacées hors du dossier, pas supprimées.",
+    es: "Las conversaciones de la carpeta se moverán fuera, no se eliminarán.",
+    en: "Conversations in this folder will be moved out, not deleted.",
+  },
+  moveToFolder: {
+    fr: "Déplacer vers un dossier",
+    es: "Mover a carpeta",
+    en: "Move to folder",
+  },
+  removeFromFolder: {
+    fr: "Retirer du dossier",
+    es: "Quitar de carpeta",
+    en: "Remove from folder",
+  },
+  noFolders: {
+    fr: "Aucun dossier",
+    es: "Sin carpetas",
+    en: "No folders",
+  },
+  folderEmpty: {
+    fr: "Aucune conversation",
+    es: "Sin conversaciones",
+    en: "No conversations",
+  },
+
   deleteAccount: {
     fr: "Supprimer le compte",
     es: "Eliminar cuenta",
