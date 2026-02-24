@@ -42,13 +42,17 @@ export async function POST(req: NextRequest) {
 
     const ext = fileName.toLowerCase().split(".").pop() || "";
 
-    // PDF (pdf-parse v2 class-based API)
+    // PDF (pdfjs-dist – pure JS, no native deps, works on Vercel)
     if (mimeType === "application/pdf" || ext === "pdf") {
-      const { PDFParse } = await import("pdf-parse");
-      const parser = new PDFParse({ data: buffer });
-      const result = await parser.getText();
-      await parser.destroy();
-      text = result.text;
+      const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
+      const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
+      const pages: string[] = [];
+      for (let i = 1; i <= doc.numPages; i++) {
+        const page = await doc.getPage(i);
+        const content = await page.getTextContent();
+        pages.push(content.items.map((item: any) => item.str).join(" "));
+      }
+      text = pages.join("\n\n");
     }
     // DOCX
     else if (
