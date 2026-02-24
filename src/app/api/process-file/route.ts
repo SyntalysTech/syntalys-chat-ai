@@ -5,22 +5,42 @@ const MAX_TEXT_LENGTH = 30000;
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
-    const file = formData.get("file") as File | null;
+    let buffer: Buffer;
+    let fileName: string;
+    let mimeType: string;
 
-    if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    const contentType = req.headers.get("content-type") || "";
+
+    if (contentType.includes("multipart/form-data")) {
+      // Web: FormData upload
+      const formData = await req.formData();
+      const file = formData.get("file") as File | null;
+      if (!file) {
+        return NextResponse.json({ error: "No file provided" }, { status: 400 });
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        return NextResponse.json({ error: "File too large (max 20MB)" }, { status: 400 });
+      }
+      buffer = Buffer.from(await file.arrayBuffer());
+      fileName = file.name;
+      mimeType = file.type;
+    } else {
+      // Mobile: JSON with base64-encoded file data
+      const body = await req.json();
+      if (!body.fileData) {
+        return NextResponse.json({ error: "No file data provided" }, { status: 400 });
+      }
+      buffer = Buffer.from(body.fileData, "base64");
+      if (buffer.length > MAX_FILE_SIZE) {
+        return NextResponse.json({ error: "File too large (max 20MB)" }, { status: 400 });
+      }
+      fileName = body.fileName || "file";
+      mimeType = body.fileType || "application/octet-stream";
     }
 
-    if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: "File too large (max 20MB)" }, { status: 400 });
-    }
-
-    const buffer = Buffer.from(await file.arrayBuffer());
     let text = "";
 
-    const ext = file.name.toLowerCase().split(".").pop() || "";
-    const mimeType = file.type;
+    const ext = fileName.toLowerCase().split(".").pop() || "";
 
     // PDF (pdf-parse v2 class-based API)
     if (mimeType === "application/pdf" || ext === "pdf") {
